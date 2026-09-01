@@ -2417,7 +2417,7 @@ le plan du chantier — `docs/superpowers/plans/2026-07-24-reorganisation-depot-
    d'accueil plein écran (`#accueil`) qui **intercepte les clics** tant qu'il
    n'a pas été cliqué lui-même. Un script qui vise les portes directement
    échoue sans rien avoir prouvé.
-3. **Livraison** — push sur `main`, puis `https://rubischtgadol.github.io/flashcards-hebreu/cards.json`
+3. **Livraison** — push sur `main`, puis `https://rubischthagadol.github.io/flashcards-hebreu/cards.json`
    doit répondre 200 après le redéploiement Pages (une à deux minutes).
    ⚠️ Sur l'iPhone, **deux lancements** pour voir la nouvelle version : le
    service worker sert d'abord le cache et rafraîchit derrière

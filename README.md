@@ -8,10 +8,10 @@ Tout s'ouvre dans un navigateur, sans installation ni téléchargement.
 
 | | |
 | --- | --- |
-| Portail | <https://rubischtgadol.github.io/flashcards-hebreu/> |
-| Flashcards | <https://rubischtgadol.github.io/flashcards-hebreu/app.html> |
-| Carnet | <https://rubischtgadol.github.io/flashcards-hebreu/vocabulaire_hebreu.html> |
-| Lexique PDF | <https://rubischtgadol.github.io/flashcards-hebreu/lexique.pdf> |
+| Portail | <https://rubischthagadol.github.io/flashcards-hebreu/> |
+| Flashcards | <https://rubischthagadol.github.io/flashcards-hebreu/app.html> |
+| Carnet | <https://rubischthagadol.github.io/flashcards-hebreu/vocabulaire_hebreu.html> |
+| Lexique PDF | <https://rubischthagadol.github.io/flashcards-hebreu/lexique.pdf> |
 
 Ces adresses ne changent pas. Chaque page mène aux autres.
 

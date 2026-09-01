@@ -4,7 +4,7 @@
 
 ## Vue d'ensemble
 
-Un toolkit en français pour apprendre l'hébreu moderne, déployé en **fichiers statiques** sur GitHub Pages (`https://rubischtgadol.github.io/flashcards-hebreu/`).
+Un toolkit en français pour apprendre l'hébreu moderne, déployé en **fichiers statiques** sur GitHub Pages (`https://rubischthagadol.github.io/flashcards-hebreu/`).
 
 **Aucune dépendance, aucun test, aucun gestionnaire de paquets.** Chaque fichier déployé est un document HTML autonome (CSS et JS inline, vanilla). Le seul outillage est `tools/build.js`, `tools/verifie_exemples.js`, `tools/ajoute_mots.js`, `tools/cherche_mots.js`, `tools/mesure_translitteration.js`, `tools/controle_tr.js` et `tools/propose_ktiv_male.js`, sept scripts Node zéro-dépendance, utilisés uniquement en développement et jamais déployés. Ils vivent dans `tools/` et **se lancent depuis la racine du dépôt** : chacun vise `ROOT = path.join(__dirname, '..')`, exporté par `build.js` pour que les cinq autres ne le recalculent jamais.
 
