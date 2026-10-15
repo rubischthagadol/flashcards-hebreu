@@ -8,12 +8,12 @@
  * vocabulaire apparaît au lancement suivant). Les polices Google sont servies
  * cache-first (immuables).
  *
- * ⚠️ VERSION NE S'INCRÉMENTE PLUS À LA MAIN (chantier 4, Task 19). La ligne est
+ * ⚠️ VERSION NE S'INCRÉMENTE PAS À LA MAIN. La ligne est
  * ESTAMPILLÉE par `node tools/build.js` : un hash des cinq artefacts +
  * manifest.webmanifest. Tout build qui change un fichier servi change la version ;
  * un build qui ne change rien la laisse stable. `node tools/build.js --check`
- * recalcule le hash et échoue si la ligne ne correspond pas — c'est ce qui a permis
- * de retirer le contrôle n°3 du hook pre-commit. Éditer la valeur à la main ne sert
+ * recalcule le hash et échoue si la ligne ne correspond pas — le hook pre-commit
+ * s'en remet à lui. Éditer la valeur à la main ne sert
  * donc à rien : le build la réécrit, et --check refuse la version éditée.
  *
  * Deux corollaires, assumés :
@@ -24,16 +24,10 @@
  *    de retard.
  *  - pour forcer une VRAIE purge de cache (changement de stratégie qui rendrait les
  *    entrées gardées nuisibles), changer le préfixe de `CACHE` ci-dessous à la main —
- *    c'est désormais le seul geste manuel qui reste sur ce fichier.
+ *    c'est le seul geste manuel qui reste sur ce fichier.
  */
-// Le journal des bumps manuels s'arrête à v35 : il justifiait, entrée par entrée, pourquoi
-// tel changement méritait d'atteindre le téléphone au 1ᵉʳ lancement plutôt qu'au 2ᵈ. Ce
-// raisonnement est devenu structurel au Task 19 — tout changement d'un fichier servi
-// déplace le hash, donc la question ne se pose plus une fois par lot. Les entrées v9 à v35
-// restent dans l'historique git de ce fichier (`git log -p -- sw.js`) ; les garder ici
-// afficherait des numéros de version qui n'existent plus, dans un fichier servi.
 /* ligne estampillée par tools/build.js — ne pas éditer la valeur (cf. en-tête) */
-const VERSION = 'v-92b3a2d6';
+const VERSION = 'v-95569c1c';
 const CACHE = 'flashcards-hebreu-' + VERSION;
 
 const ASSETS = [
@@ -70,7 +64,7 @@ self.addEventListener('fetch', (e) => {
   if (url.origin !== location.origin && !isFont) return;
 
   // Seules les navigations vers la racine (/ ou /index.html) sont normalisées
-  // sur la coquille './' — c'est désormais le PORTAIL. Les autres pages
+  // sur la coquille './' — c'est le PORTAIL. Les autres pages
   // (app.html, vocabulaire_hebreu.html) doivent être servies telles quelles —
   // les rabattre sur './' casserait l'appli et le carnet.
   const isRootNav = req.mode === 'navigate' &&

@@ -36,10 +36,8 @@
      ⚠️ 1rem vaut 16px, PAS 22px. Le `font-size:22px` de `body` ne déplace pas
      la racine des rem — il faudrait le poser sur `html` — si bien que toute
      règle déclarant une taille en rem retombe sur l'échelle par défaut du
-     navigateur. Mesuré en WebKit le 2026-07-19 ; le commentaire qui affirmait
-     l'inverse était faux, et c'est lui qui expliquait la dérive : les 24 valeurs
-     distinctes de ce fichier étaient des retouches successives contre un socle
-     mal compris. Les px en regard sont donc les tailles réellement rendues.
+     navigateur. Mesuré en WebKit le 2026-07-19. Les px en regard sont donc les
+     tailles réellement rendues.
      Ne pas « corriger » en déplaçant le 22px sur html : cela multiplierait
      chaque rem par 1,375 ici comme dans app.html, dont les tailles sont réglées
      sur ce qu'elles rendent vraiment.
@@ -73,11 +71,9 @@
        ⚠️ Ne déplace PAS la racine des rem : posé sur body, il ne vaut que par
        héritage — voir la rampe ci-dessus. */
     font-size:22px;
-    /* Interlignage du corps : le carnet n'en avait aucun et héritait de `normal`
-       (~1,2), trop serré pour du nikoud, dont les points se composent SOUS la
-       ligne de base. 1.55 est la valeur que .steps li et .tip p avaient déjà
-       choisie chacun de leur côté — l'intention existait, elle n'avait jamais
-       été portée à la racine. */
+    /* Interlignage du corps : `normal` (~1,2) serait trop serré pour du nikoud,
+       dont les points se composent SOUS la ligne de base. 1.55 est la valeur de
+       .steps li et .tip p, portée à la racine. */
     line-height:1.55;
     padding:28px 18px 60px;
   }
@@ -114,9 +110,7 @@
   h2 .count{
     /* Assistant, pas mono : c'est le nom français de la section (la voix de
        l'outil), pas une translittération ni un compteur — le mono bas-de-casse
-       était un 3e emploi hors des deux voix inventoriées (critique du 21/07).
-       ⚠️ Le TEXTE de ce span est la clé d'extraction des deux parseurs : la
-       voix peut changer, le libellé jamais. */
+       serait un 3e emploi hors des deux voix inventoriées. */
     font-family:'Assistant','Arial Hebrew','Helvetica Neue',Arial,sans-serif;
     font-size:var(--pas-petite);
     color:var(--ink);
@@ -139,8 +133,8 @@
     border:1px solid var(--line);
     /* RTL comme la table qu'il porte : l'origine du défilement passe à droite,
        et une table plus large que l'écran s'ouvre sur sa PREMIÈRE colonne (le
-       mot-vedette) au lieu de sa fin — en LTR, les 31 tables montraient le
-       pluriel d'un mot hors-champ (P0 de la critique du 21/07). */
+       mot-vedette) au lieu de sa fin — en LTR, une table large montrerait le
+       pluriel d'un mot hors-champ. */
     direction:rtl;
   }
   table{
@@ -185,10 +179,10 @@
     font-size:var(--pas-vedette);
   }
   /* --- L'hébreu inséré dans la prose française -------------------------------
-     La passe a11y du 2026-07-19 a posé `lang="he"` sur 100 % des nœuds hébreux,
-     mais 204 d'entre eux n'ont AUCUNE classe : ce sont les suites hébraïques
+     Tous les nœuds hébreux portent `lang="he"`, mais 204 d'entre eux (compte du
+     2026-07-19) n'ont AUCUNE classe : ce sont les suites hébraïques
      enveloppées au milieu d'un paragraphe français (notes, gloses, en-têtes de
-     conjugaison). Faute de classe, ils héritaient d'Assistant — mesuré à 15,2px
+     conjugaison). Faute de classe, ils hériteraient d'Assistant — mesuré à 15,2px
      en sans-serif, soit exactement la taille du français qui les entoure. Deux
      règles de charte tombaient d'un coup : la règle des trois voix (« Frank Ruhl
      pour TOUT l'hébreu ») et la règle de la vedette (« l'hébreu est toujours
@@ -240,7 +234,7 @@
     margin-top:3px;
   }
 
-  /* --- Rangs en cartes sous 640px (critique du 21/07, P0 + P2) ---------------
+  /* --- Rangs en cartes sous 640px ---------------------------------------------
      Les tables de VOCABULAIRE — reconnues à leurs exemples embarqués — quittent
      la grille défilante : chaque rang devient une carte pleine largeur, le
      mot-vedette d'abord, puis les formes courtes étiquetées comme le thead
@@ -292,7 +286,7 @@
     /* Les formes courtes : sur UNE ligne (order 4), chacune sous son étiquette mono
        (voix Label : c'est une étiquette d'inflexion, DESIGN.md §3). Si la ligne
        déborde la carte, elle passe à la suivante — jamais un défilement horizontal
-       enfermé dans le défilement vertical (le pire geste tactile, critique 21/07). */
+       enfermé dans le défilement vertical (le pire geste tactile). */
     .table-wrap:has(ul.exemples) td:not(:first-child){
       order:4; flex:0 0 auto; display:block;
       margin:10px 0 0; padding:0; border-bottom:none;
@@ -418,16 +412,15 @@
     border:1px dashed var(--line);
     border-radius:10px;
   }
-  /* Encadré « attention » — composant qui s'ignorait : quatre duplications du
-     même style inline avant le 2026-07-19. Filet plein, parce qu'il annonce
+  /* Encadré « attention » — un composant, pas un style inline à recopier.
+     Filet plein, parce qu'il annonce
      l'inverse de `.empty` : quelque chose d'important à lire. */
   .attention{
     border:1px solid var(--line); border-radius:10px;
     padding:10px 12px; color:var(--ink);
   }
   /* Titre de sous-section de grammaire (« שֶׁל — possessif », « לְ — datif »…).
-     Second composant qui s'ignorait : 5 duplications d'un même style inline,
-     que l'audit du 2026-07-19 n'avait pas relevées. */
+     Un composant aussi, pas un style inline à recopier. */
   .gram-title{
     color:var(--gold); font-size:var(--pas-glose); margin:26px 0 6px;
     font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif;
@@ -439,7 +432,7 @@
     margin:0 -18px 8px; padding:14px 18px;
     /* Opaque, délibérément : le voile translucide + blur était du glassmorphism
        (anti-référence SaaS de PRODUCT.md) et laissait le texte transparaître
-       sous la barre au défilement. Tranché à la critique du 21/07. */
+       sous la barre au défilement. */
     background:var(--bg);
     border-bottom:1px solid var(--line);
   }
@@ -474,8 +467,8 @@
     content:counter(step); position:absolute; left:0; top:0;
     width:26px; height:26px; border-radius:50%;
     /* Chiffre or sur couche, plus de disque or plein : un numéro d'étape n'est
-       ni action, ni sélection, ni identité (règle de la lampe — dernières
-       surfaces dorées au repos du carnet, critique du 21/07). Même idiome que
+       ni action, ni sélection, ni identité (règle de la lampe : pas de surface
+       dorée au repos). Même idiome que
        .part-num : l'or ne subsiste que sur le chiffre. */
     background:var(--bg2); border:1px solid var(--line); color:var(--gold);
     font-family:'JetBrains Mono','Courier New',monospace;
@@ -490,7 +483,7 @@
   .example .ex-fr{ font-size:var(--pas-corps); color:var(--ink); margin-top:4px; }
   .example .ex-gloss{ font-size:var(--pas-petite); color:var(--ink-dim); margin-top:6px; font-style:italic; }
   .ex-title{ color:var(--gold); font-size:var(--pas-petite); font-weight:600; margin:16px 0 4px; }
-  /* Encadré astuce / point-clé — même arbitrage que `.part` le 2026-07-19 :
+  /* Encadré astuce / point-clé — même arbitrage que `.part` :
      le test de la lampe demande « action, sélection ou identité ? ». Un encadré
      pédagogique n'est aucun des trois, donc pas d'or ambiant. L'or ne subsiste
      que sur le texte du titre (.tip-title). */
@@ -552,7 +545,7 @@
     *,*::before,*::after{ transition:none !important; animation:none !important; }
   }
 
-  /* Au doigt : mêmes cibles de 44px que l'app (le carnet n'avait aucun @media). */
+  /* Au doigt : mêmes cibles de 44px que l'app. */
   @media (pointer:coarse){
     .toc-links a{ min-height:44px; padding:9px 15px; align-items:center; }
     .app-link{ display:inline-flex; align-items:center; min-height:44px; }
@@ -591,12 +584,11 @@
      la typographie de ce document ; celui-ci décrit sa mise en page. Ne pas
      les fusionner.
 
-     Le carnet n'avait aucune borne de largeur — une seule `max-width` dans tout
-     le fichier, sur le champ de recherche. Mesuré en desktop 1280 : la prose
-     grammaticale courait sur 158 caractères par ligne (confortable : 45–75), et
-     les rangées de table laissaient ~1000px de vide entre l'hébreu calé à droite
-     et le français calé à gauche. Le mobile était épargné — le viewport bornait
-     tout seul —, ce qui explique que le défaut ait survécu à tous les contrôles
+     Sans borne de largeur, mesuré en desktop 1280 : la prose
+     grammaticale court sur 158 caractères par ligne (confortable : 45–75), et
+     les rangées de table laissent ~1000px de vide entre l'hébreu calé à droite
+     et le français calé à gauche. Le mobile est épargné — le viewport borne
+     tout seul —, ce qui explique que le défaut passe tous les contrôles
      visuels du projet, qui se font en iPhone 16 Pro émulé.
 
      Deux largeurs, pas une : la prose se lit, les tables se balaient.
@@ -653,12 +645,11 @@
      ⚠️ La spécificité n'est pas décorative ici. `main > *:not(.table-wrap)`
      pèse 0,1,1 et fait donc **plancher** : tout sélecteur d'élément nu qui
      voudrait le contredire (`main > h2`, `main > ol`…) est ignoré en silence.
-     C'est arrivé le 2026-07-20 — une règle morte livrée avec un commentaire
-     affirmant qu'elle agissait. Ce `:has()` pèse 0,2,1 et passe par sa
+     Une règle morte a déjà été livrée ainsi, avec un commentaire affirmant
+     qu'elle agissait. Ce `:has()` pèse 0,2,1 et passe par sa
      spécificité propre, sans dépendre de l'ordre d'écriture.
 
-     Sans support de `:has()`, les sous-thèmes restent à la colonne : c'est leur
-     état d'avant ce bloc, aucune casse. WebKit le porte depuis 15.4. */
+     Sans support de `:has()`, les sous-thèmes restent à la colonne : aucune casse. WebKit le porte depuis 15.4. */
   main > .subtheme:has(+ .table-wrap){ max-width:var(--colonne-large); }
   header, .toc{ max-width:var(--colonne-large); margin-inline:auto; }
   /* La barre collante reste pleine largeur (c'est un bandeau) ; seul son
@@ -18409,9 +18400,9 @@ function cleRecherche(s){
     var countEl = document.getElementById('voc-search-count');
     if(!input) return;
 
-    // L'état « rien ici », instancié pour de vrai : la copie du compteur
-    // promettait un vide que l'écran ne montrait jamais — `.empty` était du
-    // CSS mort depuis sa création (critique du 21/07, P1).
+    // L'état « rien ici », instancié pour de vrai : sans lui, la copie du compteur
+    // promettrait un vide que l'écran ne montrerait jamais — `.empty` serait du
+    // CSS mort.
     var emptyEl = document.createElement('p');
     emptyEl.className = 'empty';
     emptyEl.hidden = true;
@@ -18441,7 +18432,7 @@ function cleRecherche(s){
       var parts = [];
       // La prononciation d'une vedette n'est pas toujours écrite dans data/ :
       // on la calcule, sinon chercher un mot par son son ne rend rien alors
-      // que l'écran l'affiche (défaut du 2026-07-29).
+      // que l'écran l'affiche.
       el.querySelectorAll('.he, .fr, .tr').forEach(function(s){
         parts.push(s.textContent);
         if(s.classList.contains('he')) parts.push(he2tr(s.textContent));
@@ -18556,8 +18547,8 @@ function cleRecherche(s){
           if(b.matches && b.matches('.example') && !b.classList.contains('search-hidden')){ visible = true; return; }
           if(b.matches && b.matches('ul.word-list')){
             // :scope — seuls les <li> de PREMIER niveau comptent : les <li>
-            // d'exemples d'une entrée masquée gardaient toutes les sections
-            // visibles sous « 0 résultat » (critique du 21/07, P1).
+            // d'exemples d'une entrée masquée garderaient toutes les sections
+            // visibles sous « 0 résultat ».
             if(b.querySelector(':scope > li:not(.search-hidden)')){ visible = true; }
             return;
           }

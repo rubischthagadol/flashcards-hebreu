@@ -375,7 +375,6 @@
   @media (max-width:480px){ .big-he.phrase{ font-size:1.9rem; } .big-fr.phrase{ font-size:1.35rem; } }
   .translit{ font-family:'JetBrains Mono','Courier New',monospace; font-size:1.1rem; color:var(--ink-dim); margin-top:12px; direction:ltr; }
   .sub-he{ font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:1.9rem; direction:rtl; margin-top:6px; }
-  .sub-fr{ font-size:1.15rem; color:var(--ink); margin-top:10px; }
   .cursive-line{ font-family:'Playpen Sans Hebrew','Segoe Script','Comic Sans MS',cursive; font-weight:300; font-size:1.7rem; color:var(--gold-soft); direction:rtl; margin-top:8px; }
   .note-line{ font-size:1rem; color:var(--ink-dim); margin-top:14px; max-width:90%; font-style:italic; }
   /* --- Exemples en situation : pli « Voir un exemple » (verso, feedback, QCM) --- */
@@ -510,7 +509,6 @@
     .big-fr.phrase{ font-size:1.9rem; }
     .translit{ font-size:1.4rem; }
     .sub-he{ font-size:2.5rem; }
-    .sub-fr{ font-size:1.35rem; }
     .cursive-line{ font-size:2.2rem; }
     .note-line{ font-size:1.15rem; }
 
@@ -892,10 +890,10 @@
       </div>
       <div class="audio-note" id="audio-note"></div>
 
-      <!-- Dossier « lag iPhone » (TODO.md, 20/07/2026) : la seule mesure qui fasse
+      <!-- Piège n°14 d'AGENTS.md : la seule mesure qui fasse
            foi est prise sur l'appareil réel, et il n'a pas d'inspecteur — les
            millisecondes s'affichent donc ici, comme le nom de la voix ci-dessus. -->
-      <h2 id="h-perf">Diagnostic de latence</h2>
+      <h2>Diagnostic de latence</h2>
       <div class="seg-note" id="perf-boot"></div>
       <div class="seg-note" id="perf-note">Touche une chip ou « Commencer » : les temps du dernier geste s'affichent ici.</div>
 
@@ -957,7 +955,7 @@
       <button class="btn-good hide" id="btn-good">Je savais</button>
     </div>
     <!-- Un pouce qui glisse ne doit pas polluer les boîtes : la dernière réponse reste annulable. -->
-    <div class="fix-row" id="undo-row"><button class="fix-btn hide" type="button" id="undo-card">‹ Annuler la dernière réponse</button></div>
+    <div class="fix-row"><button class="fix-btn hide" type="button" id="undo-card">‹ Annuler la dernière réponse</button></div>
     <!-- Verso annoncé aux lecteurs d'écran en mode Cartes (symétrique de #quiz-live). -->
     <div class="visually-hidden" id="flip-live" aria-live="polite"></div>
 
@@ -1266,7 +1264,7 @@ function savePrefs(){
 // Une session en cours survit à un rechargement ou à une éviction de l'onglet
 // par iOS. Restauré au boot par sessRestore(), appelé depuis buildChips() → les
 // deux chemins (en ligne et autonome). Les cartes sont référencées par leur id
-// (cat|he_plain) ; si le vocabulaire a changé sous la session, on l'abandonne.
+// (cat|he) ; si le vocabulaire a changé sous la session, on l'abandonne.
 const SESS_KEY='sess_v1';
 let bootResumed=false;
 function sessSave(){
@@ -1313,7 +1311,7 @@ const SRS_KEY='srs_v1';
 // d'homographes consonantiques (לְסַפֵּר raconter / לִסְפֹּר compter,
 // לְלַמֵּד enseigner / לִלְמֹד étudier, שלומך m. / f.) — deux cartes partageaient
 // alors la même boîte de Leitner et une session restaurée substituait l'une à
-// l'autre. `cat|he` est vérifié unique sur les 713 cartes (0 doublon).
+// l'autre. `cat|he` est unique dans le corpus actuel (0 doublon).
 function cardId(c){ return c.cat+'|'+c.he; }
 function srsLoad(){ try{ return JSON.parse(localStorage.getItem(SRS_KEY))||{}; }catch(e){ return {}; } }
 function srsSave(){ try{ localStorage.setItem(SRS_KEY, JSON.stringify(SRS)); }catch(e){} }
@@ -1461,10 +1459,10 @@ function themeOk(c){ return state.themes.size===0 || (c.theme && state.themes.ha
 const SPK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19.5 5a9 9 0 0 1 0 14"/></svg>';
 // L'index de recherche, bâti UNE fois et gardé. Deux raisons de ne pas le
 // refaire à chaque frappe : he2tr est un transducteur, et il doit tourner sur
-// les cartes issues des tables — qui portent `tr:''` (l'immense majorité). Ce
-// manque était le défaut signalé le 2026-07-29 : la botte de foin fouillait
-// `c.tr` brut, si bien que la translittération AFFICHÉE juste à côté dans le
-// résultat (`c.tr||he2tr(c.he)`, plus bas) était elle-même introuvable.
+// les cartes issues des tables — qui portent `tr:''` (l'immense majorité). Une
+// botte de foin qui fouillerait `c.tr` brut rendrait la translittération AFFICHÉE
+// juste à côté dans le résultat (`c.tr||he2tr(c.he)`, plus bas) elle-même
+// introuvable.
 // ⚠️ L'index est apparié à CARDS par position : on garde la référence du
 // tableau et l'on rebâtit s'il a changé, sinon un rechargement des cartes
 // laisserait un index périmé qui désignerait les mauvais mots — en silence.
@@ -1534,8 +1532,8 @@ function runSearch(){
       + '<span class="search-ext-fl" aria-hidden="true">↗</span></a></div>';
     return;
   }
-  // Le compte est désormais EXACT (on a balayé tout le corpus) : plus de « 80+ »
-  // qui laissait croire à un plafond alors qu'il disait « au moins 80 ».
+  // Le compte est EXACT (on a balayé tout le corpus) : pas de « 80+ »
+  // qui laisserait croire à un plafond alors qu'il dirait « au moins 80 ».
   let html = '<div class="sr-count">'+total+' résultat'+(total>1?'s':'')
     + (total>hits.length ? ' · les '+hits.length+' plus proches' : '')+'</div>';
   html += hits.map((c,i)=>{
@@ -2346,8 +2344,8 @@ function reflectSeg(key){
 }
 // Restaure réglages + catégories, puis reflète le tout dans l'UI. Au 1er lancement
 // (aucune préférence) : aucune catégorie ni aucun niveau présélectionné — le choix
-// appartient à l'utilisateur ; « Commencer » reste muet et #start-hint guide
-// (décision du 19/07/2026). Les autres réglages gardent leurs valeurs initiales.
+// appartient à l'utilisateur ; « Commencer » reste muet et #start-hint guide.
+// Les autres réglages gardent leurs valeurs initiales.
 function applyPrefs(){
   const p=prefsLoad();
   state.cats.clear();
@@ -2376,7 +2374,7 @@ function applyPrefs(){
   applyFoldState();
 }
 
-// ================= Diagnostic de latence (dossier « lag iPhone », 20/07/2026) =================
+// ================= Diagnostic de latence (piège n°14 d'AGENTS.md) =================
 // Trois temps par geste, affichés dans « Réglages avancés » : « attente » (dernier
 // doigt levé → le gestionnaire démarre — c'est là que vivrait un délai de synthèse
 // du clic ou un fil principal occupé), « travail » (le gestionnaire, décomposé),
@@ -2721,8 +2719,8 @@ async function init(){
     if(!bootResumed) document.getElementById('setup').classList.remove('hidden');
     const note=document.getElementById('count-note');
     note.textContent = CARDS.length + ' mots chargés';
-    // Garde-fou : une catégorie disparue de data/ ou un décalage de listCats entre
-    // build.js et app.html fait disparaître ses cartes de cards.json sans erreur —
+    // Garde-fou : une catégorie disparue de data/ ou un décalage entre listCats
+    // (tools/build.js) et catOrder (src/app/js/07-filtres.js) fait disparaître ses cartes de cards.json sans erreur —
     // signaler toute catégorie vide.
     const counts={};
     CARDS.forEach(c=>{ counts[c.cat]=(counts[c.cat]||0)+1; });
