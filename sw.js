@@ -1,0 +1,107 @@
+/*
+ * Service worker de la PWA (hors-ligne). Non utilisé par flashcards_hebreu.html
+ * (le standalone est déjà autonome) : l'enregistrement vit dans le bloc
+ * BUILD:ONLINE-ONLY d'app.html, et dans le portail (index.html).
+ *
+ * Stratégie : stale-while-revalidate sur les fichiers de l'app — démarrage
+ * instantané depuis le cache, mise à jour en arrière-plan (le nouveau
+ * vocabulaire apparaît au lancement suivant). Les polices Google sont servies
+ * cache-first (immuables).
+ *
+ * ⚠️ VERSION NE S'INCRÉMENTE PLUS À LA MAIN (chantier 4, Task 19). La ligne est
+ * ESTAMPILLÉE par `node tools/build.js` : un hash des cinq artefacts +
+ * manifest.webmanifest. Tout build qui change un fichier servi change la version ;
+ * un build qui ne change rien la laisse stable. `node tools/build.js --check`
+ * recalcule le hash et échoue si la ligne ne correspond pas — c'est ce qui a permis
+ * de retirer le contrôle n°3 du hook pre-commit. Éditer la valeur à la main ne sert
+ * donc à rien : le build la réécrit, et --check refuse la version éditée.
+ *
+ * Deux corollaires, assumés :
+ *  - sw.js n'entre PAS dans son propre hash (la version y est écrite : l'y inclure
+ *    ferait courir le hash après sa propre queue) ; icons/ non plus. Une icône
+ *    changée n'incrémente pas la version — sans grande conséquence, tout le
+ *    même-origine étant en stale-while-revalidate : elle arrive avec un lancement
+ *    de retard.
+ *  - pour forcer une VRAIE purge de cache (changement de stratégie qui rendrait les
+ *    entrées gardées nuisibles), changer le préfixe de `CACHE` ci-dessous à la main —
+ *    c'est désormais le seul geste manuel qui reste sur ce fichier.
+ */
+// Le journal des bumps manuels s'arrête à v35 : il justifiait, entrée par entrée, pourquoi
+// tel changement méritait d'atteindre le téléphone au 1ᵉʳ lancement plutôt qu'au 2ᵈ. Ce
+// raisonnement est devenu structurel au Task 19 — tout changement d'un fichier servi
+// déplace le hash, donc la question ne se pose plus une fois par lot. Les entrées v9 à v35
+// restent dans l'historique git de ce fichier (`git log -p -- sw.js`) ; les garder ici
+// afficherait des numéros de version qui n'existent plus, dans un fichier servi.
+/* ligne estampillée par tools/build.js — ne pas éditer la valeur (cf. en-tête) */
+const VERSION = 'v-92b3a2d6';
+const CACHE = 'flashcards-hebreu-' + VERSION;
+
+const ASSETS = [
+  './',
+  './app.html',
+  './cards.json',
+  './vocabulaire_hebreu.html',
+  './manifest.webmanifest',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/apple-touch-icon.png',
+];
+
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', (e) => {
+  const req = e.request;
+  if (req.method !== 'GET') return;
+
+  const url = new URL(req.url);
+  const isFont = url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
+  if (url.origin !== location.origin && !isFont) return;
+
+  // Seules les navigations vers la racine (/ ou /index.html) sont normalisées
+  // sur la coquille './' — c'est désormais le PORTAIL. Les autres pages
+  // (app.html, vocabulaire_hebreu.html) doivent être servies telles quelles —
+  // les rabattre sur './' casserait l'appli et le carnet.
+  const isRootNav = req.mode === 'navigate' &&
+    (url.pathname.endsWith('/') || url.pathname.endsWith('/index.html'));
+  const cacheKey = isRootNav ? './' : req.url;
+
+  e.respondWith((async () => {
+    const cache = await caches.open(CACHE);
+    const cached = await cache.match(cacheKey);
+
+    // Polices : immuables, pas besoin de revalider.
+    if (cached && isFont) return cached;
+
+    // Refetch par URL (et non par Request) : l'app demande le vocabulaire en
+    // cache:'no-store', qu'on ne peut pas réutiliser tel quel pour cache.put.
+    const refresh = fetch(cacheKey === './' ? './' : req.url)
+      .then((res) => {
+        if (res && (res.ok || res.type === 'opaque')) cache.put(cacheKey, res.clone());
+        return res;
+      })
+      .catch(() => null);
+
+    if (cached) {
+      e.waitUntil(refresh);
+      return cached;
+    }
+    const fresh = await refresh;
+    if (fresh) return fresh;
+    return new Response('Hors ligne — ressource absente du cache.', {
+      status: 503,
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    });
+  })());
+});

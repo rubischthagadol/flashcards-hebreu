@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<!-- FICHIER GÉNÉRÉ — ne pas éditer. Source : src/portail/. Regénération : node tools/build.js. -->
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<!-- CSP : GitHub Pages ne sert aucun en-tête de réponse, le <meta> est la seule voie.
+     'unsafe-inline' est imposé par le parti pris du projet — tout le CSS et le JS sont
+     inline, et le <link> des polices porte un onload ; passer aux hashes couplerait la
+     règle à build.js pour un gain nul. La vraie garde est ailleurs : connect-src 'self'
+     ferme l'exfiltration, object-src/base-uri la réécriture de page. Bloc identique dans
+     les trois pages. frame-ancestors est ignoré en <meta> : inutile de l'écrire. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hébreu — carnet &amp; flashcards</title>
+<!-- Portail : la porte d'entrée commune, en deux temps — un accueil plein écran
+     (« Bienvenue » très gros, au hasard en hébreu), puis le choix des deux côtés
+     (flashcards, carnet). L'icône installée ouvre ce portail (start_url: "./"). -->
+<meta name="theme-color" content="#12181f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Hébreu">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Chargée en non-bloquant (media="print" puis bascule au onload) : en <link> classique,
+     WebKit ne peint RIEN — pas même le fond — tant que cette feuille n'est pas arrivée,
+     et c'est tout le « premier affichage lent » du tout premier chargement. -->
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.onload=null;this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+<script>document.documentElement.classList.add('js');</script>
+<style>
+  /* Charte unifiée carnet + app + portail — bloc injecté au build depuis src/tokens.css,
+     sa source unique. Rien à recopier à la main : node tools/build.js le repose ici. */
+  :root{
+    --bg:#12181f; --bg2:#161e28; --card:#1a222b; --card-edge:#2c3844;
+    --ink:#ece7dd; --ink-dim:#9aa3ac; --gold:#d4a24c; --gold-soft:#e6c68a;
+    --green:#5bbd7a; --red:#d96a5b; --line:#2a3440;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  ::selection{ background:rgba(212,162,76,.30); color:var(--ink); }
+  html,body{margin:0; height:100%;}
+  body{
+    background:radial-gradient(120% 80% at 50% 0%, var(--bg2), var(--bg) 70%);
+    color:var(--ink);
+    font-family:'Assistant','Arial Hebrew','Helvetica Neue',Arial,sans-serif;
+    font-size:22px;
+    min-height:100dvh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:28px 18px 34px;
+  }
+  /* ⚠️ `*` NE CIBLE PAS LES PSEUDO-ÉLÉMENTS — il faut les nommer. Sans ::before,
+     le halo de la menorah (.menorah::before, animation `lueur`) continuait de
+     respirer en boucle sous « réduire les animations », c'est-à-dire exactement
+     le mouvement infini que le réglage sert à éteindre. Défaut apparu TROIS fois
+     dans ce dépôt : on écrit les trois sélecteurs partout, même là où aucun
+     pseudo-élément n'est animé aujourd'hui. */
+  @media (prefers-reduced-motion: reduce){ *,*::before,*::after{transition:none !important; animation:none !important;} }
+  :focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+
+  /* ————— Premier temps : l'accueil plein écran —————
+     Un seul grand bouton par-dessus la page ; sans JS il n'existe pas
+     (les portes restent directement accessibles). */
+  #accueil{
+    position:fixed; inset:0; z-index:1; /* seule couche empilée de la page */
+    display:none;
+    width:100%; border:0; margin:0; padding:28px clamp(84px, 18vw, 210px);
+    background:radial-gradient(120% 80% at 50% 0%, var(--bg2), var(--bg) 70%);
+    color:var(--ink); font-family:inherit; cursor:pointer; text-align:center;
+    flex-direction:column; align-items:center; justify-content:center;
+    transition:opacity .4s ease, visibility 0s .4s;
+  }
+  html.js #accueil{ display:flex; }
+  body.entree #accueil{ opacity:0; visibility:hidden; pointer-events:none; }
+  /* Les deux ménorahs à sept branches qui éclairent l'accueil — la lampe de la
+     charte, prise au pied de la lettre. Or sur la nuit, flammes en or tendre,
+     halo qui respire doucement (immobile sous prefers-reduced-motion). */
+  .menorah{
+    position:absolute; top:50%; transform:translateY(-55%);
+    width:clamp(60px, 13vw, 150px); color:var(--gold); pointer-events:none;
+  }
+  .menorah-g{ left:clamp(8px, 3.5vw, 64px); }
+  .menorah-d{ right:clamp(8px, 3.5vw, 64px); }
+  .menorah svg{ display:block; width:100%; height:auto; overflow:visible; }
+  .menorah::before{
+    content:""; position:absolute; inset:-55% -70%; border-radius:50%;
+    background:radial-gradient(closest-side, rgba(212,162,76,.16), rgba(212,162,76,0) 72%);
+    animation:lueur 4.5s ease-in-out infinite alternate;
+  }
+  .flammes{
+    fill:var(--gold-soft); stroke:none;
+    filter:drop-shadow(0 0 5px rgba(230,198,138,.85)) drop-shadow(0 0 16px rgba(212,162,76,.5));
+  }
+  @keyframes lueur{ from{ opacity:.6; } to{ opacity:1; } }
+  .acc-mot{
+    display:block; max-width:22ch;
+    font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif;
+    font-size:clamp(2rem, 7.5vw, 4.2rem); font-weight:500; line-height:1.18;
+    color:var(--gold-soft); text-wrap:balance;
+    animation:acc-in .7s ease-out;
+  }
+  @keyframes acc-in{ from{ opacity:0; transform:translateY(10px); } }
+  /* Le א de l'icône, en vectoriel (glyphe Frank Ruhl 700, net à toute taille). */
+  .acc-alef{
+    display:block; margin-top:28px; line-height:1;
+    font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif;
+    font-weight:700; font-size:clamp(4.2rem, 16vw, 6.4rem);
+    color:var(--gold); text-shadow:0 0 34px rgba(212,162,76,.28);
+  }
+  .acc-entrer{
+    display:block; margin-top:34px; font-size:.95rem; font-weight:600;
+    color:var(--ink-dim); animation:acc-pouls 2.6s ease-in-out infinite alternate;
+  }
+  @keyframes acc-pouls{ from{ opacity:.55; } to{ opacity:1; } }
+  .acc-entrer .tactile{ display:none; }
+  @media (pointer:coarse){
+    .acc-entrer .souris{ display:none; }
+    .acc-entrer .tactile{ display:inline; }
+  }
+
+  /* ————— Second temps : le choix des deux côtés ————— */
+  header{ text-align:center; margin-bottom:34px; }
+  h1{
+    margin:0; font-size:2.1rem; font-weight:700; letter-spacing:.01em;
+    font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif;
+  }
+  h1 .he{ color:var(--gold); }
+  .tagline{ margin:8px 0 0; color:var(--ink-dim); font-size:.95rem; }
+  /* Le salut, une fois en français, une fois en hébreu — le même tirage que
+     l'accueil plein écran. L'or tendre des accents chaleureux. */
+  .welcome{ margin:16px 0 0; font-size:1.15rem; font-weight:600; color:var(--gold-soft); }
+  .welcome[lang="he"]{ font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:1.4rem; font-weight:500; }
+
+  /* Deux portes strictement égales — aucune n'est « sélectionnée » d'avance ;
+     l'or n'arrive qu'au survol et sur le petit lien d'action. */
+  .doors{ display:flex; flex-direction:column; gap:16px; width:100%; max-width:440px; }
+  .door{
+    display:block; text-decoration:none; color:var(--ink);
+    background:linear-gradient(160deg, var(--card), var(--bg2));
+    border:1px solid var(--card-edge); border-radius:20px;  /* jeton rounded.carte */
+    padding:22px 22px 20px; transition:transform .12s ease, border-color .13s ease;
+  }
+  .door:hover{ border-color:var(--gold); }
+  .door:active{ transform:scale(.99); }
+  body.entree .door{ animation:porte-in .5s ease-out backwards; }
+  body.entree .door + .door{ animation-delay:.08s; }
+  @keyframes porte-in{ from{ opacity:0; transform:translateY(10px); } }
+  .door-he{
+    display:block; font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif;
+    font-size:1.9rem; font-weight:500; line-height:1.25; color:var(--gold-soft);
+  }
+  .door-fr{ display:block; margin-top:2px; font-size:1.05rem; font-weight:700; }
+  .door-sub{ display:block; margin-top:6px; color:var(--ink-dim); font-size:.88rem; line-height:1.5; }
+  .door-go{
+    display:inline-block; margin-top:14px; font-size:.9rem; font-weight:600;
+    color:var(--gold); border:1px solid var(--line); border-radius:10px; padding:8px 14px;
+  }
+  footer{ margin-top:30px; color:var(--ink-dim); font-size:.8rem; text-align:center; }
+  @media (pointer:coarse){ .door{ padding:24px 22px 22px; } }
+</style>
+</head>
+<body>
+
+<button id="accueil" type="button">
+  <!-- La ménorah à sept branches : tracé unique réutilisé de part et d'autre. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="menorah-7" viewBox="0 0 120 152">
+      <g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round">
+        <path d="M60 32 V140"/>
+        <path d="M46 32 V74 A14 14 0 0 0 74 74 V32"/>
+        <path d="M30 32 V74 A30 30 0 0 0 90 74 V32"/>
+        <path d="M16 32 V74 A44 44 0 0 0 104 74 V32"/>
+        <path d="M42 140 H78"/>
+        <path d="M11 30 H21 M25 30 H35 M41 30 H51 M55 30 H65 M69 30 H79 M85 30 H95 M99 30 H109"/>
+      </g>
+      <g class="flammes">
+        <ellipse cx="16" cy="20" rx="3.2" ry="6.5"/>
+        <ellipse cx="30" cy="20" rx="3.2" ry="6.5"/>
+        <ellipse cx="46" cy="20" rx="3.2" ry="6.5"/>
+        <ellipse cx="60" cy="18" rx="3.4" ry="7.5"/>
+        <ellipse cx="74" cy="20" rx="3.2" ry="6.5"/>
+        <ellipse cx="90" cy="20" rx="3.2" ry="6.5"/>
+        <ellipse cx="104" cy="20" rx="3.2" ry="6.5"/>
+      </g>
+    </symbol>
+  </svg>
+  <span class="menorah menorah-g" aria-hidden="true"><svg><use href="#menorah-7"/></svg></span>
+  <span class="menorah menorah-d" aria-hidden="true"><svg><use href="#menorah-7"/></svg></span>
+  <span class="acc-mot" id="acc-mot">Ruben vous souhaite la bienvenue&nbsp;!</span>
+  <span class="acc-alef" aria-hidden="true">א</span>
+  <span class="acc-entrer">
+    <span class="souris">Cliquer pour entrer</span><span class="tactile">Toucher pour entrer</span>
+  </span>
+</button>
+
+<header>
+  <h1><span class="he" lang="he">עִבְרִית</span> · Hébreu</h1>
+  <p class="tagline">Le carnet d'étude et son entraînement</p>
+  <p class="welcome" id="welcome">Bienvenue&nbsp;!</p>
+</header>
+
+<nav class="doors" aria-label="Les deux parties du site">
+  <a class="door" href="./app.html">
+    <span class="door-he" lang="he">כַּרְטִיסִים</span>
+    <span class="door-fr">Les flashcards</span>
+    <span class="door-sub">S'entraîner sur tout le vocabulaire — cartes à retourner, réponse tapée ou QCM, avec révision espacée, niveaux et audio.</span>
+    <span class="door-go">S'entraîner&nbsp;›</span>
+  </a>
+  <a class="door" href="./vocabulaire_hebreu.html">
+    <span class="door-he" lang="he">מַחְבֶּרֶת</span>
+    <span class="door-fr">Le carnet</span>
+    <span class="door-sub">La référence complète : grammaire, tableaux de conjugaison, tout le vocabulaire avec nikoud, translittération et exemples.</span>
+    <span class="door-go">Ouvrir le carnet&nbsp;›</span>
+  </a>
+</nav>
+
+<footer>Un carnet pour apprendre l'hébreu moderne, en français.</footer>
+
+<script>
+// Le salut change de langue au hasard à chaque ouverture — le même tirage pour
+// l'accueil plein écran (formule complète, « ראובן » pour le prénom) et le petit
+// salut du second temps (formule courte). L'hébreu emploie la tournure
+// idiomatique לקבל את פני (« accueillir qqn » = קבלת פנים), ici avec בברכה
+// (« souhaiter la bienvenue ») ; sans nikoud (demande de Ruben) et point d'exclamation collé au
+// dernier mot ; en français, espace insécable. Sans JS, le français du HTML reste.
+(function(){
+  if (Math.random() < 0.5){
+    var textes = { 'acc-mot': 'ראובן מקבל את פניכם בברכה!', 'welcome': 'ברוכים הבאים!' };
+    Object.keys(textes).forEach(function(id){
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = textes[id];
+      el.setAttribute('lang', 'he');
+      el.setAttribute('dir', 'rtl');
+    });
+  }
+
+  // L'accueil s'efface au clic ; activé au clavier (detail === 0), le focus
+  // passe à la première porte pour que Tab reparte du bon endroit.
+  var accueil = document.getElementById('accueil');
+  accueil.addEventListener('click', function(e){
+    document.body.classList.add('entree');
+    if (e.detail === 0){
+      var porte = document.querySelector('.door');
+      if (porte) porte.focus({preventScroll:true});
+    }
+  });
+})();
+
+// PWA : le portail enregistre aussi le service worker — le site complet
+// (portail, appli, carnet) est disponible hors ligne dès la première visite.
+if ('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js')
+    .catch(err => console.warn('Service worker non enregistré :', err));
+}
+</script>
+</body>
+</html>
