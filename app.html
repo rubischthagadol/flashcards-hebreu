@@ -809,7 +809,7 @@
   </details>
 
   <!-- Chips construites depuis les data-niveau du carnet : seuls les niveaux
-       non vides apparaissent (« Expert » attendra des mots C2). -->
+       non vides apparaissent. -->
   <details class="adv" id="fold-niv">
     <summary>
       <h2 class="adv-lbl" id="h-niv">Niveau</h2>
@@ -818,7 +818,7 @@
     </summary>
     <div class="adv-body">
       <div class="chips" id="niv" role="group" aria-labelledby="h-niv" aria-describedby="niv-note"></div>
-      <div class="seg-note" id="niv-note">Selon le Cadre européen : Facile = A1 · Intermédiaire = A2–B1 · Difficile = B2–C1 · Expert = C2. Un mot pas encore classé reste visible quel que soit le choix, et la révision du jour n'en tient pas compte.</div>
+      <div class="seg-note" id="niv-note">Selon le Cadre européen : Facile = A1 · Intermédiaire = A2–B1 · Difficile = B2–C1. Un mot pas encore classé reste visible quel que soit le choix, et la révision du jour n'en tient pas compte.</div>
     </div>
   </details>
 
@@ -1417,14 +1417,13 @@ function updateSpeaker(){
 // Expose : nivOfCard, nivOk, themeOk, indexRecherche, runSearch, buildChips, buildNivChips, buildThemeChips, toggle, segPick, refreshAdvSub, foldSub, refreshFoldSubs, applyFoldState, refreshSelAll, updateStart, limitPool, THEMES, SPK_SVG, catCounts, nivCounts, themeCounts, catsEl, nivEl, themeEl, catOrder — Utilise : state (99), CARDS (05), escapeHtml (01), he2tr/cleRecherche (02), speak/bindTap (06/11), savePrefs/sessRestore/srsMigrateIds (04), applyPrefs/perfReport (13), refreshSrsUi (08)
 
 // ================= Niveaux de difficulté (CECRL) =================
-// Le carnet stocke le CECRL fin (data-niveau="A1"…"C2") ; l'app l'affiche en
-// quatre libellés. Un mot sans niveau ignore le filtre : il reste visible
+// Le carnet stocke le CECRL fin (data-niveau="A1"…"C1") ; l'app l'affiche en
+// trois libellés. Un mot sans niveau ignore le filtre : il reste visible
 // partout, le carnet peut donc s'annoter progressivement sans perdre de carte.
 const NIVEAUX = [
   {key:'facile',    label:'Facile',        cecrl:['A1']},
   {key:'inter',     label:'Intermédiaire', cecrl:['A2','B1']},
-  {key:'difficile', label:'Difficile',     cecrl:['B2','C1']},
-  {key:'expert',    label:'Expert',        cecrl:['C2']}
+  {key:'difficile', label:'Difficile',     cecrl:['B2','C1']}
 ];
 function nivOfCard(c){ const g=NIVEAUX.find(g=>g.cecrl.includes(c.niveau)); return g ? g.key : null; }
 function nivOk(c){ const k=nivOfCard(c); return !k || state.niveaux.has(k); }
@@ -1634,9 +1633,8 @@ function buildChips(){
   refreshSrsUi();
   sessRestore();
 }
-// Chips « Niveau » : seuls les niveaux non vides s'affichent (le carnet n'a pas
-// encore de C2 → pas de chip « Expert » fantôme) ; groupe entier masqué si le
-// carnet n'a aucun data-niveau.
+// Chips « Niveau » : seuls les niveaux non vides s'affichent ; groupe entier
+// masqué si le carnet n'a aucun data-niveau.
 function buildNivChips(){
   nivCounts = {};
   CARDS.forEach(c=>{ const k=nivOfCard(c); if(k) nivCounts[k]=(nivCounts[k]||0)+1; });

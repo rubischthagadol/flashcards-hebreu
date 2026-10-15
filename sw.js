@@ -27,7 +27,7 @@
  *    c'est le seul geste manuel qui reste sur ce fichier.
  */
 /* ligne estampillée par tools/build.js — ne pas éditer la valeur (cf. en-tête) */
-const VERSION = 'v-95569c1c';
+const VERSION = 'v-387b9a2d';
 const CACHE = 'flashcards-hebreu-' + VERSION;
 
 const ASSETS = [

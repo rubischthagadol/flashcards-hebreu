@@ -1,5 +1,5 @@
 {
-  "version": "2026-08-18",
+  "version": "2026-10-15",
   "cartes": [
     {
       "cat": "Verbes",
@@ -49159,7 +49159,7 @@
       "he": "אֶת",
       "tr": "et",
       "fr": "(marque du complément d'objet direct défini)",
-      "note": "<span lang=\"he\">אֲנִי רוֹאֶה אֶת הַבַּיִת</span> ; cf. section 16 du carnet",
+      "note": "seulement devant un complément d'objet direct défini (article <span lang=\"he\">הַ־</span>, nom propre, possessif) ; devant un objet indéfini, rien : <span lang=\"he\">אֲנִי רוֹאֶה בַּיִת</span>",
       "niveau": "A1",
       "exemples": [
         {
@@ -50508,7 +50508,7 @@
       "cat": "Conjonctions",
       "he": "וְ־",
       "tr": "ve-",
-      "fr": "et (préfixe ; cf. section 12)",
+      "fr": "et (préfixe)",
       "niveau": "A1",
       "exemples": [
         {
@@ -50524,7 +50524,7 @@
       "cat": "Conjonctions",
       "he": "שֶׁ־",
       "tr": "she-",
-      "fr": "que, qui (cf. section 20)",
+      "fr": "que, qui (préfixe)",
       "niveau": "A1",
       "exemples": [
         {
@@ -50943,7 +50943,7 @@
       "he": "לוּ",
       "tr": "lu",
       "fr": "si (irréel), si seulement",
-      "note": "homographe consonantique avec <span lang=\"he\">לוֹ</span> (à lui — Prépositions fléchies) : niqqud et sens différents, sections différentes ; registre soutenu — à l'oral on dit plutôt <span lang=\"he\">אִלּוּ</span> ou <span lang=\"he\">אִם</span>",
+      "note": "homographe consonantique avec <span lang=\"he\">לוֹ</span> (à lui, préposition <span lang=\"he\">לְ</span> fléchie) : niqqud et sens différents ; registre soutenu — à l'oral on dit plutôt <span lang=\"he\">אִלּוּ</span> ou <span lang=\"he\">אִם</span>",
       "niveau": "B2",
       "exemples": [
         {
@@ -56203,7 +56203,7 @@
       "he": "פָּשׁוּט",
       "tr": "pashut",
       "fr": "tout simplement, carrément",
-      "note": "emploi adverbial — l'adjectif <span lang=\"he\">פָּשׁוּט</span> « simple » est aux Adjectifs",
+      "note": "emploi adverbial, invariable, de l'adjectif <span lang=\"he\">פָּשׁוּט</span> « simple » (féminin <span lang=\"he\">פְּשׁוּטָה</span>)",
       "niveau": "A2",
       "exemples": [
         {
@@ -56724,7 +56724,7 @@
       "he": "שָׁוֶה",
       "tr": "shaveh",
       "fr": "ça vaut le coup",
-      "note": "emploi familier — l'adjectif <span lang=\"he\">שָׁוֶה</span> « égal » est aux Adjectifs",
+      "note": "emploi familier de l'adjectif <span lang=\"he\">שָׁוֶה</span> « égal » (féminin <span lang=\"he\">שָׁוָה</span>), au sens de « qui vaut (la peine) »",
       "niveau": "A2",
       "exemples": [
         {
@@ -57229,7 +57229,7 @@
       "he": "אֱלוֹהַּ",
       "tr": "eloha",
       "fr": "dieu (forme singulière poétique)",
-      "note": "surtout en poésie biblique (livre de Job) ; <span lang=\"he\">אֱלֹהִים</span>, de forme plurielle mais accordé au singulier quand il désigne Dieu, est à la table Noms",
+      "note": "surtout en poésie biblique (livre de Job) ; la forme courante est <span lang=\"he\">אֱלֹהִים</span>, de forme plurielle mais accordé au singulier quand il désigne Dieu",
       "niveau": "B2",
       "he_plain": "אלוה"
     },
@@ -57247,7 +57247,7 @@
       "he": "אֵל עֶלְיוֹן",
       "tr": "el 'elyon",
       "fr": "dieu très-haut (épithète divine)",
-      "note": "<span lang=\"he\">עֶלְיוֹן</span> seul signifie « supérieur, suprême » (table Adjectifs) ; la locution est celle de Gn 14:18-20, mais <span lang=\"he\">עֶלְיוֹן</span> sert aussi seul de titre divin dans les Psaumes (Ps 91:1)",
+      "note": "la locution est celle de Gn 14:18-20, mais <span lang=\"he\">עֶלְיוֹן</span> sert aussi seul de titre divin dans les Psaumes (Ps 91:1) ; en hébreu moderne, <span lang=\"he\">עֶלְיוֹן</span> est l'adjectif « supérieur, suprême »",
       "niveau": "B2",
       "he_plain": "אל עליון"
     },
@@ -57256,7 +57256,7 @@
       "he": "צְבָאוֹת",
       "tr": "tsva'ot",
       "fr": "des armées (épithète divine)",
-      "note": "dans la locution <span lang=\"he\">יְהוָה צְבָאוֹת</span> (« l'Éternel des armées ») ; <span lang=\"he\">צְבָאוֹת</span> est le mot que le grec a transcrit Sabaoth ; <span lang=\"he\">צָבָא</span> seul = armée, service militaire (table Noms)",
+      "note": "dans la locution <span lang=\"he\">יְהוָה צְבָאוֹת</span> (« l'Éternel des armées ») ; <span lang=\"he\">צְבָאוֹת</span> est le mot que le grec a transcrit Sabaoth ; c'est le pluriel de <span lang=\"he\">צָבָא</span>, en hébreu moderne « armée, service militaire »",
       "niveau": "B2",
       "he_plain": "צבאות"
     },
@@ -57310,7 +57310,7 @@
       "he": "הַמָּקוֹם",
       "tr": "hamakom",
       "fr": "le lieu (appellation rabbinique de Dieu)",
-      "note": "le mot <span lang=\"he\">מָקוֹם</span> (lieu, table Noms) pris avec l'article comme nom divin ; s'entend surtout dans la formule de deuil <span lang=\"he\">הַמָּקוֹם יְנַחֵם אֶתְכֶם</span> (que Dieu vous console)",
+      "note": "le nom <span lang=\"he\">מָקוֹם</span> (lieu, endroit) pris avec l'article comme nom divin ; s'entend surtout dans la formule de deuil <span lang=\"he\">הַמָּקוֹם יְנַחֵם אֶתְכֶם</span> (que Dieu vous console)",
       "niveau": "B2",
       "he_plain": "המקום"
     },
