@@ -29410,6 +29410,14 @@
       "tr": "",
       "fr": "dentifrice (f)",
       "genre": "f",
+      "forms": [
+        {
+          "he": "מִשְׁחוֹת שִׁנַּיִם",
+          "tr": "mishchot shinayim",
+          "label": "pluriel",
+          "he_plain": "משחות שנים"
+        }
+      ],
       "niveau": "A2",
       "theme": "vie-quotidienne",
       "exemples": [
@@ -31048,6 +31056,14 @@
       "tr": "",
       "fr": "pomme de terre (m)",
       "genre": "m",
+      "forms": [
+        {
+          "he": "תַּפּוּחֵי אֲדָמָה",
+          "tr": "tapuchei adamah",
+          "label": "pluriel",
+          "he_plain": "תפוחי אדמה"
+        }
+      ],
       "niveau": "A1",
       "theme": "nourriture",
       "exemples": [
@@ -35472,6 +35488,14 @@
       "tr": "",
       "fr": "aéroport (m)",
       "genre": "m",
+      "forms": [
+        {
+          "he": "שְׂדוֹת תְּעוּפָה",
+          "tr": "sdot te'ufah",
+          "label": "pluriel",
+          "he_plain": "שדות תעופה"
+        }
+      ],
       "niveau": "A2",
       "theme": "ville-transport",
       "exemples": [
@@ -36159,6 +36183,14 @@
       "tr": "",
       "fr": "synagogue (m)",
       "genre": "m",
+      "forms": [
+        {
+          "he": "בָּתֵּי כְּנֶסֶת",
+          "tr": "batei kneset",
+          "label": "pluriel",
+          "he_plain": "בתי כנסת"
+        }
+      ],
       "niveau": "A2",
       "theme": "ville-transport",
       "exemples": [
@@ -41429,14 +41461,6 @@
       "tr": "",
       "fr": "devoirs (scolaires) (m)",
       "genre": "m",
-      "forms": [
-        {
-          "he": "שִׁעוּרֵי בַּיִת",
-          "tr": "shi'urei bayit",
-          "label": "pluriel",
-          "he_plain": "שעורי בית"
-        }
-      ],
       "niveau": "A1",
       "theme": "travail-etudes",
       "exemples": [
@@ -41507,14 +41531,6 @@
       "tr": "",
       "fr": "CV (f)",
       "genre": "f",
-      "forms": [
-        {
-          "he": "קוֹרוֹת חַיִּים",
-          "tr": "korot chayim",
-          "label": "pluriel",
-          "he_plain": "קורות חיים"
-        }
-      ],
       "niveau": "B1",
       "theme": "travail-etudes",
       "exemples": [
