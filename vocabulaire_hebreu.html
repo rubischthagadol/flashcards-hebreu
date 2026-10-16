@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<!-- FICHIER GÉNÉRÉ — ne pas éditer. Source : data/ + src/carnet/. Regénération : node tools/build.js. -->
+<!-- FICHIER GÉNÉRÉ — ne pas éditer. Source : data/ + src/carnet/. -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <!-- CSP : GitHub Pages ne sert aucun en-tête de réponse, le <meta> est la seule voie.
      'unsafe-inline' est imposé par le parti pris du projet — tout le CSS et le JS sont
      inline, et le <link> des polices porte un onload ; passer aux hashes couplerait la
-     règle à build.js pour un gain nul. La vraie garde est ailleurs : connect-src 'self'
+     règle au build pour un gain nul. La vraie garde est ailleurs : connect-src 'self'
      ferme l'exfiltration, object-src/base-uri la réécriture de page. Bloc identique dans
      les trois pages. frame-ancestors est ignoré en <meta> : inutile de l'écrire. -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
@@ -22,7 +22,7 @@
 <noscript><link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Assistant:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playpen+Sans+Hebrew:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
 <style>
   /* Charte unifiée carnet + app + portail — bloc injecté au build depuis src/tokens.css,
-     sa source unique. Rien à recopier à la main : node tools/build.js le repose ici. */
+     sa source unique. Rien à recopier à la main : hebreu build le repose ici. */
 :root{
   --bg:#12181f; --bg2:#161e28; --card:#1a222b; --card-edge:#2c3844;
   --ink:#ece7dd; --ink-dim:#9aa3ac; --gold:#d4a24c; --gold-soft:#e6c68a;
@@ -18375,7 +18375,8 @@ function cleRecherche(s){
   // son registre : il est seulement amputé). Le même fichier portait aussi le
   // `</main>`, et comme deux sections le suivent au registre, elles se
   // rendaient HORS de `<main>` — donc sans la colonne de lecture posée par
-  // `main > *` (carnet.css). Voir la garde `verifieStructureCarnet()`.
+  // `main > *` (carnet.css). Voir la garde de structure du build
+  // (outils/src/flashcards/build/gardes/structure.rs).
   //
   // Le dénudage vient de `normHe` (module de translittération injecté avant ce
   // fichier), et non d'une quatrième copie locale du même `replace`.

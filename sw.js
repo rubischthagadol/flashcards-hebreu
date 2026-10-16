@@ -9,9 +9,9 @@
  * cache-first (immuables).
  *
  * ⚠️ VERSION NE S'INCRÉMENTE PAS À LA MAIN. La ligne est
- * ESTAMPILLÉE par `node tools/build.js` : un hash des cinq artefacts +
+ * ESTAMPILLÉE par `hebreu build` : un hash des cinq artefacts +
  * manifest.webmanifest. Tout build qui change un fichier servi change la version ;
- * un build qui ne change rien la laisse stable. `node tools/build.js --check`
+ * un build qui ne change rien la laisse stable. `hebreu build --check`
  * recalcule le hash et échoue si la ligne ne correspond pas — le hook pre-commit
  * s'en remet à lui. Éditer la valeur à la main ne sert
  * donc à rien : le build la réécrit, et --check refuse la version éditée.
@@ -26,8 +26,8 @@
  *    entrées gardées nuisibles), changer le préfixe de `CACHE` ci-dessous à la main —
  *    c'est le seul geste manuel qui reste sur ce fichier.
  */
-/* ligne estampillée par tools/build.js — ne pas éditer la valeur (cf. en-tête) */
-const VERSION = 'v-387b9a2d';
+/* ligne estampillée par le build — ne pas éditer la valeur (cf. en-tête) */
+const VERSION = 'v-4b1ccdf8';
 const CACHE = 'flashcards-hebreu-' + VERSION;
 
 const ASSETS = [

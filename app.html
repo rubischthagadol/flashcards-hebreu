@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<!-- FICHIER GÉNÉRÉ — ne pas éditer. Source : src/app/. Regénération : node tools/build.js. -->
+<!-- FICHIER GÉNÉRÉ — ne pas éditer. Source : src/app/. -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <!-- CSP : GitHub Pages ne sert aucun en-tête de réponse, le <meta> est la seule voie.
      'unsafe-inline' est imposé par le parti pris du projet — tout le CSS et le JS sont
      inline, et le <link> des polices porte un onload ; passer aux hashes couplerait la
-     règle à build.js pour un gain nul. La vraie garde est ailleurs : connect-src 'self'
+     règle au build pour un gain nul. La vraie garde est ailleurs : connect-src 'self'
      ferme l'exfiltration, object-src/base-uri la réécriture de page. Bloc identique dans
      les trois pages. frame-ancestors est ignoré en <meta> : inutile de l'écrire. -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
@@ -29,7 +29,7 @@
 <noscript><link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Assistant:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playpen+Sans+Hebrew:wght@300;400&display=swap" rel="stylesheet"></noscript>
 <style>
   /* Charte unifiée carnet + app + portail — bloc injecté au build depuis src/tokens.css,
-     sa source unique. Rien à recopier à la main : node tools/build.js le repose ici. */
+     sa source unique. Rien à recopier à la main : hebreu build le repose ici. */
   :root{
     --bg:#12181f; --bg2:#161e28; --card:#1a222b; --card-edge:#2c3844;
     --ink:#ece7dd; --ink-dim:#9aa3ac; --gold:#d4a24c; --gold-soft:#e6c68a;
@@ -1434,7 +1434,7 @@ function nivOk(c){ const k=nivOfCard(c); return !k || state.niveaux.has(k); }
 // Filtre OPTIONNEL, à l'inverse des catégories et du niveau : aucune puce
 // cochée = tous les thèmes, rien n'est bloqué. Dès qu'un thème est coché,
 // une carte sans thème sort du jeu — c'est le sens du choix.
-// ⚠️ Les slugs doivent rester alignés sur EXPECTED_THEMES de build.js.
+// ⚠️ Les slugs doivent rester alignés sur THEMES du build (outils/src/donnees/constantes.rs).
 const THEMES = [
   {key:'famille-personnes',   label:'Famille & personnes'},
   {key:'corps-sante',         label:'Corps & santé'},
@@ -1521,7 +1521,7 @@ function runSearch(){
     // C'est un LIEN, pas un appel réseau : rien à déroger dans la CSP (connect-src reste
     // fermé, coquille.html:11), et aucun des tokens interdits au fichier autonome n'entre
     // ici. ⚠️ Ce commentaire n'en cite AUCUN littéralement, et c'est délibéré : le
-    // garde-fou de build.js est un includes() sur tout le fichier assemblé, donc une
+    // garde-fou du build cherche la sous-chaîne dans tout le fichier assemblé, donc une
     // simple mention en commentaire le fait échouer comme un vrai appel (payé une fois).
     const enHe = /[א-ת]/.test(raw);
     const url = 'https://'+(enHe?'he':'fr')+'.wiktionary.org/w/index.php?search='+encodeURIComponent(raw);
@@ -2660,8 +2660,8 @@ document.addEventListener('keydown', e=>{
   if(btn && !btn.classList.contains('hide') && !btn.disabled){ e.preventDefault(); btn.click(); }
 });
 
-// ===== BUILD:ONLINE-ONLY : bloc remplace par build.js dans le fichier autonome =====
-// ---------- Chargement runtime des cartes (cards.json, généré par build.js) ----------
+// ===== BUILD:ONLINE-ONLY : bloc remplace par le build dans le fichier autonome =====
+// ---------- Chargement runtime des cartes (cards.json, généré par le build) ----------
 
 function showLoaderError(reason){
   const loader=document.getElementById('loader');
@@ -2717,8 +2717,8 @@ async function init(){
     if(!bootResumed) document.getElementById('setup').classList.remove('hidden');
     const note=document.getElementById('count-note');
     note.textContent = CARDS.length + ' mots chargés';
-    // Garde-fou : une catégorie disparue de data/ ou un décalage entre listCats
-    // (tools/build.js) et catOrder (src/app/js/07-filtres.js) fait disparaître ses cartes de cards.json sans erreur —
+    // Garde-fou : une catégorie disparue de data/ ou un décalage entre les catégories du build
+    // (outils/src/donnees/constantes.rs) et catOrder (src/app/js/07-filtres.js) fait disparaître ses cartes de cards.json sans erreur —
     // signaler toute catégorie vide.
     const counts={};
     CARDS.forEach(c=>{ counts[c.cat]=(counts[c.cat]||0)+1; });
