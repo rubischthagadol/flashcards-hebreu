@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-15",
+  "version": "2026-10-16",
   "cartes": [
     {
       "cat": "Verbes",
@@ -49159,7 +49159,7 @@
       "he": "אֶת",
       "tr": "et",
       "fr": "(marque du complément d'objet direct défini)",
-      "note": "seulement devant un complément d'objet direct défini (article <span lang=\"he\">הַ־</span>, nom propre, possessif) ; devant un objet indéfini, rien : <span lang=\"he\">אֲנִי רוֹאֶה בַּיִת</span>",
+      "note": "seulement devant un complément d'objet direct défini (article <span lang=\"he\">הַ־</span>, nom propre, nom à suffixe possessif : <span lang=\"he\">אֶת אָחִי</span> ; avec un pronom, il fusionne : <span lang=\"he\">אוֹתוֹ</span>) ; devant un objet indéfini, rien : <span lang=\"he\">אֲנִי רוֹאֶה בַּיִת</span>",
       "niveau": "A1",
       "exemples": [
         {
@@ -56203,7 +56203,7 @@
       "he": "פָּשׁוּט",
       "tr": "pashut",
       "fr": "tout simplement, carrément",
-      "note": "emploi adverbial, invariable, de l'adjectif <span lang=\"he\">פָּשׁוּט</span> « simple » (féminin <span lang=\"he\">פְּשׁוּטָה</span>)",
+      "note": "emploi adverbial familier, invariable, de l'adjectif <span lang=\"he\">פָּשׁוּט</span> « simple » (féminin <span lang=\"he\">פְּשׁוּטָה</span>)",
       "niveau": "A2",
       "exemples": [
         {
@@ -56724,7 +56724,7 @@
       "he": "שָׁוֶה",
       "tr": "shaveh",
       "fr": "ça vaut le coup",
-      "note": "emploi familier de l'adjectif <span lang=\"he\">שָׁוֶה</span> « égal » (féminin <span lang=\"he\">שָׁוָה</span>), au sens de « qui vaut (la peine) »",
+      "note": "adjectif « égal » (féminin <span lang=\"he\">שָׁוָה</span>), qui veut aussi dire « qui vaut » : <span lang=\"he\">זֶה שָׁוֶה אֶת הַכֶּסֶף</span>",
       "niveau": "A2",
       "exemples": [
         {
