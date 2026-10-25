@@ -6,44 +6,63 @@
  * Stratégie : stale-while-revalidate sur les fichiers de l'app — démarrage
  * instantané depuis le cache, mise à jour en arrière-plan (le nouveau
  * vocabulaire apparaît au lancement suivant). Les polices Google sont servies
- * cache-first (immuables).
+ * cache-first (immuables) ; les polices locales (polices/), du même origine,
+ * en stale-while-revalidate.
+ * Le cache HTTP : docs/ARCHITECTURE.md § La couche PWA.
  *
  * ⚠️ VERSION NE S'INCRÉMENTE PAS À LA MAIN. La ligne est
- * ESTAMPILLÉE par `hebreu build` : un hash des cinq artefacts +
- * manifest.webmanifest. Tout build qui change un fichier servi change la version ;
+ * ESTAMPILLÉE par `hebreu build` : un hash des entrées `hache` de
+ * servis.txt (artefacts, manifeste, polices). Tout build qui change une de
+ * ces entrées change la version ;
  * un build qui ne change rien la laisse stable. `hebreu build --check`
  * recalcule le hash et échoue si la ligne ne correspond pas — le hook pre-commit
  * s'en remet à lui. Éditer la valeur à la main ne sert
  * donc à rien : le build la réécrit, et --check refuse la version éditée.
  *
- * Deux corollaires, assumés :
+ * Trois corollaires, assumés :
  *  - sw.js n'entre PAS dans son propre hash (la version y est écrite : l'y inclure
  *    ferait courir le hash après sa propre queue) ; icons/ non plus. Une icône
  *    changée n'incrémente pas la version — sans grande conséquence, tout le
  *    même-origine étant en stale-while-revalidate : elle arrive avec un lancement
  *    de retard.
+ *  - le bloc ASSETS, entre les marqueurs BUILD:ASSETS, est ÉCRIT par `hebreu build` depuis
+ *    flashcards/servis.txt (les entrées `precache`) : l'éditer à la main ne sert à rien,
+ *    le build le réécrit et --check le refuse.
  *  - pour forcer une VRAIE purge de cache (changement de stratégie qui rendrait les
  *    entrées gardées nuisibles), changer le préfixe de `CACHE` ci-dessous à la main —
  *    c'est le seul geste manuel qui reste sur ce fichier.
  */
 /* ligne estampillée par le build — ne pas éditer la valeur (cf. en-tête) */
-const VERSION = 'v-d3bff79e';
+const VERSION = 'v-1e7957d6';
 const CACHE = 'flashcards-hebreu-' + VERSION;
 
 const ASSETS = [
+  // BUILD:ASSETS début : écrit par `hebreu build` depuis flashcards/servis.txt (rôle precache)
   './',
-  './app.html',
-  './cards.json',
-  './vocabulaire_hebreu.html',
-  './manifest.webmanifest',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/apple-touch-icon.png',
+  'app.html',
+  'vocabulaire_hebreu.html',
+  'cards.json',
+  'manifest.webmanifest',
+  'icons/icon-192.png',
+  'icons/icon-512.png',
+  'icons/icon-maskable-512.png',
+  'icons/apple-touch-icon.png',
+  'icons/favicon-16.png',
+  'icons/favicon-32.png',
+  'icons/favicon-48.png',
+  'polices/telaviv-modernistregular.ttf',
+  'polices/telaviv-modernistbold.ttf',
+  // BUILD:ASSETS fin
 ];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())
+    // cache:'no-cache' revalide auprès du serveur malgré le max-age que sert Pages
+    // (requête conditionnelle) : sans lui, un cache neuf peut se remplir de copies
+    // encore fraîches pour le cache HTTP mais déjà périmées.
+    caches.open(CACHE)
+      .then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'no-cache' }))))
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -75,14 +94,17 @@ self.addEventListener('fetch', (e) => {
     const cache = await caches.open(CACHE);
     const cached = await cache.match(cacheKey);
 
-    // Polices : immuables, pas besoin de revalider.
+    // Polices Google : immuables, pas besoin de revalider.
     if (cached && isFont) return cached;
 
     // Refetch par URL (et non par Request) : l'app demande le vocabulaire en
-    // cache:'no-store', qu'on ne peut pas réutiliser tel quel pour cache.put.
-    const refresh = fetch(cacheKey === './' ? './' : req.url)
+    // cache:'no-store', qu'on ne peut pas réutiliser tel quel pour cache.put ;
+    // cache:'no-cache' pour la même raison qu'à l'installation. Une requête par URL
+    // part en mode cors : le statut d'une police se lit, et une erreur n'est jamais
+    // mise en cache.
+    const refresh = fetch(cacheKey === './' ? './' : req.url, { cache: 'no-cache' })
       .then((res) => {
-        if (res && (res.ok || res.type === 'opaque')) cache.put(cacheKey, res.clone());
+        if (res && res.ok) cache.put(cacheKey, res.clone());
         return res;
       })
       .catch(() => null);

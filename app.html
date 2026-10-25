@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- FICHIER GÉNÉRÉ — ne pas éditer. Source : src/app/. -->
-<html lang="fr">
+<html lang="fr" data-charte="plaque-emaillee">
 <head>
 <meta charset="UTF-8">
 <!-- CSP : GitHub Pages ne sert aucun en-tête de réponse, le <meta> est la seule voie.
@@ -10,42 +10,503 @@
      ferme l'exfiltration, object-src/base-uri la réécriture de page. Bloc identique dans
      les trois pages. frame-ancestors est ignoré en <meta> : inutile de l'écrire. -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iPhone installé : viewport-fit=cover étend la page sous l'encoche, et la barre d'état
+     black-translucent la rend transparente ; la bande sous l'heure et les quatre zones sûres sont
+     décrites dans flashcards/docs/DESIGN.md § La barre d'état et les zones sûres (gardées par
+     build/gardes/charte.rs). -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Flashcards Hébreu</title>
-<!-- PWA : installable sur iPhone via Safari → Partager → « Sur l'écran d'accueil ». -->
-<meta name="theme-color" content="#12181f">
+<!-- PWA : installable sur iPhone via Safari → Partager → « Sur l'écran d'accueil ». Même couche : l'icône
+     d'écran d'accueil et les favicons, que la version autonome retire avec le manifeste. -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Hébreu">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Chargée en non-bloquant (media="print" puis bascule au onload) : en <link> classique,
+<!-- La feuille Google, posée au marqueur @CHARTE (avec les metas theme-color, les polices
+     servies et le script de tête), est chargée en non-bloquant (media="print" puis bascule
+     au onload) : en <link> classique,
      WebKit ne peint RIEN — pas même le fond — tant que cette feuille n'est pas arrivée,
      et c'est tout le « premier affichage lent » du tout premier chargement. -->
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Assistant:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playpen+Sans+Hebrew:wght@300;400&display=swap" rel="stylesheet" media="print" onload="this.onload=null;this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Assistant:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playpen+Sans+Hebrew:wght@300;400&display=swap" rel="stylesheet"></noscript>
-<style>
-  /* Charte unifiée carnet + app + portail — bloc injecté au build depuis src/tokens.css,
-     sa source unique. Rien à recopier à la main : hebreu build le repose ici. */
-  :root{
-    --bg:#12181f; --bg2:#161e28; --card:#1a222b; --card-edge:#2c3844;
-    --ink:#ece7dd; --ink-dim:#9aa3ac; --gold:#d4a24c; --gold-soft:#e6c68a;
-    --green:#5bbd7a; --red:#d96a5b; --line:#2a3440;
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#e9e4d8">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#323232">
+<link rel="preload" href="polices/telaviv-modernistregular.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="polices/telaviv-modernistbold.ttf" as="font" type="font/ttf" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Playpen+Sans+Hebrew:wght@300;400&family=Frank+Ruhl+Libre:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.onload=null;this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Playpen+Sans+Hebrew:wght@300;400&family=Frank+Ruhl+Libre:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
+<script>
+// La charte, posée avant le premier rendu : chartesLue() rend le slug stocké s'il est une charte du
+// registre, sinon le défaut ; chartesPose() en pose la liste sur <html>, recopie le --bg calculé dans
+// les <meta name="theme-color"> (chartesMetas) et annonce `charte-changee` sur document. Une page
+// rendue par le cache aller-retour (pageshow persisté) et une clé changée dans une autre page
+// (storage, `null` pour clear()) la reposent.
+var CHARTES = {"cle":"charte_v1","defaut":"plaque-emaillee","listes":{"plaque-emaillee":"plaque-emaillee","balcons-partout":"balcons-partout plaque-emaillee","carnet":"carnet"},"choix":[{"slug":"plaque-emaillee","nom":"Bauhaus 1"},{"slug":"balcons-partout","nom":"Bauhaus 2"},{"slug":"carnet","nom":"Nuit"}]};
+function chartesLue() {
+  try {
+    var s = localStorage.getItem(CHARTES.cle);
+    if (s !== null && Object.prototype.hasOwnProperty.call(CHARTES.listes, s)) return s;
+  } catch (e) { /* stockage inaccessible : le défaut */ }
+  return CHARTES.defaut;
+}
+function chartesMetas() {
+  var bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+  if (!bg) return;
+  var metas = document.querySelectorAll('meta[name="theme-color"]');
+  for (var i = 0; i < metas.length; i++) metas[i].setAttribute('content', bg);
+}
+function chartesPose(slug) {
+  document.documentElement.setAttribute('data-charte', CHARTES.listes[slug]);
+  CHARTES.courante = slug;
+  chartesMetas();
+  document.dispatchEvent(new Event('charte-changee'));
+}
+// Au chargement, @CHARTE précède le <style> : chartesMetas() lit un --bg vide et sort ; les metas
+// suivent au DOMContentLoaded.
+chartesPose(chartesLue());
+addEventListener('pageshow', function (e) { if (e.persisted) chartesPose(chartesLue()); });
+addEventListener('storage', function (e) {
+  if (e.key === CHARTES.cle || e.key === null) chartesPose(chartesLue());
+});
+document.addEventListener('DOMContentLoaded', chartesMetas);
+try {
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', chartesMetas);
+} catch (e) { /* matchMedia sans addEventListener : les metas suivent le chargement seul */ }
+// Le sélecteur de chartes : dans chaque montage [data-chartes] (le portail, les Réglages avancés),
+// un menu déroulant « Thème » : le bouton .chartes-bouton ouvre le groupe, qui tient une vignette par
+// charte visible du registre (CHARTES.choix) ; Échap, un clic hors du montage et un choix le
+// referment (chartesMenu). Une vignette est un hôte
+// <charte-vignette data-charte="<liste>"> : les jetons de sa charte l'atteignent par les blocs du
+// registre ; son ombre ouverte porte la feuille VIGNETTE (src/chartes/vignette.css, posée par le
+// build) et un bouton pressé quand sa charte est la courante. Sans attachShadow, ou à moins de deux
+// chartes visibles, le montage reste caché. chartesChoisis() écrit la clé (si l'écriture lève, la charte ne vaut que pour la page ouverte) et pose la charte.
+var VIGNETTE = "/* La vignette d'une charte, dans l'ombre de son hôte <charte-vignette> (src/chartes/selecteur.js) :\n   les jetons seuls de sa charte, que le bloc du registre pose sur l'hôte ; `all:initial` coupe ce\n   que la page ferait hériter (`direction`, que `all` n'atteint pas, est reposée). Quand son bouton a\n   le focus, l'hôte prend `:focus` et `:focus-within` (jamais `:focus-visible`) : l'`!important` du\n   contour tient tout contour de page loin de lui. Tailles en px : un `rem` suivrait <html> jusqu'ici\n   (piège n°3). Ni transition ni animation. Une ligne de la liste du menu : l'échantillon, puis le nom. */\n:host{all:initial;direction:ltr;display:block;min-width:0}\n:host{outline:none!important;outline-offset:0!important}\nbutton{\n  -webkit-appearance:none; appearance:none;\n  box-sizing:border-box; display:flex; flex-direction:row; align-items:center; gap:10px;\n  width:100%; margin:0; padding:8px;\n  background:var(--bg); color:var(--ink);\n  border:3px solid transparent; border-radius:var(--rayon-panneau-12);\n  font-size:13px; line-height:1.25; text-align:start; cursor:pointer;\n}\nbutton[aria-pressed=\"true\"]{ border-color:var(--gold); }\nbutton:focus{ outline:none; }\nbutton:focus-visible{ outline:3px solid var(--ink); outline-offset:-3px; }\n.echantillon{\n  box-sizing:border-box; display:flex; flex-direction:column; align-items:center; gap:4px;\n  flex:none; width:56px; padding:4px 6px 6px;\n  background:var(--card); border:1px solid var(--card-edge);\n  border-radius:var(--rayon-carte); box-shadow:var(--ombre-carte);\n}\n.alef{\n  display:block; font-family:var(--fonte-hebreu); font-weight:var(--graisse-hebreu);\n  font-size:22px; line-height:1.1; color:var(--gold);\n}\n.barre{ display:block; width:100%; height:6px; background:var(--gold); border-radius:var(--rayon-commande); }\n.nom{\n  display:block; font-family:var(--fonte-ui); font-weight:var(--graisse-titre);\n  text-transform:var(--casse-section); letter-spacing:var(--interlettre-section);\n  color:var(--ink); overflow-wrap:anywhere;\n}\n";
+function chartesChoisis(slug) {
+  try {
+    localStorage.setItem(CHARTES.cle, slug);
+  } catch (e) { /* stockage refusé : la charte ne vaut que pour la page ouverte */ }
+  chartesPose(slug);
+}
+function chartesSelecteurs() {
+  if (typeof Element.prototype.attachShadow !== 'function' || CHARTES.choix.length < 2) return;
+  var boutons = [];
+  var montages = document.querySelectorAll('[data-chartes]');
+  for (var i = 0; i < montages.length; i++) {
+    var groupe = montages[i].querySelector('[role="group"]');
+    for (var j = 0; j < CHARTES.choix.length; j++) boutons.push(chartesVignette(groupe, CHARTES.choix[j]));
+    chartesMenu(montages[i], montages[i].querySelector('.chartes-bouton'), groupe);
+    montages[i].removeAttribute('hidden');
   }
+  document.addEventListener('charte-changee', function () {
+    for (var k = 0; k < boutons.length; k++) {
+      boutons[k].setAttribute('aria-pressed', String(boutons[k].slug === CHARTES.courante));
+    }
+  });
+}
+function chartesMenu(montage, bouton, groupe) {
+  function ouvre(oui) {
+    groupe.hidden = !oui;
+    bouton.setAttribute('aria-expanded', String(oui));
+  }
+  ouvre(false);
+  bouton.addEventListener('click', function () { ouvre(groupe.hidden); });
+  // Un clic venu d'une ombre arrive retargeté sur son hôte <charte-vignette> : c'est un choix.
+  groupe.addEventListener('click', function (e) {
+    if (e.target.localName === 'charte-vignette') { ouvre(false); bouton.focus(); }
+  });
+  montage.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !groupe.hidden) { ouvre(false); bouton.focus(); }
+  });
+  document.addEventListener('click', function (e) {
+    if (!groupe.hidden && !montage.contains(e.target)) ouvre(false);
+  });
+}
+function chartesVignette(groupe, charte) {
+  var hote = document.createElement('charte-vignette');
+  hote.setAttribute('data-charte', CHARTES.listes[charte.slug]);
+  var ombre = hote.attachShadow({ mode: 'open' });
+  var feuille = document.createElement('style');
+  feuille.textContent = VIGNETTE;
+  var bouton = document.createElement('button');
+  bouton.type = 'button';
+  bouton.slug = charte.slug;
+  bouton.setAttribute('aria-pressed', String(charte.slug === CHARTES.courante));
+  var echantillon = document.createElement('span');
+  echantillon.className = 'echantillon';
+  echantillon.setAttribute('aria-hidden', 'true');
+  var alef = document.createElement('span');
+  alef.className = 'alef';
+  alef.lang = 'he';
+  alef.textContent = 'א';
+  var barre = document.createElement('span');
+  barre.className = 'barre';
+  echantillon.appendChild(alef);
+  echantillon.appendChild(barre);
+  var nom = document.createElement('span');
+  nom.className = 'nom';
+  nom.textContent = charte.nom;
+  bouton.appendChild(echantillon);
+  bouton.appendChild(nom);
+  bouton.addEventListener('click', function () { chartesChoisis(charte.slug); });
+  ombre.appendChild(feuille);
+  ombre.appendChild(bouton);
+  groupe.appendChild(hote);
+  return bouton;
+}
+document.addEventListener('DOMContentLoaded', chartesSelecteurs);
+</script>
+<style>
+  /* Chartes — CSS injecté au build depuis le registre src/chartes/ (repli, jetons, règles),
+     sa source unique. Rien à recopier à la main : hebreu build le repose ici. */
+@font-face{font-family:'Tel Aviv Modernist';font-weight:400;font-style:normal;font-display:swap;src:url("polices/telaviv-modernistregular.ttf") format("truetype");}
+@font-face{font-family:'Tel Aviv Modernist';font-weight:700;font-style:normal;font-display:swap;src:url("polices/telaviv-modernistbold.ttf") format("truetype");}
+:root{
+  --bg:#e9e4d8;
+  --bg2:#e9e4d8;
+  --card:#e9e4d8;
+  --card-edge:#365c8d;
+  --ink:#323232;
+  --ink-dim:#323232;
+  --gold:#365c8d;
+  --gold-soft:#365c8d;
+  --green:#323232;
+  --red:#323232;
+  --line:#365c8d;
+  --gold-rgb:54,92,141;
+  --red-rgb:50,50,50;
+  --green-rgb:50,50,50;
+  --sur-or:#e9e4d8;
+  --sur-rouge:#e9e4d8;
+  --sur-vert:#e9e4d8;
+  --ombre-carte:none;
+  --voile-sombre:transparent;
+  --ombre-action:none;
+  --fonte-hebreu:'Tel Aviv Modernist','Assistant',sans-serif;
+  --fonte-ui:'Tel Aviv Modernist','Assistant',sans-serif;
+  --fonte-mono:'Tel Aviv Modernist','Assistant',sans-serif;
+  --fonte-cursive:'Playpen Sans Hebrew','Segoe Script','Comic Sans MS',cursive;
+  --fonte-accueil:'Tel Aviv Modernist','Assistant',sans-serif;
+  --graisse-titre:700;
+  --graisse-action:700;
+  --graisse-accent:700;
+  --graisse-commande:700;
+  --graisse-etiquette:700;
+  --graisse-vedette-fr:700;
+  --graisse-hebreu:400;
+  --graisse-cursive:300;
+  --graisse-texte:400;
+  --interlettre-titre:.01em;
+  --interlettre-action:.01em;
+  --interlettre-section:.12em;
+  --interlettre-surtitre:.14em;
+  --interlettre-categorie:.08em;
+  --interlettre-rubrique:.1em;
+  --interlettre-sortie:.02em;
+  --interlettre-verset:.04em;
+  --casse-section:uppercase;
+  --casse-surtitre:uppercase;
+  --casse-categorie:uppercase;
+  --casse-rubrique:uppercase;
+  --rayon-carte:8px;
+  --rayon-panneau-14:8px;
+  --rayon-panneau-12:8px;
+  --rayon-commande:8px;
+  --rayon-section:8px;
+  --rayon-case-4:4px;
+  --rayon-case-9:8px;
+  --rayon-case-10:8px;
+  --rayon-case-11:8px;
+  --rayon-case-12:8px;
+  --rayon-pilule:8px;
+  --rayon-rond:50%;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+:root{
+  --bg:#323232;
+  --bg2:#323232;
+  --card:#323232;
+  --card-edge:#a9c8e9;
+  --ink:#e9e4d8;
+  --ink-dim:#e9e4d8;
+  --gold:#a9c8e9;
+  --gold-soft:#a9c8e9;
+  --green:#e9e4d8;
+  --red:#e9e4d8;
+  --line:#a9c8e9;
+  --gold-rgb:169,200,233;
+  --red-rgb:233,228,216;
+  --green-rgb:233,228,216;
+  --sur-or:#323232;
+  --sur-rouge:#323232;
+  --sur-vert:#323232;
+  --ombre-carte:none;
+  --voile-sombre:transparent;
+  --ombre-action:none;
+  --fonte-hebreu:'Tel Aviv Modernist','Assistant',sans-serif;
+  --fonte-ui:'Tel Aviv Modernist','Assistant',sans-serif;
+  --fonte-mono:'Tel Aviv Modernist','Assistant',sans-serif;
+  --fonte-cursive:'Playpen Sans Hebrew','Segoe Script','Comic Sans MS',cursive;
+  --fonte-accueil:'Tel Aviv Modernist','Assistant',sans-serif;
+  --graisse-titre:700;
+  --graisse-action:700;
+  --graisse-accent:700;
+  --graisse-commande:700;
+  --graisse-etiquette:700;
+  --graisse-vedette-fr:700;
+  --graisse-hebreu:400;
+  --graisse-cursive:300;
+  --graisse-texte:400;
+  --interlettre-titre:.01em;
+  --interlettre-action:.01em;
+  --interlettre-section:.12em;
+  --interlettre-surtitre:.14em;
+  --interlettre-categorie:.08em;
+  --interlettre-rubrique:.1em;
+  --interlettre-sortie:.02em;
+  --interlettre-verset:.04em;
+  --casse-section:uppercase;
+  --casse-surtitre:uppercase;
+  --casse-categorie:uppercase;
+  --casse-rubrique:uppercase;
+  --rayon-carte:8px;
+  --rayon-panneau-14:8px;
+  --rayon-panneau-12:8px;
+  --rayon-commande:8px;
+  --rayon-section:8px;
+  --rayon-case-4:4px;
+  --rayon-case-9:8px;
+  --rayon-case-10:8px;
+  --rayon-case-11:8px;
+  --rayon-case-12:8px;
+  --rayon-pilule:8px;
+  --rayon-rond:50%;
+  color-scheme:dark;
+}
+}
+[data-charte~="plaque-emaillee"]{
+  --bg:#e9e4d8; --bg2:#e9e4d8; --card:#e9e4d8; --card-edge:#365c8d;
+  --ink:#323232; --ink-dim:#323232; --gold:#365c8d; --gold-soft:#365c8d;
+  --green:#323232; --red:#323232; --line:#365c8d;
+  --gold-rgb:54,92,141; --red-rgb:50,50,50; --green-rgb:50,50,50;
+  --sur-or:#e9e4d8; --sur-rouge:#e9e4d8; --sur-vert:#e9e4d8;
+  --ombre-carte:none; --voile-sombre:transparent; --ombre-action:none;
+  --fonte-hebreu:'Tel Aviv Modernist','Assistant',sans-serif; --fonte-ui:'Tel Aviv Modernist','Assistant',sans-serif;
+  --fonte-mono:'Tel Aviv Modernist','Assistant',sans-serif; --fonte-cursive:'Playpen Sans Hebrew','Segoe Script','Comic Sans MS',cursive; --fonte-accueil:'Tel Aviv Modernist','Assistant',sans-serif;
+  --graisse-titre:700; --graisse-action:700; --graisse-accent:700; --graisse-commande:700; --graisse-etiquette:700;
+  --graisse-vedette-fr:700; --graisse-hebreu:400; --graisse-cursive:300; --graisse-texte:400;
+  --interlettre-titre:.01em; --interlettre-action:.01em; --interlettre-section:.12em; --interlettre-surtitre:.14em;
+  --interlettre-categorie:.08em; --interlettre-rubrique:.1em; --interlettre-sortie:.02em; --interlettre-verset:.04em;
+  --casse-section:uppercase; --casse-surtitre:uppercase; --casse-categorie:uppercase; --casse-rubrique:uppercase;
+  --rayon-carte:8px; --rayon-panneau-14:8px; --rayon-panneau-12:8px; --rayon-commande:8px; --rayon-section:8px;
+  --rayon-case-4:4px; --rayon-case-9:8px; --rayon-case-10:8px; --rayon-case-11:8px; --rayon-case-12:8px;
+  --rayon-pilule:8px; --rayon-rond:50%;
+}
+@media (prefers-color-scheme: dark){
+[data-charte~="plaque-emaillee"]{
+  --bg:#323232; --bg2:#323232; --card:#323232; --card-edge:#a9c8e9;
+  --ink:#e9e4d8; --ink-dim:#e9e4d8; --gold:#a9c8e9; --gold-soft:#a9c8e9;
+  --green:#e9e4d8; --red:#e9e4d8; --line:#a9c8e9;
+  --gold-rgb:169,200,233; --red-rgb:233,228,216; --green-rgb:233,228,216;
+  --sur-or:#323232; --sur-rouge:#323232; --sur-vert:#323232;
+  --ombre-carte:none; --voile-sombre:transparent; --ombre-action:none;
+}}
+:root[data-charte~="plaque-emaillee"]{color-scheme:light;}
+@media (prefers-color-scheme: dark){:root[data-charte~="plaque-emaillee"]{color-scheme:dark;}}
+[data-charte~="balcons-partout"]{
+  --rayon-carte:0 56px 56px 0; --rayon-panneau-14:0 40px 40px 0; --rayon-panneau-12:0 40px 40px 0;
+  --rayon-commande:0 26px 26px 0;
+}
+[data-charte~="carnet"]{
+  --bg:#12181f; --bg2:#161e28; --card:#1a222b; --card-edge:#2c3844;
+  --ink:#ece7dd; --ink-dim:#9aa3ac; --gold:#d4a24c; --gold-soft:#e6c68a;
+  --green:#5bbd7a; --red:#d96a5b; --line:#2a3440;
+  --gold-rgb:212,162,76; --red-rgb:217,106,91; --green-rgb:91,189,122;
+  --sur-or:#1a1206; --sur-rouge:#1a0d0a; --sur-vert:#0a1a0f;
+  --ombre-carte:0 20px 50px -22px #000, inset 0 1px 0 rgba(255,255,255,.03);
+  --voile-sombre:rgba(0,0,0,.18); --ombre-action:0 6px 18px -8px var(--gold);
+  --fonte-hebreu:'Frank Ruhl Libre','David Libre','Times New Roman',serif; --fonte-ui:'Assistant','Arial Hebrew','Helvetica Neue',Arial,sans-serif;
+  --fonte-mono:'JetBrains Mono','Courier New',monospace; --fonte-cursive:'Playpen Sans Hebrew','Segoe Script','Comic Sans MS',cursive; --fonte-accueil:'Tel Aviv Modernist','Assistant',sans-serif;
+  --graisse-titre:700; --graisse-action:700; --graisse-accent:700; --graisse-commande:600; --graisse-etiquette:600;
+  --graisse-vedette-fr:600; --graisse-hebreu:500; --graisse-cursive:300; --graisse-texte:400;
+  --interlettre-titre:.01em; --interlettre-action:.01em; --interlettre-section:.12em; --interlettre-surtitre:.14em;
+  --interlettre-categorie:.08em; --interlettre-rubrique:.1em; --interlettre-sortie:.02em; --interlettre-verset:.04em;
+  --casse-section:uppercase; --casse-surtitre:uppercase; --casse-categorie:uppercase; --casse-rubrique:uppercase;
+  --rayon-carte:20px; --rayon-panneau-14:14px; --rayon-panneau-12:12px; --rayon-commande:12px; --rayon-section:16px;
+  --rayon-case-4:4px; --rayon-case-9:9px; --rayon-case-10:10px; --rayon-case-11:11px; --rayon-case-12:12px;
+  --rayon-pilule:999px; --rayon-rond:50%;
+}
+:root[data-charte~="carnet"]{color-scheme:dark;}
+/* Plaque émaillée (docs/DESIGN.md) : le port des règles de l'aperçu
+   (bauhaus/apercu-ordi-2026-10-21/chartes/plaque-emaillee.css), chaque sélecteur sous le préfixe.
+   Les jetons portent polices, graisses, rayons et la suppression des ombres. Le préfixe ajoute
+   (0,2,0) : les règles d'état communes des éléments touchés sont reposées en fin de fichier. */
+:root[data-charte~="plaque-emaillee"] ::selection{ background:var(--gold); color:var(--sur-or); }
+:root[data-charte~="plaque-emaillee"] .note-line,
+:root[data-charte~="plaque-emaillee"] .srd-note{ font-style:normal; }
+/* la bande sous l'heure d'iOS : l'encre (l'heure est blanche), le fond sous le mode sombre */
+:root[data-charte~="plaque-emaillee"] body::before{ background:var(--ink); }
+@media (prefers-color-scheme: dark){ :root[data-charte~="plaque-emaillee"] body::before{ background:var(--bg); } }
+/* aucune profondeur : ni dégradé, ni enfoncement */
+:root[data-charte~="plaque-emaillee"] .flip:active,
+:root[data-charte~="plaque-emaillee"] .door:active,
+:root[data-charte~="plaque-emaillee"] .speak-btn:active{ transform:none; }
+/* la plaque : cadre bleu doublé d'un filet intérieur */
+:root[data-charte~="plaque-emaillee"] .flip,
+:root[data-charte~="plaque-emaillee"] .review-card,
+:root[data-charte~="plaque-emaillee"] .adv,
+:root[data-charte~="plaque-emaillee"] .door{ background:var(--card); border:3px solid var(--line); outline:1px solid var(--line); outline-offset:-7px; }
+:root[data-charte~="plaque-emaillee"] .review-card:hover,
+:root[data-charte~="plaque-emaillee"] .review-card:disabled{ background:var(--card); border-color:var(--line); color:var(--ink); }
+:root[data-charte~="plaque-emaillee"] .review-card:disabled .review-sub,
+:root[data-charte~="plaque-emaillee"] .review-card:disabled .review-ico{ color:var(--ink); }
+:root[data-charte~="plaque-emaillee"] .panel{ background:none; border:0; }
+:root[data-charte~="plaque-emaillee"] .panel h2{ color:var(--ink); }
+:root[data-charte~="plaque-emaillee"] .face .eyebrow{ color:var(--ink); border-bottom:1px solid var(--line); padding-bottom:8px; margin-inline:0 46px; padding-inline:46px 0; } /* le filet s'arrête avant le bouton d'écoute ; l'étiquette reste sur l'axe de la carte */
+:root[data-charte~="plaque-emaillee"] header h1,
+:root[data-charte~="plaque-emaillee"] .brand{ padding-bottom:10px; border-bottom:3px solid var(--line); }
+/* l'en-tête de l'app à la largeur de son texte : le filet du titre court sur le titre et le sous-titre, comme au portail */
+:root[data-charte~="plaque-emaillee"] body > header{ width:fit-content; margin-inline:auto; }
+:root[data-charte~="plaque-emaillee"] .tagline{ margin-top:8px; }
+/* commandes à cadre : neutres sur l'enduit */
+:root[data-charte~="plaque-emaillee"] .exit,
+:root[data-charte~="plaque-emaillee"] .speak-btn,
+:root[data-charte~="plaque-emaillee"] .ex-speak,
+:root[data-charte~="plaque-emaillee"] .sr-speak,
+:root[data-charte~="plaque-emaillee"] .fix-btn,
+:root[data-charte~="plaque-emaillee"] .ghost-btn,
+:root[data-charte~="plaque-emaillee"] .chip,
+:root[data-charte~="plaque-emaillee"] .controls button,
+:root[data-charte~="plaque-emaillee"] .qc,
+:root[data-charte~="plaque-emaillee"] .again-btns button,
+:root[data-charte~="plaque-emaillee"] #search-input,
+:root[data-charte~="plaque-emaillee"] #answer-input,
+:root[data-charte~="plaque-emaillee"] .door-go,
+:root[data-charte~="plaque-emaillee"] .loader .retry,
+:root[data-charte~="plaque-emaillee"] .ex-toggle{ background:var(--card); color:var(--ink); border:3px solid var(--line); }
+:root[data-charte~="plaque-emaillee"] .speak-btn,
+:root[data-charte~="plaque-emaillee"] .ex-speak,
+:root[data-charte~="plaque-emaillee"] .sr-speak{ border-radius:var(--rayon-case-10); }
+:root[data-charte~="plaque-emaillee"] .ex-toggle{ border:0; text-decoration:underline; background:none; }
+/* le nombre d'une puce à l'encre de sa puce : Plaque n'a pas d'encre atténuée (--ink-dim = --ink),
+   et l'opacité commune (.6, .7) le mettrait sous 4,5:1 */
+:root[data-charte~="plaque-emaillee"] .chip .n{ opacity:1; }
+:root[data-charte~="plaque-emaillee"] .chip:hover,
+:root[data-charte~="plaque-emaillee"] .qc:hover,
+:root[data-charte~="plaque-emaillee"] .ghost-btn:hover,
+:root[data-charte~="plaque-emaillee"] .fix-btn:hover,
+:root[data-charte~="plaque-emaillee"] .ex-speak:hover,
+:root[data-charte~="plaque-emaillee"] .exit:hover{ border-color:var(--line); color:var(--ink); }
+/* l'action : bleu plein */
+:root[data-charte~="plaque-emaillee"] .start,
+:root[data-charte~="plaque-emaillee"] .controls .btn-flip,
+:root[data-charte~="plaque-emaillee"] #btn-check,
+:root[data-charte~="plaque-emaillee"] .btn-next,
+:root[data-charte~="plaque-emaillee"] .again-btns .primary,
+:root[data-charte~="plaque-emaillee"] .chip[aria-pressed="true"],
+:root[data-charte~="plaque-emaillee"] .controls .btn-good,
+:root[data-charte~="plaque-emaillee"] .danger-btn,
+:root[data-charte~="plaque-emaillee"] .loader .retry:hover{ background:var(--gold); color:var(--sur-or); border:3px solid var(--gold); }
+:root[data-charte~="plaque-emaillee"] body.has-due .start:enabled{ background:var(--card); color:var(--ink); border-color:var(--line); }
+:root[data-charte~="plaque-emaillee"] .start:disabled{ background:var(--card); color:var(--ink); border-color:var(--line); }
+:root[data-charte~="plaque-emaillee"] .controls .btn-again,
+:root[data-charte~="plaque-emaillee"] .controls .btn-again:hover{ background:var(--card); color:var(--ink); border-color:var(--line); }
+:root[data-charte~="plaque-emaillee"] .controls .btn-good:hover{ background:var(--gold); color:var(--sur-or); }
+/* jauges : piste d'enduit cerclée de bleu, remplissage d'encre */
+:root[data-charte~="plaque-emaillee"] .bar,
+:root[data-charte~="plaque-emaillee"] .mastery .mbar{ display:block; height:12px; background:var(--card); border:3px solid var(--line); }
+:root[data-charte~="plaque-emaillee"] .bar > span,
+:root[data-charte~="plaque-emaillee"] .mastery .mbar > span{ background:var(--ink); border-radius:0; }
+:root[data-charte~="plaque-emaillee"] .counter{ color:var(--ink); font-weight:var(--graisse-accent); }
+/* rangées : coins de tôle, filet fin */
+:root[data-charte~="plaque-emaillee"] .missed-list li,
+:root[data-charte~="plaque-emaillee"] .sr-row,
+:root[data-charte~="plaque-emaillee"] .sr-item,
+:root[data-charte~="plaque-emaillee"] .hebkb button,
+:root[data-charte~="plaque-emaillee"] .sr-cat{ background:var(--card); border:1px solid var(--line); }
+:root[data-charte~="plaque-emaillee"] .sr-item .sr-row{ border:0; }
+:root[data-charte~="plaque-emaillee"] kbd{ background:none; border:1px solid var(--line); color:var(--ink); }
+/* juste / faux : la forme dit le verdict, pas la couleur (exception au piège n°7, docs/DESIGN.md) */
+:root[data-charte~="plaque-emaillee"] .qc.ok,
+:root[data-charte~="plaque-emaillee"] .qc.ok .qc-tr{ background:var(--gold); color:var(--sur-or); border-color:var(--gold); }
+:root[data-charte~="plaque-emaillee"] .qc.no{ background:var(--card); color:var(--ink); border-color:var(--line); text-decoration:line-through; text-decoration-thickness:2px; outline:3px dashed var(--ink); outline-offset:-8px; }
+:root[data-charte~="plaque-emaillee"] .qc.no .qc-tr{ color:var(--ink); }
+:root[data-charte~="plaque-emaillee"] .qc.dim{ opacity:1; }
+:root[data-charte~="plaque-emaillee"] #answer-input.ok,
+:root[data-charte~="plaque-emaillee"] #answer-input.no{ border-color:var(--line); }
+:root[data-charte~="plaque-emaillee"] #answer-input.no{ border-style:dashed; }
+:root[data-charte~="plaque-emaillee"] .reset-confirm{ background:none; }
+/* portail */
+:root[data-charte~="plaque-emaillee"] .door-he,
+:root[data-charte~="plaque-emaillee"] .welcome{ color:var(--ink); }
+:root[data-charte~="plaque-emaillee"] h1 .he,
+:root[data-charte~="plaque-emaillee"] .brand .he{ color:var(--gold); }
+/* le filet intérieur passe par outline : le focus clavier le remplace */
+:root[data-charte~="plaque-emaillee"] .review-card:focus-visible,
+:root[data-charte~="plaque-emaillee"] .door:focus-visible{ outline:3px solid var(--ink); outline-offset:3px; }
+/* les états communs que le préfixe ferait perdre, reposés tels quels */
+:root[data-charte~="plaque-emaillee"] #search-input:focus,
+:root[data-charte~="plaque-emaillee"] #answer-input:focus{ border-color:var(--gold); }
+:root[data-charte~="plaque-emaillee"] .sr-row:hover,
+:root[data-charte~="plaque-emaillee"] .sr-item.open{ border-color:var(--gold); }
+:root[data-charte~="plaque-emaillee"] .chip:disabled{ border-color:var(--line); }
+:root[data-charte~="plaque-emaillee"] body.has-due .start:enabled:hover{ border-color:var(--gold); }
+:root[data-charte~="plaque-emaillee"] .exit:active{ color:var(--ink); border-color:var(--ink-dim); }
+:root[data-charte~="plaque-emaillee"] .speak-btn.speaking{ color:var(--gold-soft); border-color:var(--gold); }
+:root[data-charte~="plaque-emaillee"] .ex-toggle:hover{ border-color:var(--gold); color:var(--gold); }
+:root[data-charte~="plaque-emaillee"] .ex-toggle[aria-expanded="true"]{ color:var(--gold); }
+:root[data-charte~="plaque-emaillee"] .hebkb button:active{ background:var(--gold); color:var(--sur-or); }
+:root[data-charte~="plaque-emaillee"] .door:hover{ border-color:var(--gold); }
+/* Balcons partout (docs/DESIGN.md § 8) : Plaque émaillée, sa base, et le bout arrondi des balcons ;
+   les rayons sont des jetons (jetons.css), ici la place que le bout arrondi demande. Aucune règle
+   d'état commune ne pose ces propriétés : rien n'est à reposer. */
+:root[data-charte~="balcons-partout"] .door{ padding-inline-end:40px; }
+:root[data-charte~="balcons-partout"] .review-card{ padding-inline-end:32px; }
+:root[data-charte~="balcons-partout"] .speak-btn{ right:32px; top:24px; }
+/* l'étiquette descend avec le bouton d'écoute, rentré hors de la courbe du coin : les deux restent sur une ligne */
+:root[data-charte~="balcons-partout"] .face .eyebrow{ margin-top:8px; }
+/* Décor propre à carnet (docs/DESIGN.md § 4) : les dégradés que le CSS commun pose en aplat
+   du même jeton. Le préfixe ajoute (0,2,0) : chaque règle d'état commune qui pose un
+   background sur ces éléments, et qu'il ferait perdre, est reposée ici, dans le même ordre. */
+:root[data-charte~="carnet"] body{ background:radial-gradient(120% 80% at 50% 0%, var(--bg2), var(--bg) 70%); }
+:root[data-charte~="carnet"] .panel{ background:linear-gradient(180deg, var(--card), var(--bg2)); }
+:root[data-charte~="carnet"] .start{ background:linear-gradient(180deg, var(--gold-soft), var(--gold)); }
+:root[data-charte~="carnet"] body.has-due .start:enabled{ background:var(--card); }
+:root[data-charte~="carnet"] .start:disabled{ background:none; }
+:root[data-charte~="carnet"] .flip{ background:linear-gradient(160deg, var(--card), var(--bg2)); }
+:root[data-charte~="carnet"] #btn-check,
+:root[data-charte~="carnet"] .btn-next,
+:root[data-charte~="carnet"] .again-btns .primary{ background:linear-gradient(180deg,var(--gold-soft),var(--gold)); }
+:root[data-charte~="carnet"] .review-card{ background:linear-gradient(135deg, rgba(var(--gold-rgb),.16), rgba(var(--gold-rgb),.05)); }
+:root[data-charte~="carnet"] .review-card:hover{ background:linear-gradient(135deg, rgba(var(--gold-rgb),.24), rgba(var(--gold-rgb),.08)); }
+:root[data-charte~="carnet"] .review-card:disabled{ background:var(--bg2); }
+:root[data-charte~="carnet"] .mastery .mbar > span{ background:linear-gradient(90deg,var(--gold),var(--gold-soft)); }
+:root[data-charte~="carnet"] .door{ background:linear-gradient(160deg, var(--card), var(--bg2)); }
+/* le nombre d'une puce pressée : .8 de --sur-or sur l'or, 5,6:1 ; l'opacité commune (.7) le mettrait sous 4,5:1 */
+:root[data-charte~="carnet"] .chip[aria-pressed="true"] .n{ opacity:.8; }
+
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-  ::selection{ background:rgba(212,162,76,.30); color:var(--ink); }
+  ::selection{ background:rgba(var(--gold-rgb),.30); color:var(--ink); }
   html,body{margin:0; height:100%;}
+  /* La bande sous l'heure d'iOS (app installée, `black-translucent` : la page passe sous la
+     barre d'état) : fixe, au fond de la charte ; sans zone d'iOS, `env()` vaut 0 et la bande n'a pas de hauteur. */
+  body::before{ content:""; position:fixed; top:0; left:0; right:0; height:env(safe-area-inset-top, 0px); background:var(--bg); z-index:3; pointer-events:none; }
+  /* Le bas : un enfant du flux, car le `body` à height:100% perd son rembourrage du bas sur
+     un écran long ; étiré, car vide et centré il serait large de 0 et ne compterait pas. */
+  body::after{ content:""; flex:none; align-self:stretch; height:env(safe-area-inset-bottom, 0px); }
   body{
-    background:radial-gradient(120% 80% at 50% 0%, var(--bg2), var(--bg) 70%);
+    background:var(--bg);
     color:var(--ink);
-    font-family:'Assistant','Arial Hebrew','Helvetica Neue',Arial,sans-serif;
+    font-family:var(--fonte-ui);
     font-size:22px;
     min-height:100dvh;
     display:flex; flex-direction:column;
-    padding:16px 14px 26px;
+    padding:calc(16px + env(safe-area-inset-top, 0px)) max(14px, env(safe-area-inset-right, 0px)) 26px max(14px, env(safe-area-inset-left, 0px));
   }
   /* ⚠️ `*` ne cible pas les pseudo-éléments : les trois sélecteurs, toujours.
      Aucune animation de l'app n'est portée par un ::before aujourd'hui (spin et
@@ -56,8 +517,8 @@
   /* ---------- Header ---------- */
   header{ text-align:center; margin-bottom:10px; }
   .brand{
-    font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-weight:700;
-    font-size:1.5rem; letter-spacing:.01em; margin:0;
+    font-family:var(--fonte-hebreu); font-weight:var(--graisse-titre);
+    font-size:1.5rem; letter-spacing:var(--interlettre-titre); margin:0;
   }
   /* Focus clavier : anneau d'or uniforme sur tout l'interactif. */
   :focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
@@ -70,22 +531,36 @@
 
   /* ---------- Setup panel ---------- */
   .panel{
-    background:linear-gradient(180deg, var(--card), var(--bg2));
-    border:1px solid var(--card-edge); border-radius:16px;
+    background:var(--card);
+    border:1px solid var(--card-edge); border-radius:var(--rayon-section);
     padding:16px 15px; max-width:520px; width:100%; margin:8px auto 0;
   }
   .panel h2{
-    font-family:'Assistant','Arial Hebrew','Helvetica Neue',Arial,sans-serif; font-size:.84rem; font-weight:700;
-    text-transform:uppercase; letter-spacing:.12em; color:var(--gold);
+    font-family:var(--fonte-ui); font-size:.84rem; font-weight:var(--graisse-titre);
+    text-transform:var(--casse-section); letter-spacing:var(--interlettre-section); color:var(--gold);
     margin:0 0 9px;
   }
   .panel h2:not(:first-of-type){ margin-top:18px; }
+  /* Premier h2 de son montage, « Thème » garde l'écart des autres titres des Réglages. Le titre est
+     le bouton du menu (src/chartes/selecteur.js) ; sa liste s'ouvre dessous, dans le flux, et n'a
+     de `display` qu'ouverte (il battrait [hidden]). */
+  #h-charte{ margin-top:18px; }
+  .chartes-bouton{
+    font-family:var(--fonte-ui); font-size:inherit; font-weight:var(--graisse-titre);
+    text-transform:var(--casse-section); letter-spacing:var(--interlettre-section); color:var(--gold);
+    background:none; border:0; padding:0; cursor:pointer;
+  }
+  /* La flèche hors du nom accessible (« / "" ») ; la première déclaration sert de repli au navigateur
+     qui ne lit pas ce texte de remplacement. */
+  .chartes-bouton::after{ content:" ▾"; content:" ▾" / ""; }
+  .chartes-bouton[aria-expanded="true"]::after{ content:" ▴"; content:" ▴" / ""; }
+  .chartes-choix:not([hidden]){ display:flex; flex-direction:column; gap:10px; max-width:260px; }
   /* L'action du jour n'est pas un réglage : elle sort de la voix Title (étiquette de
      repère) pour la voix display, au pas « marque » du barème. Pas d'or ajouté — la
      carte de révision porte déjà la seule teinte dorée au repos. */
   .panel h2.lead{
-    font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif;
-    font-size:1.5rem; font-weight:700; text-transform:none; letter-spacing:0;
+    font-family:var(--fonte-hebreu);
+    font-size:1.5rem; font-weight:var(--graisse-titre); text-transform:none; letter-spacing:0;
     color:var(--ink); margin-bottom:12px;
   }
 
@@ -93,14 +568,14 @@
   .search-wrap{ position:relative; margin:20px 0 4px; }
   .search-ico{ position:absolute; left:13px; top:50%; transform:translateY(-50%); width:18px; height:18px; color:var(--ink-dim); pointer-events:none; }
   #search-input{
-    width:100%; border-radius:12px; border:1px solid var(--line);
+    width:100%; border-radius:var(--rayon-commande); border:1px solid var(--line);
     background:var(--bg2); color:var(--ink); font-family:inherit; font-size:1rem;
     padding:12px 48px 12px 40px; transition:border-color .15s ease;
   }
   #search-input:focus{ border-color:var(--gold); }
   .search-clear{
     position:absolute; right:2px; top:50%; transform:translateY(-50%);
-    width:44px; height:44px; border-radius:50%; border:none; background:transparent;
+    width:44px; height:44px; border-radius:var(--rayon-rond); border:none; background:transparent;
     color:var(--ink-dim); font-size:1.3rem; line-height:1; cursor:pointer;
   }
   /* Pas de défilement imbriqué : les résultats s'étirent et la page défile. */
@@ -108,21 +583,21 @@
   .sr-count{ font-size:.84rem; color:var(--ink-dim); padding:2px 2px 4px; }
   .sr-row{
     display:flex; align-items:center; gap:11px; padding:9px 11px;
-    border:1px solid var(--line); border-radius:11px; background:var(--bg2); cursor:pointer;
+    border:1px solid var(--line); border-radius:var(--rayon-case-11); background:var(--bg2); cursor:pointer;
     transition:border-color .12s ease;
   }
   .sr-row:hover{ border-color:var(--gold); }
   .sr-speak{
-    flex:none; width:44px; height:44px; border-radius:50%;
+    flex:none; width:44px; height:44px; border-radius:var(--rayon-rond);
     border:1px solid var(--line); background:transparent; color:var(--gold);
     display:flex; align-items:center; justify-content:center; padding:0;
   }
   .sr-speak svg{ width:17px; height:17px; }
   .sr-body{ flex:1; min-width:0; }
-  .sr-he{ font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:1.3rem; direction:rtl; }
-  .sr-tr{ font-family:'JetBrains Mono','Courier New',monospace; font-size:.84rem; color:var(--ink-dim); margin-inline-start:8px; }
+  .sr-he{ font-family:var(--fonte-hebreu); font-size:1.3rem; direction:rtl; }
+  .sr-tr{ font-family:var(--fonte-mono); font-size:.84rem; color:var(--ink-dim); margin-inline-start:8px; }
   .sr-fr{ color:var(--ink); font-size:.9rem; margin-top:1px; }
-  .sr-cat{ flex:none; font-size:.76rem; text-transform:uppercase; letter-spacing:.08em; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:3px 9px; white-space:nowrap; }
+  .sr-cat{ flex:none; font-size:.76rem; text-transform:var(--casse-categorie); letter-spacing:var(--interlettre-categorie); color:var(--gold); border:1px solid var(--line); border-radius:var(--rayon-pilule); padding:3px 9px; white-space:nowrap; }
   /* La requête est renvoyée EN ÉCHO ici : une saisie longue sans espace est donc du
      texte insécable piloté par l'utilisateur. Sans cette coupure, 100 caractères
      poussaient le document 391px au-delà du viewport téléphone (mesuré au Range —
@@ -136,27 +611,28 @@
     border-bottom:1px solid transparent; transition:border-color .18s ease, opacity .18s ease; }
   .search-ext:hover{ border-bottom-color:var(--gold); }
   .search-ext-fl{ margin-inline-start:5px; opacity:.7; }
-  .sr-item{ border:1px solid var(--line); border-radius:11px; background:var(--bg2); overflow:hidden; }
+  .sr-item{ border:1px solid var(--line); border-radius:var(--rayon-case-11); background:var(--bg2); overflow:hidden; }
   .sr-item .sr-row{ border:none; border-radius:0; background:transparent; }
   .sr-item.open{ border-color:var(--gold); }
   .sr-chev{ flex:none; color:var(--ink-dim); font-size:1.3rem; line-height:1; transition:transform .18s ease; }
   .sr-item.open .sr-chev{ transform:rotate(90deg); color:var(--gold); }
   .sr-detail{ padding:2px 12px 12px 12px; border-top:1px dashed var(--line); margin:0 0 2px; }
-  .srd-title{ font-size:.76rem; text-transform:uppercase; letter-spacing:.1em; color:var(--gold); margin:10px 0 7px; }
+  .srd-title{ font-size:.76rem; text-transform:var(--casse-rubrique); letter-spacing:var(--interlettre-rubrique); color:var(--gold); margin:10px 0 7px; }
   .srd-forms{ display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; direction:rtl; }
   .srd-f{ display:flex; align-items:baseline; gap:7px; }
-  .srd-he{ font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:1.15rem; direction:rtl; }
-  .srd-lbl{ font-family:'JetBrains Mono','Courier New',monospace; font-size:.8rem; color:var(--ink-dim); direction:ltr; }
+  .srd-he{ font-family:var(--fonte-hebreu); font-size:1.15rem; direction:rtl; }
+  .srd-lbl{ font-family:var(--fonte-mono); font-size:.8rem; color:var(--ink-dim); direction:ltr; }
   .srd-note{ font-size:.8rem; color:var(--ink-dim); font-style:italic; margin-top:10px; direction:ltr; }
+  .srd-note [lang="he"]{ color:var(--ink); } /* l'hébreu de la note, à l'encre pleine comme au verso (.note-line), 7:1 */
   .chips{ display:flex; flex-wrap:wrap; gap:7px; }
   .chip{
     border:1px solid var(--line); background:transparent; color:var(--ink);
-    font-family:inherit; font-size:.95rem; padding:7px 13px; border-radius:999px;
+    font-family:inherit; font-size:.95rem; padding:7px 13px; border-radius:var(--rayon-pilule);
     cursor:pointer; transition:background .15s ease, color .15s ease, border-color .15s ease, opacity .15s ease; user-select:none;
   }
   .chip:hover{ border-color:var(--gold); }
   .chip[aria-pressed="true"]{
-    background:var(--gold); color:#1a1206; border-color:var(--gold); font-weight:600;
+    background:var(--gold); color:var(--sur-or); border-color:var(--gold); font-weight:var(--graisse-commande);
   }
   /* Sans voix hébraïque, le réglage « Prononciation » est sans effet → chips inertes. */
   .chip:disabled{ opacity:.45; cursor:not-allowed; border-color:var(--line); }
@@ -187,11 +663,11 @@
     font-size:.9rem; cursor:pointer; text-decoration:underline; padding:0;
   }
   .start{
-    margin-top:20px; width:100%; border:1px solid transparent; border-radius:12px;
-    background:linear-gradient(180deg, var(--gold-soft), var(--gold));
-    color:#1a1206; font-family:inherit; font-weight:700; font-size:1rem;
-    padding:14px; cursor:pointer; letter-spacing:.01em;
-    box-shadow:0 6px 18px -8px var(--gold);
+    margin-top:20px; width:100%; border:1px solid transparent; border-radius:var(--rayon-commande);
+    background:var(--gold);
+    color:var(--sur-or); font-family:inherit; font-weight:var(--graisse-action); font-size:1rem;
+    padding:14px; cursor:pointer; letter-spacing:var(--interlettre-action);
+    box-shadow:var(--ombre-action);
     /* Propriétés listées une à une, jamais `all` : le raccourci capture les
        longhands `outline-*`, que WebKit fige alors sur leurs valeurs initiales —
        l'anneau de focus doré disparaît sans qu'aucun sélecteur cesse de matcher. */
@@ -222,21 +698,21 @@
      défile hors de vue : la hiérarchie corrigée dans l'espace, réintroduite dans
      le temps. La carte de révision, elle, est en tête — elle n'a rien à épingler. */
   @media (pointer:coarse){
-    body:not(.has-due) .start:enabled{ position:sticky; bottom:12px; z-index:2; }
+    body:not(.has-due) .start:enabled{ position:sticky; bottom:calc(12px + env(safe-area-inset-bottom, 0px)); z-index:2; }
   }
 
   /* ---------- Pli « Réglages avancés » ---------- */
   /* Ordre/Longueur/Prononciation se règlent une fois (mémorisés) : repliés,
      l'écran raccourcit et « Commencer » remonte. */
-  .adv{ margin-top:18px; border:1px solid var(--line); border-radius:12px; background:var(--bg2); }
+  .adv{ margin-top:18px; border:1px solid var(--line); border-radius:var(--rayon-panneau-12); background:var(--bg2); }
   .adv summary{
     display:flex; align-items:baseline; gap:10px; cursor:pointer; list-style:none;
-    padding:12px 14px; border-radius:12px; -webkit-tap-highlight-color:transparent;
-    font-size:.95rem; font-weight:600; color:var(--ink); transition:color .13s ease;
+    padding:12px 14px; border-radius:var(--rayon-panneau-12); -webkit-tap-highlight-color:transparent;
+    font-size:.95rem; font-weight:var(--graisse-etiquette); color:var(--ink); transition:color .13s ease;
   }
   .adv summary::-webkit-details-marker{ display:none; }
   .adv summary:hover .adv-chev{ color:var(--gold); }
-  .adv-sub{ margin-left:auto; font-weight:400; font-size:.8rem; color:var(--ink-dim);
+  .adv-sub{ margin-left:auto; font-weight:var(--graisse-texte); font-size:.8rem; color:var(--ink-dim);
     min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .adv-chev{ color:var(--ink-dim); transition:transform .15s ease; align-self:center; }
   .adv[open] .adv-chev{ transform:rotate(90deg); }
@@ -246,7 +722,7 @@
      voix du libellé de pli, et non la voix Title des sections restées dépliées — un
      groupe replié se lit comme un pli, pas comme une section. */
   .adv summary h2.adv-lbl{
-    font-family:inherit; font-size:inherit; font-weight:600; text-transform:none;
+    font-family:inherit; font-size:inherit; font-weight:var(--graisse-etiquette); text-transform:none;
     letter-spacing:0; color:var(--ink); margin:0;
   }
   /* Le summary est la seule cible tactile du groupe replié. */
@@ -256,11 +732,11 @@
   /* Remise à zéro : discrète au repos, rouge assumé au moment de confirmer. */
   .reset-zone{ margin-top:20px; padding-top:4px; border-top:1px solid var(--line); }
   .reset-call:hover{ border-color:var(--red); color:var(--red); }
-  .reset-confirm{ margin-top:10px; padding:12px 14px; border:1px solid var(--red); border-radius:12px; background:rgba(217,106,91,.07); }
+  .reset-confirm{ margin-top:10px; padding:12px 14px; border:1px solid var(--red); border-radius:var(--rayon-case-12); background:rgba(var(--red-rgb),.07); }
   .reset-confirm p{ margin:0 0 12px; font-size:.9rem; line-height:1.5; }
   .reset-actions{ display:flex; gap:10px; flex-wrap:wrap; }
-  .danger-btn{ background:var(--red); border:1px solid var(--red); border-radius:10px; color:#1a0d0a;
-    font-family:inherit; font-size:.9rem; font-weight:600; padding:9px 14px; cursor:pointer; transition:filter .13s ease; }
+  .danger-btn{ background:var(--red); border:1px solid var(--red); border-radius:var(--rayon-case-10); color:var(--sur-rouge);
+    font-family:inherit; font-size:.9rem; font-weight:var(--graisse-commande); padding:9px 14px; cursor:pointer; transition:filter .13s ease; }
   .danger-btn:hover{ filter:brightness(1.1); }
   .reset-done{ margin-top:10px; font-size:.9rem; color:var(--green); }
 
@@ -276,11 +752,11 @@
   .setup.hidden{ display:none; }
 
   .progress-wrap{ display:flex; align-items:center; gap:12px; margin:6px 2px 16px; }
-  .bar{ flex:1; height:5px; background:var(--line); border-radius:999px; overflow:hidden; }
-  .bar > span{ display:block; height:100%; width:100%; background:var(--gold); border-radius:999px; transform:scaleX(0); transform-origin:left; transition:transform .35s ease; }
-  .counter{ font-family:'JetBrains Mono','Courier New',monospace; font-size:.88rem; color:var(--ink-dim); white-space:nowrap; }
-  .exit{ display:inline-flex; align-items:center; gap:3px; min-height:44px; background:var(--card); border:1px solid var(--card-edge); color:var(--ink-dim); font-family:inherit; font-size:.95rem; line-height:1; cursor:pointer; padding:9px 12px 9px 10px; border-radius:10px; -webkit-tap-highlight-color:transparent; }
-  .exit > span{ font-size:.82rem; letter-spacing:.02em; }
+  .bar{ flex:1; height:5px; background:var(--line); border-radius:var(--rayon-pilule); overflow:hidden; }
+  .bar > span{ display:block; height:100%; width:100%; background:var(--gold); border-radius:var(--rayon-pilule); transform:scaleX(0); transform-origin:left; transition:transform .35s ease; }
+  .counter{ font-family:var(--fonte-mono); font-size:.88rem; color:var(--ink-dim); white-space:nowrap; }
+  .exit{ display:inline-flex; align-items:center; gap:3px; min-height:44px; background:var(--card); border:1px solid var(--card-edge); color:var(--ink-dim); font-family:inherit; font-size:.95rem; line-height:1; cursor:pointer; padding:9px 12px 9px 10px; border-radius:var(--rayon-case-10); -webkit-tap-highlight-color:transparent; }
+  .exit > span{ font-size:.82rem; letter-spacing:var(--interlettre-sortie); }
   .exit:hover, .exit:active{ color:var(--ink); border-color:var(--ink-dim); }
 
   /* ---------- The card ---------- */
@@ -288,9 +764,9 @@
   .flip{
     position:relative; width:100%; max-width:420px;
     display:flex; flex-direction:column;
-    border-radius:20px; border:1px solid var(--card-edge);
-    background:linear-gradient(160deg, var(--card), var(--bg2));
-    box-shadow:0 20px 50px -22px #000, inset 0 1px 0 rgba(255,255,255,.03);
+    border-radius:var(--rayon-carte); border:1px solid var(--card-edge);
+    background:var(--card);
+    box-shadow:var(--ombre-carte);
     cursor:pointer; overflow:hidden;
     min-height:340px; max-height:520px; height:min(60vh,520px);
     transition:transform .12s ease;
@@ -320,23 +796,28 @@
     padding:16px 22px 14px; text-align:center;
   }
   /* min-height:0 laisse la rangée se comprimer au lieu de pousser la carte ;
-     align-content:center garde le contenu centré tant qu'il y a du mou. */
-  #face-content{ min-height:0; overflow-y:auto; display:grid; align-content:center; }
+     safe center centre tant qu'il y a du mou, commence en haut quand ça déborde (1re ligne atteignable).
+     minmax(0,1fr) : la colonne a la largeur de la carte ; implicite (auto), elle prenait la largeur sans retour
+     de .forms (width:max-content, son max-width:100% sans base pendant le calcul) et décalait tout à droite. */
+  #face-content{ min-height:0; overflow-y:auto; display:grid; grid-template-columns:minmax(0,1fr); align-content:safe center; }
   .face .eyebrow{
     /* Le padding latéral réserve les deux coins : le bouton d'écoute est en
        absolu par-dessus, et l'étiquette est centrée — sans lui, une catégorie
        longue passerait dessous sur la carte étroite du téléphone. */
     padding-inline:46px;
-    font-size:.8rem; letter-spacing:.14em; text-transform:uppercase;
-    color:var(--gold); font-weight:600;
+    /* La rangée a la hauteur du bouton d'écoute (44 px au doigt) : il tient au-dessus du filet,
+       et le contenu qui défile s'arrête 6 px sous elle, jamais sous le bouton. */
+    min-height:44px; display:flex; align-items:center; justify-content:center; margin-bottom:6px;
+    font-size:.8rem; letter-spacing:var(--interlettre-surtitre); text-transform:var(--casse-surtitre);
+    color:var(--gold); font-weight:var(--graisse-etiquette);
   }
   .face .hint{
-    font-size:.84rem; color:var(--ink-dim);
+    font-size:.84rem; color:var(--ink-dim); margin-top:8px;
   }
   .speak-btn{
-    position:absolute; top:12px; right:14px;
-    width:40px; height:40px; border-radius:50%;
-    border:1px solid var(--line); background:rgba(0,0,0,.18);
+    position:absolute; top:16px; right:14px;
+    width:40px; height:40px; border-radius:var(--rayon-rond);
+    border:1px solid var(--line); background:var(--voile-sombre);
     color:var(--gold); display:flex; align-items:center; justify-content:center;
     cursor:pointer; padding:0; transition:transform .1s ease, color .15s ease, border-color .15s ease;
     z-index:2;
@@ -358,7 +839,7 @@
      long et n'a pas de mots). */
   .voice-id{
     display:block; margin-top:3px; direction:ltr;
-    font-family:'JetBrains Mono','Courier New',monospace; font-size:.7rem;
+    font-family:var(--fonte-mono); font-size:.7rem;
     word-break:break-all;
   }
   .face.flip-anim{ animation:cardIn .26s ease; }
@@ -366,34 +847,52 @@
 
   /* Tailles uniformes : un même élément (mot, translittération, inflexions…)
      garde la même taille partout où il apparaît (carte, feedback, les deux sens). */
-  .big-he{ font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:3.6rem; line-height:1.15; direction:rtl; }
-  .big-he.cursive{ font-family:'Playpen Sans Hebrew','Segoe Script','Comic Sans MS',cursive; font-weight:300; font-size:3.2rem; color:var(--gold-soft); }
-  .big-fr{ font-size:2.4rem; font-weight:600; font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; }
+  .big-he{ font-family:var(--fonte-hebreu); font-size:3.6rem; line-height:1.15; direction:rtl; }
+  .big-he.cursive{ font-family:var(--fonte-cursive); font-weight:var(--graisse-cursive); font-size:3.2rem; color:var(--gold-soft); }
+  /* overflow-wrap:anywhere : un mot plus large que la carte (« soutenu/journalistique ») se coupe au lieu d'être rogné. */
+  .big-fr{ font-size:2.4rem; font-weight:var(--graisse-vedette-fr); font-family:var(--fonte-hebreu); overflow-wrap:anywhere; }
   /* Phrases : plus longues qu'un mot → taille réduite et retour à la ligne propre. */
   .big-he.phrase{ font-size:2.15rem; line-height:1.45; }
   .big-fr.phrase{ font-size:1.5rem; line-height:1.35; }
   @media (max-width:480px){ .big-he.phrase{ font-size:1.9rem; } .big-fr.phrase{ font-size:1.35rem; } }
-  .translit{ font-family:'JetBrains Mono','Courier New',monospace; font-size:1.1rem; color:var(--ink-dim); margin-top:12px; direction:ltr; }
-  .sub-he{ font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:1.9rem; direction:rtl; margin-top:6px; }
-  .cursive-line{ font-family:'Playpen Sans Hebrew','Segoe Script','Comic Sans MS',cursive; font-weight:300; font-size:1.7rem; color:var(--gold-soft); direction:rtl; margin-top:8px; }
-  .note-line{ font-size:1rem; color:var(--ink-dim); margin-top:14px; max-width:90%; font-style:italic; }
+  .translit{ font-family:var(--fonte-mono); font-size:1.1rem; color:var(--ink-dim); margin-top:12px; direction:ltr; }
+  .rappel{font-family:var(--fonte-hebreu);font-size:2.5rem;line-height:1.4;direction:rtl;margin-bottom:6px} .rappel.phrase{font-size:1.9rem;line-height:1.45} /* verso hé→fr : l'hébreu rappelé en tête, plus grand que la vedette française (DESIGN.md § 3) */
+  .cursive-line{ font-family:var(--fonte-cursive); font-weight:var(--graisse-cursive); font-size:1.7rem; color:var(--gold-soft); direction:rtl; margin-top:8px; }
+  .note-line{ font-size:1rem; color:var(--ink-dim); margin-top:14px; max-width:90%; margin-inline:auto; font-style:italic; }
+  /* Une langue par ligne (noteHtml, 10-rendu.js) : la suite hébraïque sur sa ligne, en rtl ; un mot hébreu
+     resté dans la phrase est isolé (il se lit dans l'ordre du français) et insécable. */
+  .note-line .nl-he{ font-family:var(--fonte-hebreu); font-size:1.25em; line-height:1.4; margin:2px 0; direction:rtl; font-style:normal; }
+  /* L'hébreu de la note est du contenu d'étude : l'encre pleine, jamais --ink-dim (DESIGN.md, Parchemin estompé), 7:1. */
+  .note-line [lang="he"]{ color:var(--ink); }
+  .note-line .nl-fr + .nl-fr{ margin-top:2px; }
+  .note-line span[lang="he"]{ unicode-bidi:isolate; }
+  .note-line .nl-mot{ white-space:nowrap; }
   /* --- Exemples en situation : pli « Voir un exemple » (verso, feedback, QCM) --- */
   .ex-wrap{ margin-top:16px; }
   .ex-toggle{
-    background:none; border:1px solid var(--line); border-radius:10px;
-    color:var(--ink-dim); font-family:'Assistant','Arial Hebrew','Helvetica Neue',Arial,sans-serif; font-size:.88rem;
+    background:none; border:1px solid var(--line); border-radius:var(--rayon-case-10);
+    color:var(--ink-dim); font-family:var(--fonte-ui); font-size:.88rem;
     padding:7px 14px; cursor:pointer; transition:border-color .15s ease, color .15s ease;
   }
   .ex-toggle:hover{ border-color:var(--gold); color:var(--gold); }
   .ex-toggle[aria-expanded="true"]{ color:var(--gold); }
   .ex-box{ margin-top:12px; display:flex; flex-direction:column; gap:10px; }
-  .ex-item{ display:flex; align-items:center; justify-content:center; gap:10px; }
-  .ex-body{ min-width:0; }
-  .ex-he{ font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:1.5rem; line-height:1.45; direction:rtl; }
-  .ex-tr{ font-family:'JetBrains Mono','Courier New',monospace; font-size:.8rem; color:var(--ink-dim); direction:ltr; margin-top:2px; }
-  .ex-fr{ font-family:'Assistant','Arial Hebrew','Helvetica Neue',Arial,sans-serif; font-size:.95rem; margin-top:2px; }
+  /* Trois colonnes : le bouton d'écoute à gauche, le texte au milieu, une colonne vide en miroir —
+     le texte reste sur l'axe de la carte et passe à la ligne plutôt que de s'en écarter. */
+  .ex-item{ display:grid; grid-template-columns:minmax(44px,1fr) minmax(0,auto) minmax(44px,1fr); align-items:center; gap:10px; }
+  .ex-item .ex-speak{ grid-column:1; justify-self:end; }
+  .ex-item .ex-body{ grid-column:2; min-width:0; }
+  /* Au téléphone la phrase prend toute la largeur, le bouton passe dessous, sur l'axe. */
+  @media (max-width:480px){
+    .ex-item{ grid-template-columns:minmax(0,1fr); }
+    .ex-item .ex-body{ grid-column:1; }
+    .ex-item .ex-speak{ grid-column:1; grid-row:2; justify-self:center; }
+  }
+  .ex-he{ font-family:var(--fonte-hebreu); font-size:1.5rem; line-height:1.45; direction:rtl; }
+  .ex-tr{ font-family:var(--fonte-mono); font-size:.8rem; color:var(--ink-dim); direction:ltr; margin-top:2px; }
+  .ex-fr{ font-family:var(--fonte-ui); font-size:.95rem; margin-top:2px; }
   .ex-speak{
-    flex:0 0 auto; width:40px; height:40px; padding:9px; border-radius:50%;
+    flex:0 0 auto; width:40px; height:40px; padding:9px; border-radius:var(--rayon-rond);
     border:1px solid var(--line); background:none; color:var(--ink-dim); cursor:pointer;
     display:flex; align-items:center; justify-content:center;
     transition:border-color .15s ease, color .15s ease;
@@ -419,20 +918,17 @@
   .srd-ex .ex-tr{ font-size:.76rem; margin-top:0; }
   .srd-ex .ex-fr{ font-size:.8rem; margin-top:0; }
   .srd-ex .ex-speak{ width:34px; height:34px; padding:7px; }
-  /* Inflexions : chaque forme est une cellule empilée (mot au-dessus, étiquette
-     dessous), le tout centré et en retour à la ligne — jamais de mélange rtl/ltr
-     sur une même ligne (source des chevauchements) et une taille lisible. */
+  /* Inflexions : une forme par rangée (décision du 2026-10-24). La grille est en rtl : l'hébreu à droite, sa
+     translittération, puis le français à gauche ; chaque colonne s'aligne sur elle-même. */
+  .forms-titre{ margin-top:18px; font-size:.75rem; color:var(--ink-dim); text-transform:var(--casse-surtitre); letter-spacing:var(--interlettre-surtitre); }
   .forms{
-    margin-top:20px; display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start;
-    gap:14px 22px; direction:rtl; max-width:100%;
+    margin:18px auto 0; display:grid; grid-template-columns:repeat(3,auto); align-items:baseline;
+    gap:6px 14px; width:max-content; max-width:100%; direction:rtl;
   }
-  /* Verbes : les 4 formes se rangent en 2×2 — singulier au-dessus, pluriel
-     dessous ; en lecture RTL (direction:rtl ci-dessus) le masculin tombe à
-     droite, le féminin à gauche, exactement comme une table de conjugaison. */
-  .forms.forms-grid{ display:grid; grid-template-columns:repeat(2,max-content); justify-content:center; gap:14px 34px; }
-  .forms .form-cell{ display:flex; flex-direction:column; align-items:center; gap:3px; min-width:78px; }
-  .forms .f-he{ font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:2rem; line-height:1.1; direction:rtl; }
-  .forms .f-lbl{ font-size:.85rem; color:var(--ink-dim); direction:ltr; line-height:1.2; white-space:nowrap; }
+  .forms-titre + .forms{ margin-top:6px; }
+  .forms .f-he{ font-family:var(--fonte-hebreu); font-size:1.7rem; line-height:1.2; text-align:right; }
+  .forms .f-tr{ font-size:.85rem; color:var(--ink-dim); direction:ltr; text-align:right; }
+  .forms .f-lbl{ font-size:.75rem; color:var(--ink-dim); direction:ltr; text-align:left; white-space:nowrap; text-transform:var(--casse-surtitre); letter-spacing:var(--interlettre-surtitre); }
 
   /* ---------- Le palier « ordi » ----------
      L'app est née sur iPhone et s'y était arrêtée : avant ce bloc, ses seules
@@ -487,8 +983,9 @@
        plafond `46vh` posé pour le téléphone gagnerait aussi au palier ordi. */
     body.input-mode .flip{ min-height:min(30vh,260px); height:auto; max-height:none; }
     .face{ padding:20px 30px 18px; }
+    .speak-btn{ top:20px; }
     .face .eyebrow{ font-size:.9rem; padding-inline:56px; }
-    /* Ici la carte fait exactement la hauteur de son contenu : `align-content:center`
+    /* Ici la carte fait exactement la hauteur de son contenu : `align-content:safe center`
        n'a aucun mou à répartir, et la consigne se colle sous les inflexions. */
     .face .hint{ font-size:.95rem; margin-top:12px; }
     /* Au-dessus de 900px, rien ne défile dans la carte — il n'y a rien à y faire
@@ -508,14 +1005,12 @@
     .big-he.phrase{ font-size:2.8rem; }
     .big-fr.phrase{ font-size:1.9rem; }
     .translit{ font-size:1.4rem; }
-    .sub-he{ font-size:2.5rem; }
+    .rappel{font-size:3.1rem} .rappel.phrase{font-size:2.5rem}
     .cursive-line{ font-size:2.2rem; }
     .note-line{ font-size:1.15rem; }
 
-    .forms{ gap:16px 30px; margin-top:24px; }
-    .forms.forms-grid{ gap:16px 44px; }
-    .forms .f-he{ font-size:2.6rem; }
-    .forms .f-lbl{ font-size:1rem; }
+    /* La liste des inflexions garde la taille du téléphone : plus grande, quatre rangées de verbe
+       doublaient les versos à faire défiler à `bureau` (1536×730) (décision du 2026-10-25). */
     /* ⚠️ Les inflexions du mode saisie ne se règlent PAS ici : leur règle de base
        est dans `40-reponses.css`, concaténé après ce fichier, et à sélecteur égal
        c'est le dernier qui gagne — une @media n'ajoute pas de spécificité. Le
@@ -529,25 +1024,32 @@
     .ex-toggle{ font-size:1rem; }
   }
 
+  /* Téléphone couché : la carte prend la hauteur de son contenu et c'est la page qui défile. Plafonnée,
+     elle faisait défiler le verso dans une fenêtre de 400 px de haut, sous le défilement de la page
+     (décision du 2026-10-25). */
+  @media (orientation:landscape) and (max-height:500px){
+    .flip, body.input-mode .flip{ height:auto; max-height:none; }
+    #face-content{ overflow:visible; }
+  }
+
   /* ---------- Answer controls ---------- */
   .controls{ display:flex; gap:10px; margin-top:18px; min-height:52px; }
   .controls button{
-    flex:1; border-radius:12px; font-family:inherit; font-weight:600; font-size:.95rem;
+    flex:1; border-radius:var(--rayon-commande); font-family:inherit; font-weight:var(--graisse-commande); font-size:.95rem;
     padding:13px; cursor:pointer; border:1px solid var(--line); background:var(--card); color:var(--ink);
     transition:background .13s ease, color .13s ease, border-color .13s ease, opacity .13s ease;
   }
-  .btn-flip{ background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#1a1206; border:none; font-weight:700; }
   .btn-again{ border-color:var(--red); color:var(--red); }
-  .btn-again:hover{ background:var(--red); color:#1a0d0a; }
+  .btn-again:hover{ background:var(--red); color:var(--sur-rouge); }
   .btn-good{ border-color:var(--green); color:var(--green); }
-  .btn-good:hover{ background:var(--green); color:#0a1a0f; }
+  .btn-good:hover{ background:var(--green); color:var(--sur-vert); }
   .hide{ display:none !important; }
 
   /* ---------- Input mode ---------- */
   .input-zone{ margin-top:18px; }
   .input-row{ display:flex; gap:10px; }
   #answer-input{
-    flex:1; border-radius:12px; border:1px solid var(--line);
+    flex:1; border-radius:var(--rayon-commande); border:1px solid var(--line);
     background:var(--bg2); color:var(--ink); font-family:inherit; font-size:1.1rem;
     padding:13px 15px; transition:border-color .15s ease;
   }
@@ -555,28 +1057,28 @@
   #answer-input.ok{ border-color:var(--green); }
   #answer-input.no{ border-color:var(--red); }
   #btn-check{
-    border:none; border-radius:12px; font-family:inherit; font-weight:700; font-size:.95rem;
+    border:none; border-radius:var(--rayon-commande); font-family:inherit; font-weight:var(--graisse-action); font-size:.95rem;
     padding:13px 20px; cursor:pointer;
-    background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#1a1206;
+    background:var(--gold); color:var(--sur-or);
   }
   .btn-next{
-    margin-top:14px; width:100%; border:none; border-radius:12px; font-family:inherit;
-    font-weight:700; font-size:.95rem; padding:14px; cursor:pointer;
-    background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#1a1206;
+    margin-top:14px; width:100%; border:none; border-radius:var(--rayon-commande); font-family:inherit;
+    font-weight:var(--graisse-action); font-size:.95rem; padding:14px; cursor:pointer;
+    background:var(--gold); color:var(--sur-or);
   }
   .feedback{ margin-top:14px; text-align:center; font-size:1rem; min-height:1.2em; }
-  .feedback .verdict{ font-weight:700; font-size:1.1rem; }
+  .feedback .verdict{ font-weight:var(--graisse-accent); font-size:1.1rem; }
   .feedback .verdict.ok{ color:var(--green); }
   .feedback .verdict.no{ color:var(--red); }
   .feedback .answer{ margin-top:8px; color:var(--ink); }
-  .feedback .answer .he{ font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:1.9rem; direction:rtl; }
-  .feedback .answer .tr{ font-family:'JetBrains Mono','Courier New',monospace; font-size:1.1rem; color:var(--ink-dim); }
+  .feedback .answer .he{ font-family:var(--fonte-hebreu); font-size:1.9rem; direction:rtl; }
+  .feedback .answer .tr{ font-family:var(--fonte-mono); font-size:1.1rem; color:var(--ink-dim); }
   .feedback .your-answer{ font-size:.9rem; color:var(--ink-dim); margin-top:6px; }
   .feedback .your-answer s{ opacity:.7; }
   /* « Corriger » / « Annuler » : même bouton discret dans les trois modes. */
   .fix-btn{
     margin-top:12px; border:1px solid var(--line); background:transparent; color:var(--ink-dim);
-    border-radius:10px; font-family:inherit; font-size:.86rem; padding:8px 14px; cursor:pointer; transition:background .13s ease, color .13s ease, border-color .13s ease, opacity .13s ease;
+    border-radius:var(--rayon-case-10); font-family:inherit; font-size:.86rem; padding:8px 14px; cursor:pointer; transition:background .13s ease, color .13s ease, border-color .13s ease, opacity .13s ease;
   }
   .fix-btn:hover{ color:var(--gold); border-color:var(--gold); }
   .fix-btn[disabled]{ opacity:.5; cursor:default; }
@@ -585,7 +1087,7 @@
   /* ---------- Done screen ---------- */
   .done{ display:none; flex-direction:column; align-items:center; justify-content:center; flex:1; text-align:center; max-width:520px; margin:0 auto; }
   .done.active{ display:flex; }
-  .done .score{ font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:3.4rem; color:var(--gold); }
+  .done .score{ font-family:var(--fonte-hebreu); font-size:3.4rem; color:var(--gold); }
   .done .score small{ font-size:1.4rem; color:var(--ink-dim); }
   .done p{ color:var(--ink-dim); margin:6px 0 24px; }
   /* Récapitulatif des ratées : mêmes rangées posées que la recherche, en lecture seule. */
@@ -595,23 +1097,25 @@
   }
   .missed-list li{
     display:flex; flex-wrap:wrap; align-items:baseline; column-gap:14px; row-gap:2px;
-    padding:9px 13px; border:1px solid var(--line); border-radius:11px; background:var(--bg2);
+    padding:9px 13px; border:1px solid var(--line); border-radius:var(--rayon-case-11); background:var(--bg2);
   }
-  .missed-list .m-he{ font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:1.3rem; line-height:1.3; direction:rtl; }
+  .missed-list .m-he{ font-family:var(--fonte-hebreu); font-size:1.3rem; line-height:1.3; direction:rtl; }
   .missed-list .m-fr{ color:var(--ink-dim); font-size:.95rem; margin-inline-start:auto; }
   .again-btns{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
   .again-btns button{
-    border-radius:12px; font-family:inherit; font-weight:600; font-size:.95rem; padding:12px 20px; cursor:pointer;
+    border-radius:var(--rayon-commande); font-family:inherit; font-weight:var(--graisse-commande); font-size:.95rem; padding:12px 20px; cursor:pointer;
     border:1px solid var(--line); background:var(--card); color:var(--ink);
   }
-  .again-btns .primary{ background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#1a1206; border:none; }
+  .again-btns .primary{ background:var(--gold); color:var(--sur-or); border:none; }
 
-  kbd{ font-family:'JetBrains Mono','Courier New',monospace; font-size:.84rem; background:var(--line); padding:1px 5px; border-radius:4px; color:var(--ink-dim); }
-  .kbd-hint{ text-align:center; color:var(--ink-dim); font-size:.84rem; margin-top:12px; }
-  @media (max-width:480px){ .kbd-hint{ display:none; } .big-he{ font-size:3.2rem; } .big-he.cursive{ font-size:2.8rem; } .big-fr{ font-size:2rem; } .forms{ gap:12px 16px; } .forms .f-he{ font-size:1.9rem; } }
+  kbd{ font-family:var(--fonte-mono); font-size:.84rem; background:var(--line); padding:1px 5px; border-radius:var(--rayon-case-4); color:var(--ink-dim); }
+  .kbd-hint{ text-align:center; color:var(--ink-dim); font-size:.84rem; margin-top:12px; text-wrap:balance; line-height:2; }
+  /* Une touche ne se sépare pas de son libellé : la ligne se coupe entre les paires. */
+  .kbd-hint .kh{ white-space:nowrap; }
+  @media (max-width:480px){ .kbd-hint{ display:none; } .big-he{ font-size:3.2rem; } .big-he.cursive{ font-size:2.8rem; } .big-fr{ font-size:2rem; } }
 
   .loader{ max-width:520px; margin:40px auto; text-align:center; color:var(--ink-dim); }
-  .loader .spin{ width:34px; height:34px; margin:0 auto 14px; border:3px solid var(--line); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; }
+  .loader .spin{ width:34px; height:34px; margin:0 auto 14px; border:3px solid var(--line); border-top-color:var(--gold); border-radius:var(--rayon-rond); animation:spin 1s linear infinite; }
   @keyframes spin{ to{ transform:rotate(360deg); } }
   .count-note{ text-align:center; color:var(--ink-dim); font-size:.88rem; margin-top:12px; }
   .exit-note{ text-align:center; color:var(--ink-dim); font-size:.9rem; margin:2px 0 14px; }
@@ -620,19 +1124,19 @@
   .start-hint{ text-align:center; color:var(--gold); font-size:.86rem; margin:16px 0 -8px; }
   .loader .retry{
     margin-top:16px; border:1px solid var(--gold); background:transparent; color:var(--gold);
-    border-radius:10px; font-family:inherit; font-weight:600; font-size:.9rem; padding:10px 20px; cursor:pointer; transition:background .13s ease, color .13s ease, border-color .13s ease, opacity .13s ease;
+    border-radius:var(--rayon-case-10); font-family:inherit; font-weight:var(--graisse-commande); font-size:.9rem; padding:10px 20px; cursor:pointer; transition:background .13s ease, color .13s ease, border-color .13s ease, opacity .13s ease;
   }
-  .loader .retry:hover{ background:var(--gold); color:#1a1206; }
-  .loader .loader-title{ color:var(--ink); font-size:1.1rem; font-weight:600; }
+  .loader .retry:hover{ background:var(--gold); color:var(--sur-or); }
+  .loader .loader-title{ color:var(--ink); font-size:1.1rem; font-weight:var(--graisse-etiquette); }
   .loader .loader-detail{ font-size:.9rem; opacity:.85; margin-top:6px; }
-  .loader .loader-detail code{ font-family:'JetBrains Mono','Courier New',monospace; font-size:.85em; background:var(--line); padding:1px 5px; border-radius:4px; }
+  .loader .loader-detail code{ font-family:var(--fonte-mono); font-size:.85em; background:var(--line); padding:1px 5px; border-radius:var(--rayon-case-4); }
   .src-link{ text-align:center; margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
   .src-link a{ color:var(--gold); text-decoration:none; font-size:.95rem; }
   .src-link a:hover{ text-decoration:underline; }
   /* ---------- Saisie : passer + clavier hébreu ---------- */
   .input-actions{ display:flex; align-items:center; gap:10px; margin-top:10px; }
   .ghost-btn{
-    background:none; border:1px solid var(--line); border-radius:10px; color:var(--ink-dim);
+    background:none; border:1px solid var(--line); border-radius:var(--rayon-case-10); color:var(--ink-dim);
     font-family:inherit; font-size:.9rem; padding:9px 14px; cursor:pointer; transition:background .13s ease, color .13s ease, border-color .13s ease, opacity .13s ease;
   }
   .ghost-btn:hover{ border-color:var(--gold); color:var(--gold); }
@@ -641,11 +1145,11 @@
   .kb-row{ display:flex; gap:6px; direction:rtl; }
   .hebkb button{
     flex:1; min-width:0;
-    font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:1.35rem;
-    padding:10px 0; border-radius:9px; border:1px solid var(--line);
+    font-family:var(--fonte-hebreu); font-size:1.35rem;
+    padding:10px 0; border-radius:var(--rayon-case-9); border:1px solid var(--line);
     background:var(--bg2); color:var(--ink); cursor:pointer; line-height:1;
   }
-  .hebkb button:active{ background:var(--gold); color:#1a1206; }
+  .hebkb button:active{ background:var(--gold); color:var(--sur-or); }
   .hebkb .kb-final{ color:var(--gold-soft); }
   .hebkb .kb-ctl{ font-family:inherit; font-size:.9rem; color:var(--ink-dim); }
   .hebkb .kb-space{ flex:3; }
@@ -654,8 +1158,8 @@
      acceptée. Il n'existe que sur pointeur fin — l'AZERTY du bureau, lui, ne
      sait pas taper l'hébreu. (!important : prime sur les bascules .hide du JS.) */
   @media (pointer:coarse){ #kb-toggle, .hebkb{ display:none !important; } }
-  /* Inflexions sous la correction en mode saisie : mêmes cellules empilées,
-     espacement et taille resserrés pour tenir dans la carte compacte. */
+  /* Inflexions sous la correction en mode saisie : la même liste, espacement
+     resserré pour tenir dans la carte compacte. */
   .feedback .forms{ margin:12px auto 0; gap:10px 16px; }
   .feedback .forms .f-he{ font-size:1.7rem; }
   .feedback .note-line{ margin-top:10px; }
@@ -690,6 +1194,8 @@
     body.input-mode #face-content .forms{ margin-top:24px; gap:12px 22px; }
     body.input-mode #face-content .forms .f-he{ font-size:2.2rem; }
     #answer-input{ font-size:1.25rem; }
+    /* La colonne de réponse est à côté de la carte : son premier rang part du haut de la carte. */
+    .answer-col > .controls{ margin-top:0; }
 
     .done{ max-width:760px; }
     .missed-list{ max-width:620px; }
@@ -706,17 +1212,17 @@
   .quiz-choices{ display:flex; flex-direction:column; gap:10px; }
   .qc{
     width:100%; border:1px solid var(--line); background:var(--card); color:var(--ink);
-    font-family:inherit; font-size:1.1rem; padding:14px 16px; border-radius:12px;
+    font-family:inherit; font-size:1.1rem; padding:14px 16px; border-radius:var(--rayon-commande);
     cursor:pointer; text-align:center; transition:border-color .12s ease, background .12s ease, color .12s ease;
     display:flex; flex-direction:column; align-items:center; gap:2px;
   }
-  .qc .qc-he{ font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:1.7rem; direction:rtl; line-height:1.15; }
-  .qc .qc-tr{ font-family:'JetBrains Mono','Courier New',monospace; font-size:.82rem; color:var(--ink-dim); direction:ltr; }
+  .qc .qc-he{ font-family:var(--fonte-hebreu); font-size:1.7rem; direction:rtl; line-height:1.15; }
+  .qc .qc-tr{ font-family:var(--fonte-mono); font-size:.82rem; color:var(--ink-dim); direction:ltr; }
   .qc:hover{ border-color:var(--gold); }
   .qc:disabled{ cursor:default; }
-  .qc.ok{ border-color:var(--green); background:rgba(91,189,122,.14); color:var(--green); }
+  .qc.ok{ border-color:var(--green); background:rgba(var(--green-rgb),.14); color:var(--green); }
   .qc.ok .qc-tr{ color:var(--green); }
-  .qc.no{ border-color:var(--red); background:rgba(217,106,91,.13); color:var(--red); }
+  .qc.no{ border-color:var(--red); background:rgba(var(--red-rgb),.13); color:var(--red); }
   .qc.no .qc-tr{ color:var(--red); }
   .qc.dim{ opacity:.5; }
   /* Options « Phrases » : quatre phrases complètes empilées feraient des boutons
@@ -728,11 +1234,11 @@
   /* ---------- Révision espacée (SRS) ---------- */
   .review-card{
     display:flex; align-items:center; gap:12px; width:100%; text-align:left;
-    border:1px solid var(--gold); border-radius:14px; cursor:pointer;
-    background:linear-gradient(135deg, rgba(212,162,76,.16), rgba(212,162,76,.05));
+    border:1px solid var(--gold); border-radius:var(--rayon-panneau-14); cursor:pointer;
+    background:rgba(var(--gold-rgb),.16);
     color:var(--ink); font-family:inherit; padding:13px 15px; transition:background .13s ease, color .13s ease, border-color .13s ease;
   }
-  .review-card:hover{ background:linear-gradient(135deg, rgba(212,162,76,.24), rgba(212,162,76,.08)); }
+  .review-card:hover{ background:rgba(var(--gold-rgb),.24); }
   /* Peau pleine, pas d'opacité : `opacity:.55` enfreignait DESIGN.md §5 deux fois —
      il disait l'état inerte par une transparence, et laissait l'icône en or PÂLI
      plutôt que de la sortir de l'or. Un état inactif n'est jamais éclairé. */
@@ -741,15 +1247,15 @@
   .review-ico{ flex:none; width:24px; height:24px; color:var(--gold); }
   .review-ico svg{ width:100%; height:100%; }
   .review-body{ flex:1; min-width:0; }
-  .review-title{ font-weight:700; font-size:1rem; }
+  .review-title{ font-weight:var(--graisse-titre); font-size:1rem; }
   .review-sub{ font-size:.84rem; color:var(--ink-dim); margin-top:1px; }
   .review-card:disabled .review-sub{ color:var(--ink-dim); }
   .review-arrow{ flex:none; color:var(--gold); font-size:1.3rem; }
   .review-card:disabled .review-arrow{ display:none; }
   .mastery{ margin-top:12px; font-size:.9rem; color:var(--ink-dim); }
-  .mastery b{ color:var(--gold-soft); font-weight:700; }
-  .mastery .mbar{ height:6px; border-radius:999px; background:var(--line); overflow:hidden; margin-top:7px; }
-  .mastery .mbar > span{ display:block; height:100%; width:100%; background:linear-gradient(90deg,var(--gold),var(--gold-soft)); border-radius:999px; transform:scaleX(0); transform-origin:left; transition:transform .5s ease; }
+  .mastery b{ color:var(--gold-soft); font-weight:var(--graisse-accent); }
+  .mastery .mbar{ height:6px; border-radius:var(--rayon-pilule); background:var(--line); overflow:hidden; margin-top:7px; }
+  .mastery .mbar > span{ display:block; height:100%; width:100%; background:var(--gold); border-radius:var(--rayon-pilule); transform:scaleX(0); transform-origin:left; transition:transform .5s ease; }
 </style>
 </head>
 <body>
@@ -890,6 +1396,10 @@
       </div>
       <div class="audio-note" id="audio-note"></div>
 
+      <!-- Le choix de la charte, un menu « Thème » : src/chartes/selecteur.js remplit le groupe,
+           l'ouvre et le ferme, et ôte `hidden` du montage. -->
+      <div data-chartes hidden><h2 id="h-charte"><button type="button" class="chartes-bouton" aria-expanded="false" aria-controls="chartes-liste">Thème</button></h2><div class="chartes-choix" id="chartes-liste" role="group" aria-label="Thème" hidden></div></div>
+
       <!-- Piège n°14 d'AGENTS.md : la seule mesure qui fasse
            foi est prise sur l'appareil réel, et il n'a pas d'inspecteur — les
            millisecondes s'affichent donc ici, comme le nom de la voix ci-dessus. -->
@@ -902,7 +1412,7 @@
       <div class="reset-zone">
         <h2 id="h-reset">Repartir de zéro</h2>
         <button class="ghost-btn reset-call" type="button" id="reset-btn" aria-describedby="reset-note">Effacer toute ma progression…</button>
-        <div class="seg-note" id="reset-note">Progression de révision, réglages et session en cours.</div>
+        <div class="seg-note" id="reset-note">Progression de révision, réglages (la charte reste) et session en cours.</div>
         <div class="reset-confirm hide" id="reset-confirm" role="group" aria-labelledby="h-reset">
           <p id="reset-warn"></p>
           <div class="reset-actions">
@@ -910,7 +1420,7 @@
             <button class="danger-btn" type="button" id="reset-yes">Oui, tout effacer</button>
           </div>
         </div>
-        <div class="reset-done hide" id="reset-done" role="status">Profil effacé — l'appli est revenue à son état de départ.</div>
+        <div class="reset-done hide" id="reset-done" role="status">Profil effacé. La charte choisie reste.</div>
       </div>
     </div>
   </details>
@@ -981,7 +1491,7 @@
       <button class="btn-next hide" id="quiz-next">Suivant →</button>
     </div>
 
-    <div class="kbd-hint" id="kbd-hint"><kbd>espace</kbd> retourner · <kbd>&larr;</kbd> à revoir · <kbd>&rarr;</kbd> je savais<span class="spk-hint"> · <kbd>p</kbd> écouter</span></div>
+    <div class="kbd-hint" id="kbd-hint"><span class="kh"><kbd>espace</kbd> retourner</span> · <span class="kh"><kbd>&larr;</kbd> à revoir</span> · <span class="kh"><kbd>&rarr;</kbd> je savais</span><span class="spk-hint"> · <span class="kh"><kbd>p</kbd> écouter</span></span></div>
   </div>
 
 </section>
@@ -1004,8 +1514,14 @@ function fmtMs(v){ return (v>=100 ? ''+Math.round(v) : v.toFixed(1).replace('.',
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function todayNum(){ return Math.floor(Date.now()/86400000); }
 function escapeHtml(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-// Expose : he2tr, trKey, cleRecherche, normHe, editDist — Utilise : (rien — logique pure)
-function normHe(s){ return (s||'').replace(/[\u0591-\u05C7]/g,'').replace(/\s+/g,' ').trim(); }
+// Expose : he2tr, trKey, cleRecherche, normHe, cleSaisieHe, editDist, sansInvisibles — Utilise : (rien — logique pure)
+// Les invisibles de format (U+200B-U+200F, U+2060, U+FEFF) : l'antiliant qu'ancreMarques (10) pose suit
+// une vedette copiée ; saisie (normHe) et recherche (cleRecherche) les retirent ici.
+function sansInvisibles(s){ return (s||'').replace(/[\u200B-\u200F\u2060\uFEFF]/g,''); }
+function normHe(s){ return sansInvisibles(s).replace(/[\u0591-\u05C7]/g,'').replace(/\s+/g,' ').trim(); }
+// Clé d'une saisie en graphie pleine : le maqaf (U+05BE) devient une espace, sans quoi
+// normHe l'effacerait et collerait les deux mots qu'il relie.
+function cleSaisieHe(s){ return normHe((s||'').replace(/\u05BE/g,' ')); }
 function editDist(a,b){
   const m=a.length,n=b.length; if(!m)return n; if(!n)return m;
   const d=Array.from({length:m+1},(_,i)=>[i,...Array(n).fill(0)]);
@@ -1146,7 +1662,7 @@ function trKey(s){
 //      ferait deux jetons quand « yodea » n'en fait qu'un, et les deux
 //      cesseraient de se rejoindre.
 function cleRecherche(s){
-  return (s||'').toLowerCase()
+  return sansInvisibles(s).toLowerCase()
     .normalize('NFD').replace(/[̀-֑ͯ-ׇ]/g,'')
     .replace(/['’׳]/g,'')
     .replace(/[וי]/g,'')
@@ -1175,7 +1691,7 @@ function cleRecherche(s){
     })
     .join(' ');
 }
-// Expose : normFr, frVariants, checkAnswer, answerHtml — Utilise : he2tr/trKey/normHe/editDist (02), formsHtml (10), state (99)
+// Expose : normFr, frVariants, checkAnswer, answerHtml — Utilise : he2tr/trKey/normHe/cleSaisieHe/editDist (02), formsHtml/noteHtml (10), state (99)
 
 // ---------- Input mode: answer checking ----------
 function normFr(s){
@@ -1208,6 +1724,9 @@ function checkAnswer(card, raw){
   } else {
     const uHe = normHe(user);
     if(uHe && uHe===normHe(card.he)) return 'exact';
+    // La graphie pleine (he_plein), celle qu'on tape au clavier : le dénudé reste accepté ci-dessus.
+    const p = cleSaisieHe(user);
+    if(p && p===cleSaisieHe(card.he_plein)) return 'exact';
     // Translittération : celle du carnet si présente, sinon générée depuis le nikud
     const uTr = trKey(user);
     let almost=false;
@@ -1240,7 +1759,7 @@ function answerHtml(card){
   // Inflexions : en français→hébreu elles n'apparaissent qu'ici (les montrer avant
   // révélerait la réponse) ; en hébreu→français elles sont déjà sur la carte.
   if(state.dir==='fr2he') h += formsHtml(card);
-  if(card.note) h += '<div class="note-line">'+card.note+'</div>';
+  if(card.note) h += noteHtml(card.note);
   return h;
 }
 // Expose : prefsLoad, savePrefs, sessSave, sessClear, sessRestore, srsLoad, srsSave, srsMigrateIds, cardId, PREFS_KEY, SESS_KEY, bootResumed, SRS_KEY, SRS — Utilise : CARDS (05), render (10), state (99)
@@ -1334,8 +1853,10 @@ function srsMigrateIds(){
     srsSave();
   }
 }
-// Expose : CARDS — Utilise : (rien — donnée pure, remplie par init() dans 99-principal.js)
+// Expose : CARDS, cartesAJour — Utilise : (rien — CARDS est rempli par init() dans 99-principal.js, ou inscrit par le build dans le fichier autonome)
 let CARDS = [];
+// Chaque carte porte-t-elle sa graphie pleine ? Une cards.json d'avant he_plein est refusée par init().
+function cartesAJour(cartes){ return cartes.every(c=>typeof c.he_plein==='string'); }
 // Expose : loadVoices, reflectVoiceUi, speak, speakCurrent, updateSpeaker, TTS_OK, heVoice — Utilise : state (99)
 
 // ----- Speech (Web Speech API) -----
@@ -1346,7 +1867,7 @@ function loadVoices(){
   if(!TTS_OK) return;
   voicesCache = window.speechSynthesis.getVoices() || [];
   // Voix hébraïques : le `lang` BCP-47 est le critère fiable ; le nom n'est qu'un
-  // filet. ⚠️ `name` est LOCALISÉ par iOS (relevé le 19/07 sur l'iPhone de Ruben,
+  // filet. ⚠️ `name` est LOCALISÉ par iOS (relevé sur un iPhone
   // réglé en norvégien : « Carmit (forbedret) » dans les Réglages). Chercher
   // « hebrew » dans le nom ne marche donc que sur un appareil anglophone —
   // d'où l'ajout du `voiceURI`, qui est un identifiant technique jamais traduit.
@@ -1904,26 +2425,71 @@ function finish(){
     '<li><span class="m-he" lang="he">'+c.he+'</span><span class="m-fr">'+c.fr+'</span></li>').join('');
   document.getElementById('retry-missed').classList.toggle('hide', !state.missed.length);
 }
-// Expose : render, heFront, bigFr, formsHtml, exHtml, exActivate, exBind, frShort — Utilise : state (99), he2tr (02), speak/updateSpeaker/speakCurrent (06), setupCardsMode/setupInputCard (11), setupQuizCard (12), sessSave (04), escapeHtml (01)
+// Expose : render, versoHeFr, heFront, bigFr, formsHtml, noteHtml, exHtml, exActivate, exBind, frShort, ancreMarques — Utilise : state (99), he2tr (02), speak/updateSpeaker/speakCurrent (06), setupCardsMode/setupInputCard (11), setupQuizCard (12), sessSave (04), escapeHtml (01)
 
 // ================= Mode QCM (choix multiple) =================
 function frShort(card){ return card.fr.split(/[\/,]| ou /)[0].replace(/\([^)]*\)/g,'').trim() || card.fr; }
 
 function heFront(card){
   const ph = card.cat==='Phrases' ? ' phrase' : '';
-  if(state.script==='plain') return '<div class="big-he'+ph+'" lang="he">'+card.he_plain+'</div>';
-  if(state.script==='cursive') return '<div class="big-he cursive'+ph+'" lang="he">'+card.he_plain+'</div>';
+  if(state.script==='plain') return '<div class="big-he'+ph+'" lang="he">'+card.he_plein+'</div>';
+  if(state.script==='cursive') return '<div class="big-he cursive'+ph+'" lang="he">'+card.he_plein+'</div>';
   return '<div class="big-he'+ph+'" lang="he">'+card.he+'</div>';
 }
+// WebKit remonte tout un texte hébreu dont le dernier signe est décalé en hauteur par la police (la voyelle
+// sous un ך final, Tel Aviv Modernist) : ce signe est le premier glyphe tracé de la ligne, et son décalage
+// devient celui de la ligne. Un antiliant (U+200C) en fin de nœud prend cette place, sans largeur.
+function ancreMarques(n){
+  if(n.nodeType===3){ if(/[\u0591-\u05C7]$/.test(n.data)) n.data+='\u200C'; return; }
+  if(n.nodeType!==1) return;
+  const w=document.createTreeWalker(n, NodeFilter.SHOW_TEXT);
+  for(let t=w.nextNode(); t; t=w.nextNode()) if(/[\u0591-\u05C7]$/.test(t.data)) t.data+='\u200C';
+}
 function bigFr(card){ return '<div class="big-fr'+(card.cat==='Phrases'?' phrase':'')+'">'+card.fr+'</div>'; }
+// Les inflexions en liste, une forme par rangée (décision du 2026-10-24) : l'hébreu à droite, sa translittération,
+// le français à gauche ; les verbes sous « présent », l'adjectif ouvert par sa vedette.
+const FORME_LBL={ il:'masc. sing.', elle:'fém. sing.', ils:'masc. plur.', elles:'fém. plur.', 'f. sing.':'fém. sing.', 'm. plur.':'masc. plur.', 'f. plur.':'fém. plur.' };
 function formsHtml(card){
   if(!card.forms) return '';
-  // Les verbes (4 formes il/elle/ils/elles) passent en grille 2×2 ; noms et
-  // adjectifs (1 et 3 formes) gardent la ligne souple.
-  const grid = card.cat==='Verbes' ? ' forms-grid' : '';
-  let h='<div class="forms'+grid+'">';
-  card.forms.forEach(f=>{ h+='<div class="form-cell"><span class="f-he" lang="he">'+f.he+'</span><span class="f-lbl">'+f.label+(f.tr?' · '+f.tr:'')+'</span></div>'; });
-  return h+'</div>';
+  const l=card.forms.map(f=>({he:f.he, tr:f.tr||he2tr(f.he), lbl:FORME_LBL[f.label]||f.label}));
+  if(card.cat==='Adjectifs') l.unshift({he:card.he, tr:card.tr||he2tr(card.he), lbl:'masc. sing.'});
+  return (card.cat==='Verbes' ? '<div class="forms-titre">présent</div>' : '') + '<div class="forms">'
+    + l.map(f=>'<span class="f-he" lang="he">'+f.he+'</span><span class="f-tr">'+f.tr+'</span><span class="f-lbl">'+f.lbl+'</span>').join('') + '</div>';
+}
+// La note, une langue par ligne (décision du 2026-10-24) : une suite de mots hébreux (séparés par / , ou ni) fait sa
+// ligne, la traduction qui la suit (= …, « … », (…)) passe dessous ; un mot hébreu seul, ou pris dans une
+// parenthèse ouverte plus tôt, reste dans la phrase. La parenthèse ou les guillemets qui entourent une ligne
+// hébraïque tombent avec la coupure ; aucune ligne de ponctuation seule.
+function noteHtml(note){
+  const RE=/<span lang="he">([^<]*)<\/span>/g, m=[]; let i=0, r;
+  while((r=RE.exec(note))){ m.push({fr:note.slice(i,r.index)},{he:r[1]}); i=RE.lastIndex; }
+  m.push({fr:note.slice(i)});
+  const lignes=[]; let cour='';
+  const pousse=()=>{ const t=cour.trim().replace(/^[,;.]\s*/,'').replace(/\s*[,;]$/,''); if(/[\p{L}\p{N}]/u.test(t)) lignes.push('<div class="nl-fr">'+t+'</div>'); cour=''; };
+  const compte=c=>cour.split(c).length-1;
+  for(let k=0;k<m.length;k++){
+    if(m[k].fr!==undefined){ cour+=m[k].fr; continue; }
+    const he=m[k].he;
+    if(compte('(')>compte(')') && !/\(\s*$/.test(cour)){ cour+='<span lang="he"'+(/\s/.test(he)?'':' class="nl-mot"')+'>'+he+'</span>'; continue; }
+    const g=[he]; let j=k;
+    while(j+2<m.length && /^\s*(\/|,|ou|ni)\s*$/.test(m[j+1].fr)){ g.push(m[j+1].fr.trim(), m[j+2].he); j+=2; }
+    const o=cour.match(/[(«]\s*$/), ferme=o ? (o[0][0]==='(' ? ')' : '»') : '';
+    let suite=m[j+1].fr;
+    if(ferme && suite.trimStart().startsWith(ferme)) suite=suite.trimStart().slice(1);
+    const t=suite.match(/^\s*(?:=\s*([^.;]*)[.;]?|«\s*([^»]*)»|\(([^)]*)\))/);
+    if(g.length===1 && !t && !/\s/.test(he)){ cour+='<span lang="he" class="nl-mot">'+he+'</span>'; continue; }
+    if(o) cour=cour.slice(0,o.index);
+    pousse();
+    lignes.push('<div class="nl-he" lang="he">'+g.join(' ').replace(/ ,/g,',')+'</div>');
+    if(t){
+      let tr=(t[1]||t[2]||t[3]).replace(/^[\s,;.]+/,'').replace(/[\s,;:]+$/,'');
+      if(ferme && tr.endsWith(ferme)) tr=tr.slice(0,-1);
+      lignes.push('<div class="nl-fr nl-trad">'+tr+'</div>'); suite=suite.slice(t[0].length);
+    }
+    m[j+1].fr=suite; k=j;
+  }
+  pousse();
+  return '<div class="note-line">'+lignes.join('')+'</div>';
 }
 // Exemples en situation : pli « Voir un exemple », uniquement là où la réponse est
 // déjà visible (verso des Cartes, feedback de Saisie, verdict du QCM) — jamais
@@ -1974,12 +2540,17 @@ function exBind(el){
   el.addEventListener('click', e=>{ const t=hit(e); if(!t) return; e.preventDefault(); e.stopPropagation(); if(!handled) exActivate(t); });
 }
 
+function versoHeFr(card, note){
+  return '<div class="rappel'+(card.cat==='Phrases'?' phrase':'')+'" lang="he">'+card.he+'</div>' + bigFr(card)
+    + '<div class="translit">'+(card.tr||he2tr(card.he))+'</div>' + formsHtml(card) + note + exHtml(card);
+}
+
 function render(){
   const card=state.queue[state.idx];
   state.flipped=false;
   state.answered=false;
 
-  const note = card.note ? '<div class="note-line">'+card.note+'</div>' : '';
+  const note = card.note ? noteHtml(card.note) : '';
 
   if(state.mode==='quiz'){
     state.frontHtml = quizPrompt(card);   // pas de verso en QCM : la carte ne se retourne pas
@@ -1988,15 +2559,11 @@ function render(){
     // En mode saisie, inflexions visibles directement sous le mot : elles sont en
     // hébreu et ne révèlent donc pas la traduction française demandée.
     if(state.mode==='input') state.frontHtml += formsHtml(card);
-    let b = bigFr(card);
-    b += '<div class="translit">'+(card.tr||he2tr(card.he))+'</div>';
-    if(state.script!=='nikud') b += '<div class="sub-he" lang="he">'+card.he+'</div>';
-    b += formsHtml(card) + note + exHtml(card);
-    state.backHtml = b;
+    state.backHtml = versoHeFr(card, note);
   } else {
     state.frontHtml = bigFr(card) + (card.tr?'<div class="translit">'+card.tr+'</div>':'');
     let b = '<div class="big-he" lang="he">'+card.he+'</div>';
-    b += '<div class="cursive-line" lang="he">'+card.he_plain+'</div>';
+    b += '<div class="cursive-line" lang="he">'+card.he_plein+'</div>';
     b += '<div class="translit">'+(card.tr||he2tr(card.he))+'</div>';
     b += formsHtml(card) + note + exHtml(card);
     state.backHtml = b;
@@ -2032,7 +2599,7 @@ function setupCardsMode(){
   document.getElementById('input-zone').classList.add('hide');
   document.getElementById('quiz-zone').classList.add('hide');
   const kh=document.getElementById('kbd-hint');
-  kh.innerHTML='<kbd>espace</kbd> retourner · <kbd>&larr;</kbd> à revoir · <kbd>&rarr;</kbd> je savais · <kbd>c</kbd> annuler<span class="spk-hint"> · <kbd>p</kbd> écouter</span>';
+  kh.innerHTML='<span class="kh"><kbd>espace</kbd> retourner</span> · <span class="kh"><kbd>&larr;</kbd> à revoir</span> · <span class="kh"><kbd>&rarr;</kbd> je savais</span> · <span class="kh"><kbd>c</kbd> annuler</span><span class="spk-hint"> · <span class="kh"><kbd>p</kbd> écouter</span></span>';
   kh.classList.remove('hide');
   document.getElementById('flip-live').textContent='';
   document.getElementById('face-hint').textContent = 'touche la carte pour la retourner';
@@ -2223,11 +2790,11 @@ function quizPrompt(card){
 }
 function quizChoiceHtml(opt){
   if(state.dir==='he2fr') return '<span>'+(opt.cat==='Phrases'?opt.fr:frShort(opt))+'</span>';
-  const he = (state.script==='nikud') ? opt.he : opt.he_plain;
+  const he = (state.script==='nikud') ? opt.he : opt.he_plein;
   return '<span class="qc-he" lang="he">'+he+'</span><span class="qc-tr">'+(opt.tr||he2tr(opt.he))+'</span>';
 }
 function pickDistractors(card, n){
-  const key = state.dir==='he2fr' ? (c=>frShort(c).toLowerCase()) : (c=>c.he_plain);
+  const key = state.dir==='he2fr' ? (c=>frShort(c).toLowerCase()) : (c=>c.he_plein);
   const answer=key(card), seen=new Set([answer]), out=[];
   // Deux options au français quasi identique (« content »/« contente ») ou au
   // synonyme partagé rendraient le choix ambigu — en fr→he, un distracteur
@@ -2266,7 +2833,7 @@ function setupQuizCard(card){
   document.getElementById('input-zone').classList.add('hide');
   document.getElementById('quiz-zone').classList.remove('hide');
   const kh=document.getElementById('kbd-hint');
-  kh.innerHTML='<kbd>1</kbd>–<kbd>4</kbd> choisir · <kbd>entrée</kbd> suivant · <kbd>c</kbd> corriger<span class="spk-hint"> · <kbd>p</kbd> écouter</span>';
+  kh.innerHTML='<span class="kh"><kbd>1</kbd>–<kbd>4</kbd> choisir</span> · <span class="kh"><kbd>entrée</kbd> suivant</span> · <span class="kh"><kbd>c</kbd> corriger</span><span class="spk-hint"> · <span class="kh"><kbd>p</kbd> écouter</span></span>';
   kh.classList.remove('hide');
   document.getElementById('face-hint').textContent = state.dir==='he2fr' ? 'choisis la traduction' : 'choisis le mot hébreu';
   document.getElementById('quiz-next').classList.add('hide');
@@ -2299,7 +2866,7 @@ function quizPick(btn, chosen, card){
   if(correct) state.goodCount++; else state.missed.push(card);
   // Verdict du QCM : annoncé aussi aux lecteurs d'écran (les couleurs ne suffisent pas).
   const goodTxt = state.dir==='he2fr' ? (card.cat==='Phrases'?card.fr:frShort(card))
-                                      : card.he_plain+' ('+(card.tr||he2tr(card.he))+')';
+                                      : card.he_plein+' ('+(card.tr||he2tr(card.he))+')';
   document.getElementById('quiz-live').textContent =
     correct ? 'Exact !' : 'Raté — la bonne réponse était : '+goodTxt;
   // Même correction du verdict qu'en mode saisie : un pouce qui glisse s'annule.
@@ -2455,8 +3022,8 @@ document.getElementById('start').onclick=start;
 (function(){ const b=document.getElementById('review-btn'); if(b) b.onclick=startReview; })();
 
 // ================= Remise à zéro du profil =================
-// Efface TOUT le local (srs_v1, prefs_v1, sess_v1) et remet l'appli dans l'état
-// du premier lancement, en place. Deux temps obligatoires : le bouton ouvre une
+// Efface la progression et les réglages (srs_v1, prefs_v1, sess_v1) et remet l'appli
+// dans l'état du premier lancement, en place ; la charte choisie reste. Deux temps obligatoires : le bouton ouvre une
 // confirmation qui nomme la perte (nombre de cartes suivies), « Annuler » est le
 // défaut sûr et reçoit le focus.
 (function(){
@@ -2663,17 +3230,26 @@ document.addEventListener('keydown', e=>{
 // ===== BUILD:ONLINE-ONLY : bloc remplace par le build dans le fichier autonome =====
 // ---------- Chargement runtime des cartes (cards.json, généré par le build) ----------
 
+// Le refus d'une cards.json sans graphie pleine (cartesAJour, 05) : une paire app/cartes
+// périmée du cache, montrée sans nikud, afficherait « undefined ».
+const CARTES_PERIMEES = 'cartes-perimees';
 function showLoaderError(reason){
   const loader=document.getElementById('loader');
   const spin=loader.querySelector('.spin');
   if(spin) spin.style.display='none';
   const isFile = location.protocol==='file:';
   const isOffline = ('onLine' in navigator) && navigator.onLine===false;
+  const isPerimees = !!reason && reason.message===CARTES_PERIMEES;
   let title, detail;
   if(isFile){
     title="Cette page a besoin d'un petit serveur.";
     detail="Ouverte directement depuis un fichier, elle ne peut pas charger le carnet. "
       + "Passe par son adresse en ligne, ou lance un serveur local (par ex. <code>python3 -m http.server</code>).";
+  } else if(isPerimees){
+    title="Le vocabulaire doit être mis à jour.";
+    detail = isOffline
+      ? "Le carnet gardé sur l'appareil est plus ancien que l'app. Reconnecte-toi, puis réessaie."
+      : "Le carnet gardé sur l'appareil est plus ancien que l'app. « Réessayer » le recharge.";
   } else if(isOffline){
     title="Connexion perdue.";
     detail="Le carnet n'a pas pu être récupéré — vérifie ta connexion, puis réessaie.";
@@ -2701,6 +3277,7 @@ async function init(){
     CARDS = (await res.json()).cartes;
     const tB2=performance.now();
     if(!CARDS.length) throw new Error('empty');
+    if(!cartesAJour(CARDS)) throw new Error(CARTES_PERIMEES);
     buildChips();
     updateStart();
     const tB3=performance.now();
@@ -2733,6 +3310,9 @@ async function init(){
     showLoaderError(err);
   }
 }
+// Tout hébreu affiché, à l'arrivée et à chaque rendu, reçoit son ancre (ancreMarques, 10).
+ancreMarques(document.body);
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(ancreMarques))).observe(document.body,{childList:true,subtree:true});
 init();
 
 // ---------- PWA : service worker (hors-ligne) ----------
