@@ -18231,7 +18231,11 @@ function editDist(a,b){
 function he2tr(he){
   var V={}; V[0x05B7]='a'; V[0x05B8]='a'; V[0x05B2]='a'; V[0x05B5]='e'; V[0x05B6]='e'; V[0x05B1]='e';
   V[0x05B4]='i'; V[0x05B9]='o'; V[0x05BA]='o'; V[0x05B3]='o'; V[0x05BB]='u';
+  V[0x05C7]='o';  // kamats katan écrit comme tel (חׇפְשִׁי) : « o », comme celui de כל
   var out='', s=(he||'').trim(), wordStart=true;
+  // Sans aucun nikoud (voyelle, chva, dagesh, point du shin ; cantillation, meteg, rafé et maqaf n'en
+  // sont pas), pas de lecture déterministe (בלגרד, צה"ל) : aucune plutôt qu'un squelette faux.
+  if(/[\u05D0-\u05EA]/.test(s) && !/[\u05B0-\u05BC\u05C1\u05C2\u05C7]/.test(s)) return '';
   for(var i=0;i<s.length;i++){
     var ch=s[i], code=s.charCodeAt(i);
     if(code>=0x0591&&code<=0x05C7) continue;
