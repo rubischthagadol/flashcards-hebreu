@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-24",
+  "version": "2026-10-28",
   "cartes": [
     {
       "cat": "Verbes",
@@ -296,6 +296,7 @@
           "he_plain": "חוזרות"
         }
       ],
+      "note": "<span lang=\"he\">לַחְזֹר עַל</span>… : répéter, réviser",
       "niveau": "A1",
       "theme": "ville-transport",
       "exemples": [
@@ -2269,6 +2270,7 @@
           "he_plain": "נותנות"
         }
       ],
+      "note": "aussi « laisser, permettre de » + infinitif",
       "niveau": "A1",
       "theme": "vie-quotidienne",
       "exemples": [
@@ -7119,6 +7121,7 @@
           "he_plain": "מתקשרות"
         }
       ],
+      "note": "<span lang=\"he\">לְהִתְקַשֵּׁר עִם</span>… : entrer en contact avec…",
       "niveau": "A1",
       "theme": "communication-pensee",
       "exemples": [
@@ -11479,6 +11482,7 @@
           "he_plain": "מתקימות"
         }
       ],
+      "note": "aussi « avoir lieu » (une réunion, un événement)",
       "niveau": "B1",
       "theme": "abstrait",
       "exemples": [
@@ -14243,6 +14247,7 @@
           "he_plain": "ממטירות"
         }
       ],
+      "note": "littéraire, « faire pleuvoir » ; « il pleut » : <span lang=\"he\">יוֹרֵד גֶּשֶׁם</span>",
       "niveau": "A2",
       "theme": "nature",
       "exemples": [
@@ -14639,6 +14644,7 @@
           "he_plain": "צופות"
         }
       ],
+      "note": "à ne pas confondre avec <span lang=\"he\">לְצַפּוֹת לְ</span>… (piel) « s'attendre à » ; sans nikoud, les deux s'écrivent <span lang=\"he\">לצפות</span>",
       "niveau": "A2",
       "theme": "loisirs-culture",
       "exemples": [
@@ -17497,6 +17503,7 @@
           "he_plain": "חיבות"
         }
       ],
+      "note": "d'abord « devoir, être obligé de » + infinitif (liste des verbes modaux) ; redevable : <span lang=\"he\">חַיָּב לְ</span>…",
       "niveau": "B1",
       "theme": "argent-achats",
       "exemples": [
@@ -18371,6 +18378,7 @@
           "he_plain": "מיחדות"
         }
       ],
+      "note": "aussi « unique »",
       "niveau": "B1",
       "theme": "abstrait",
       "exemples": [
@@ -19017,6 +19025,7 @@
           "he_plain": "צודקות"
         }
       ],
+      "note": "c'est aussi le présent de <span lang=\"he\">צָדַק</span> (avoir raison), qui se conjugue : <span lang=\"he\">צָדַקְתָּ</span> « tu avais raison »",
       "niveau": "B1",
       "theme": "abstrait",
       "exemples": [
@@ -21943,6 +21952,7 @@
           "he_plain": "זהירות"
         }
       ],
+      "note": "<span lang=\"he\">זָהִיר מִ</span>… : prendre garde à…",
       "niveau": "A2",
       "theme": "emotions-caractere",
       "exemples": [
@@ -22741,6 +22751,7 @@
           "he_plain": "אחראיות"
         }
       ],
+      "note": "<span lang=\"he\">אַחְרַאי עַל</span>… : responsable de…",
       "niveau": "B1",
       "theme": "travail-etudes",
       "exemples": [
@@ -23311,6 +23322,7 @@
           "he_plain": "נגישות"
         }
       ],
+      "note": "<span lang=\"he\">נָגִישׁ לְ</span>… : accessible à…",
       "niveau": "B1",
       "theme": "ville-transport",
       "exemples": [
@@ -26525,6 +26537,7 @@
           "he_plain": "בעלים"
         }
       ],
+      "note": "aussi « maître, propriétaire » ; à l'état construit, <span lang=\"he\">בַּעַל־</span> « propriétaire de… »",
       "niveau": "A2",
       "theme": "famille-personnes",
       "exemples": [
@@ -28300,6 +28313,7 @@
       "tr": "",
       "fr": "visage (m)",
       "genre": "m",
+      "note": "toujours au pluriel",
       "niveau": "A2",
       "theme": "corps-sante",
       "exemples": [
@@ -31113,6 +31127,7 @@
       "tr": "",
       "fr": "eau (m)",
       "genre": "m",
+      "note": "toujours au pluriel",
       "niveau": "A1",
       "theme": "nourriture",
       "exemples": [
@@ -41293,6 +41308,7 @@
           "he_plain": "מועדים"
         }
       ],
+      "note": "aussi « fête juive » : <span lang=\"he\">חֹל הַמּוֹעֵד</span>, les jours entre le début et la fin de Pessah et de Souccot",
       "niveau": "B1",
       "theme": "temps-calendrier",
       "exemples": [
@@ -42537,6 +42553,7 @@
           "he_plain": "בטוחים"
         }
       ],
+      "note": "à ne pas confondre avec <span lang=\"he\">בָּטוּחַ</span> (sûr, certain ; en sécurité), même racine ; sans nikoud : <span lang=\"he\">ביטוח</span> contre <span lang=\"he\">בטוח</span>",
       "niveau": "A2",
       "theme": "argent-achats",
       "exemples": [
@@ -42618,6 +42635,7 @@
           "he_plain": "ישיבות"
         }
       ],
+      "note": "aussi « yeshiva » (école d'étude des textes juifs) ; au sens premier, « le fait d'être assis »",
       "niveau": "A2",
       "theme": "travail-etudes",
       "exemples": [
@@ -42845,6 +42863,7 @@
           "he_plain": "חוזים"
         }
       ],
+      "note": "au sens général, tout contrat ; homographe de <span lang=\"he\">חוֹזֶה</span> « voyant, prophète » ; c'est aussi le présent de <span lang=\"he\">לַחֲזוֹת</span> (prévoir, prédire)",
       "niveau": "B1",
       "theme": "travail-etudes",
       "exemples": [
@@ -43566,6 +43585,7 @@
           "he_plain": "עסקאות"
         }
       ],
+      "note": "une transaction conclue ; l'entreprise elle-même se dit <span lang=\"he\">עֵסֶק</span>",
       "niveau": "B1",
       "theme": "argent-achats",
       "exemples": [
@@ -43693,6 +43713,7 @@
           "he_plain": "רוחים"
         }
       ],
+      "note": "homographe de <span lang=\"he\">רֶוַח</span> « espace, écart, blanc »",
       "niveau": "B1",
       "theme": "argent-achats",
       "exemples": [
@@ -44071,6 +44092,7 @@
           "he_plain": "עסקים"
         }
       ],
+      "note": "l'entreprise, le commerce ; l'affaire conclue se dit <span lang=\"he\">עִסְקָה</span>",
       "niveau": "B1",
       "theme": "argent-achats",
       "exemples": [
@@ -46494,6 +46516,7 @@
           "he_plain": "מזלות"
         }
       ],
+      "note": "<span lang=\"he\">מַזָּל טוֹב</span> = « félicitations » ; « bonne chance » se dit <span lang=\"he\">בְּהַצְלָחָה</span> ; au pluriel <span lang=\"he\">מַזָּלוֹת</span>, les signes du zodiaque",
       "niveau": "A2",
       "theme": "abstrait",
       "exemples": [
@@ -53463,6 +53486,7 @@
       "he": "מִנַּיִן",
       "tr": "minayin",
       "fr": "d'où (soutenu)",
+      "note": "aussi « comment, sur quelle base »",
       "niveau": "B2",
       "exemples": [
         {
@@ -56574,6 +56598,7 @@
       "he": "כָּל",
       "tr": "kol",
       "fr": "chaque / tout le, tous les",
+      "note": "se lit kol : son kamats est un kamats katan",
       "niveau": "A1",
       "exemples": [
         {
@@ -57174,6 +57199,7 @@
       "he": "לְהִתְרָאוֹת",
       "tr": "lehitra'ot",
       "fr": "au revoir (à bientôt)",
+      "note": "infinitif de « se revoir », figé en salutation",
       "niveau": "A1",
       "he_plain": "להתראות",
       "he_plein": "להתראות"
@@ -58085,6 +58111,7 @@
       "he": "אֲנִי אוֹהֵב אוֹתָךְ.",
       "tr": "ani ohev otakh",
       "fr": "je t'aime (à une femme)",
+      "note": "sans nikoud, <span lang=\"he\">אותך</span> vaut pour le masculin et le féminin : seul le nikoud (<span lang=\"he\">אוֹתְךָ</span>, <span lang=\"he\">אוֹתָךְ</span>) les distingue",
       "niveau": "A2",
       "he_plain": "אני אוהב אותך.",
       "he_plein": "אני אוהב אותך."
