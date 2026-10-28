@@ -5,11 +5,11 @@
 <meta charset="UTF-8">
 <!-- CSP : GitHub Pages ne sert aucun en-tête de réponse, le <meta> est la seule voie.
      'unsafe-inline' est imposé par le parti pris du projet — tout le CSS et le JS sont
-     inline, et le <link> des polices porte un onload ; passer aux hashes couplerait la
-     règle au build pour un gain nul. La vraie garde est ailleurs : connect-src 'self'
+     inline ; passer aux hashes couplerait la règle au build pour un gain nul.
+     La vraie garde est ailleurs : connect-src 'self'
      ferme l'exfiltration, object-src/base-uri la réécriture de page. Bloc identique dans
      les trois pages. frame-ancestors est ignoré en <meta> : inutile de l'écrire. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <!-- iPhone installé : viewport-fit=cover étend la page sous l'encoche, et la barre d'état
      black-translucent la rend transparente ; la bande sous l'heure et les quatre zones sûres sont
      décrites dans flashcards/docs/DESIGN.md § La barre d'état et les zones sûres (gardées par
@@ -28,30 +28,27 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Hébreu">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- La feuille Google, posée au marqueur @CHARTE (avec les metas theme-color, les polices
-     servies et le script de tête), est chargée en non-bloquant (media="print" puis bascule
-     au onload) : en <link> classique,
-     WebKit ne peint RIEN — pas même le fond — tant que cette feuille n'est pas arrivée,
-     et c'est tout le « premier affichage lent » du tout premier chargement. -->
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#e9e4d8">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#323232">
 <link rel="preload" href="polices/telaviv-modernistregular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="polices/telaviv-modernistbold.ttf" as="font" type="font/ttf" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Playpen+Sans+Hebrew:wght@300;400&family=Frank+Ruhl+Libre:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.onload=null;this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Playpen+Sans+Hebrew:wght@300;400&family=Frank+Ruhl+Libre:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" href="polices/assistant.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="polices/playpensanshebrew.ttf" as="font" type="font/ttf" crossorigin>
 <script>
-// La charte, posée avant le premier rendu : chartesLue() rend le slug stocké s'il est une charte du
-// registre, sinon le défaut ; chartesPose() en pose la liste sur <html>, recopie le --bg calculé dans
-// les <meta name="theme-color"> (chartesMetas) et annonce `charte-changee` sur document. Une page
-// rendue par le cache aller-retour (pageshow persisté) et une clé changée dans une autre page
-// (storage, `null` pour clear()) la reposent.
-var CHARTES = {"cle":"charte_v1","defaut":"plaque-emaillee","listes":{"plaque-emaillee":"plaque-emaillee","balcons-partout":"balcons-partout plaque-emaillee","carnet":"carnet"},"choix":[{"slug":"plaque-emaillee","nom":"Bauhaus 1"},{"slug":"balcons-partout","nom":"Bauhaus 2"},{"slug":"carnet","nom":"Nuit"}]};
+// La charte, posée avant le premier rendu : chartesLue() rend le slug stocké, traduit s'il est un
+// ancien nom (CHARTES.renommees), s'il est une charte du registre, sinon le défaut ; la clé n'est
+// jamais réécrite, qu'une page d'avant le renommage encore ouverte la lise toujours. chartesPose()
+// en pose la liste sur <html>, recopie le --bg calculé dans les <meta name="theme-color">
+// (chartesMetas) et annonce `charte-changee` sur document. Une page rendue par le cache
+// aller-retour (pageshow persisté) et une clé changée dans une autre page (storage, `null` pour
+// clear()) la reposent.
+var CHARTES = {"cle":"charte_v1","defaut":"plaque-emaillee","renommees":{"carnet":"nuit"},"listes":{"plaque-emaillee":"plaque-emaillee","balcons-partout":"balcons-partout plaque-emaillee","nuit":"nuit"},"choix":[{"slug":"plaque-emaillee","nom":"Bauhaus 1"},{"slug":"balcons-partout","nom":"Bauhaus 2"},{"slug":"nuit","nom":"Nuit"}]};
 function chartesLue() {
   try {
     var s = localStorage.getItem(CHARTES.cle);
-    if (s !== null && Object.prototype.hasOwnProperty.call(CHARTES.listes, s)) return s;
+    var a = Object.prototype.hasOwnProperty;
+    if (s !== null && a.call(CHARTES.renommees, s)) s = CHARTES.renommees[s];
+    if (s !== null && a.call(CHARTES.listes, s)) return s;
   } catch (e) { /* stockage inaccessible : le défaut */ }
   return CHARTES.defaut;
 }
@@ -167,6 +164,17 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
      sa source unique. Rien à recopier à la main : hebreu build le repose ici. */
 @font-face{font-family:'Tel Aviv Modernist';font-weight:400;font-style:normal;font-display:swap;src:url("polices/telaviv-modernistregular.ttf") format("truetype");}
 @font-face{font-family:'Tel Aviv Modernist';font-weight:700;font-style:normal;font-display:swap;src:url("polices/telaviv-modernistbold.ttf") format("truetype");}
+@font-face{font-family:'Assistant';font-weight:400;font-style:normal;font-display:swap;src:url("polices/assistant.ttf") format("truetype");}
+@font-face{font-family:'Assistant';font-weight:700;font-style:normal;font-display:swap;src:url("polices/assistant.ttf") format("truetype");}
+@font-face{font-family:'Playpen Sans Hebrew';font-weight:300;font-style:normal;font-display:swap;src:url("polices/playpensanshebrew.ttf") format("truetype");}
+@font-face{font-family:'Playpen Sans Hebrew';font-weight:400;font-style:normal;font-display:swap;src:url("polices/playpensanshebrew.ttf") format("truetype");}
+@font-face{font-family:'Frank Ruhl Libre';font-weight:400;font-style:normal;font-display:swap;src:url("polices/frankruhllibre.ttf") format("truetype");}
+@font-face{font-family:'Frank Ruhl Libre';font-weight:500;font-style:normal;font-display:swap;src:url("polices/frankruhllibre.ttf") format("truetype");}
+@font-face{font-family:'Frank Ruhl Libre';font-weight:700;font-style:normal;font-display:swap;src:url("polices/frankruhllibre.ttf") format("truetype");}
+@font-face{font-family:'Assistant';font-weight:500;font-style:normal;font-display:swap;src:url("polices/assistant.ttf") format("truetype");}
+@font-face{font-family:'Assistant';font-weight:600;font-style:normal;font-display:swap;src:url("polices/assistant.ttf") format("truetype");}
+@font-face{font-family:'JetBrains Mono';font-weight:400;font-style:normal;font-display:swap;src:url("polices/jetbrainsmono.ttf") format("truetype");}
+@font-face{font-family:'JetBrains Mono';font-weight:500;font-style:normal;font-display:swap;src:url("polices/jetbrainsmono.ttf") format("truetype");}
 :root{
   --bg:#e9e4d8;
   --bg2:#e9e4d8;
@@ -324,7 +332,7 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   --rayon-carte:0 56px 56px 0; --rayon-panneau-14:0 40px 40px 0; --rayon-panneau-12:0 40px 40px 0;
   --rayon-commande:0 26px 26px 0;
 }
-[data-charte~="carnet"]{
+[data-charte~="nuit"]{
   --bg:#12181f; --bg2:#161e28; --card:#1a222b; --card-edge:#2c3844;
   --ink:#ece7dd; --ink-dim:#9aa3ac; --gold:#d4a24c; --gold-soft:#e6c68a;
   --green:#5bbd7a; --red:#d96a5b; --line:#2a3440;
@@ -343,7 +351,7 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   --rayon-case-4:4px; --rayon-case-9:9px; --rayon-case-10:10px; --rayon-case-11:11px; --rayon-case-12:12px;
   --rayon-pilule:999px; --rayon-rond:50%;
 }
-:root[data-charte~="carnet"]{color-scheme:dark;}
+:root[data-charte~="nuit"]{color-scheme:dark;}
 /* Plaque émaillée (docs/DESIGN.md) : le port des règles de l'aperçu
    (bauhaus/apercu-ordi-2026-10-21/chartes/plaque-emaillee.css), chaque sélecteur sous le préfixe.
    Les jetons portent polices, graisses, rayons et la suppression des ombres. Le préfixe ajoute
@@ -472,25 +480,25 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
 :root[data-charte~="balcons-partout"] .speak-btn{ right:32px; top:24px; }
 /* l'étiquette descend avec le bouton d'écoute, rentré hors de la courbe du coin : les deux restent sur une ligne */
 :root[data-charte~="balcons-partout"] .face .eyebrow{ margin-top:8px; }
-/* Décor propre à carnet (docs/DESIGN.md § 4) : les dégradés que le CSS commun pose en aplat
+/* Décor propre à nuit (docs/DESIGN.md § 4) : les dégradés que le CSS commun pose en aplat
    du même jeton. Le préfixe ajoute (0,2,0) : chaque règle d'état commune qui pose un
    background sur ces éléments, et qu'il ferait perdre, est reposée ici, dans le même ordre. */
-:root[data-charte~="carnet"] body{ background:radial-gradient(120% 80% at 50% 0%, var(--bg2), var(--bg) 70%); }
-:root[data-charte~="carnet"] .panel{ background:linear-gradient(180deg, var(--card), var(--bg2)); }
-:root[data-charte~="carnet"] .start{ background:linear-gradient(180deg, var(--gold-soft), var(--gold)); }
-:root[data-charte~="carnet"] body.has-due .start:enabled{ background:var(--card); }
-:root[data-charte~="carnet"] .start:disabled{ background:none; }
-:root[data-charte~="carnet"] .flip{ background:linear-gradient(160deg, var(--card), var(--bg2)); }
-:root[data-charte~="carnet"] #btn-check,
-:root[data-charte~="carnet"] .btn-next,
-:root[data-charte~="carnet"] .again-btns .primary{ background:linear-gradient(180deg,var(--gold-soft),var(--gold)); }
-:root[data-charte~="carnet"] .review-card{ background:linear-gradient(135deg, rgba(var(--gold-rgb),.16), rgba(var(--gold-rgb),.05)); }
-:root[data-charte~="carnet"] .review-card:hover{ background:linear-gradient(135deg, rgba(var(--gold-rgb),.24), rgba(var(--gold-rgb),.08)); }
-:root[data-charte~="carnet"] .review-card:disabled{ background:var(--bg2); }
-:root[data-charte~="carnet"] .mastery .mbar > span{ background:linear-gradient(90deg,var(--gold),var(--gold-soft)); }
-:root[data-charte~="carnet"] .door{ background:linear-gradient(160deg, var(--card), var(--bg2)); }
+:root[data-charte~="nuit"] body{ background:radial-gradient(120% 80% at 50% 0%, var(--bg2), var(--bg) 70%); }
+:root[data-charte~="nuit"] .panel{ background:linear-gradient(180deg, var(--card), var(--bg2)); }
+:root[data-charte~="nuit"] .start{ background:linear-gradient(180deg, var(--gold-soft), var(--gold)); }
+:root[data-charte~="nuit"] body.has-due .start:enabled{ background:var(--card); }
+:root[data-charte~="nuit"] .start:disabled{ background:none; }
+:root[data-charte~="nuit"] .flip{ background:linear-gradient(160deg, var(--card), var(--bg2)); }
+:root[data-charte~="nuit"] #btn-check,
+:root[data-charte~="nuit"] .btn-next,
+:root[data-charte~="nuit"] .again-btns .primary{ background:linear-gradient(180deg,var(--gold-soft),var(--gold)); }
+:root[data-charte~="nuit"] .review-card{ background:linear-gradient(135deg, rgba(var(--gold-rgb),.16), rgba(var(--gold-rgb),.05)); }
+:root[data-charte~="nuit"] .review-card:hover{ background:linear-gradient(135deg, rgba(var(--gold-rgb),.24), rgba(var(--gold-rgb),.08)); }
+:root[data-charte~="nuit"] .review-card:disabled{ background:var(--bg2); }
+:root[data-charte~="nuit"] .mastery .mbar > span{ background:linear-gradient(90deg,var(--gold),var(--gold-soft)); }
+:root[data-charte~="nuit"] .door{ background:linear-gradient(160deg, var(--card), var(--bg2)); }
 /* le nombre d'une puce pressée : .8 de --sur-or sur l'or, 5,6:1 ; l'opacité commune (.7) le mettrait sous 4,5:1 */
-:root[data-charte~="carnet"] .chip[aria-pressed="true"] .n{ opacity:.8; }
+:root[data-charte~="nuit"] .chip[aria-pressed="true"] .n{ opacity:.8; }
 
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   ::selection{ background:rgba(var(--gold-rgb),.30); color:var(--ink); }

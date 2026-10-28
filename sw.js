@@ -5,9 +5,7 @@
  *
  * Stratégie : stale-while-revalidate sur les fichiers de l'app — démarrage
  * instantané depuis le cache, mise à jour en arrière-plan (le nouveau
- * vocabulaire apparaît au lancement suivant). Les polices Google sont servies
- * cache-first (immuables) ; les polices locales (polices/), du même origine,
- * en stale-while-revalidate.
+ * vocabulaire apparaît au lancement suivant), polices de polices/ comprises.
  * Le cache HTTP : docs/ARCHITECTURE.md § La couche PWA.
  *
  * ⚠️ VERSION NE S'INCRÉMENTE PAS À LA MAIN. La ligne est
@@ -33,7 +31,7 @@
  *    c'est le seul geste manuel qui reste sur ce fichier.
  */
 /* ligne estampillée par le build — ne pas éditer la valeur (cf. en-tête) */
-const VERSION = 'v-23a7ef94';
+const VERSION = 'v-2dbbfcc9';
 const CACHE = 'flashcards-hebreu-' + VERSION;
 
 const ASSETS = [
@@ -52,6 +50,8 @@ const ASSETS = [
   'icons/favicon-48.png',
   'polices/telaviv-modernistregular.ttf',
   'polices/telaviv-modernistbold.ttf',
+  'polices/assistant.ttf',
+  'polices/playpensanshebrew.ttf',
   // BUILD:ASSETS fin
 ];
 
@@ -79,8 +79,7 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
-  const isFont = url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
-  if (url.origin !== location.origin && !isFont) return;
+  if (url.origin !== location.origin) return;
 
   // Seules les navigations vers la racine (/ ou /index.html) sont normalisées
   // sur la coquille './' — c'est le PORTAIL. Les autres pages
@@ -93,9 +92,6 @@ self.addEventListener('fetch', (e) => {
   e.respondWith((async () => {
     const cache = await caches.open(CACHE);
     const cached = await cache.match(cacheKey);
-
-    // Polices Google : immuables, pas besoin de revalider.
-    if (cached && isFont) return cached;
 
     // Refetch par URL (et non par Request) : l'app demande le vocabulaire en
     // cache:'no-store', qu'on ne peut pas réutiliser tel quel pour cache.put ;

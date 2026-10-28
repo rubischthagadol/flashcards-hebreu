@@ -5,24 +5,30 @@
 <meta charset="UTF-8">
 <!-- CSP : GitHub Pages ne sert aucun en-tête de réponse, le <meta> est la seule voie.
      'unsafe-inline' est imposé par le parti pris du projet — tout le CSS et le JS sont
-     inline, et le <link> des polices porte un onload ; passer aux hashes couplerait la
-     règle au build pour un gain nul. La vraie garde est ailleurs : connect-src 'self'
+     inline ; passer aux hashes couplerait la règle au build pour un gain nul.
+     La vraie garde est ailleurs : connect-src 'self'
      ferme l'exfiltration, object-src/base-uri la réécriture de page. Bloc identique dans
      les trois pages. frame-ancestors est ignoré en <meta> : inutile de l'écrire. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#12181f">
 <title>Vocabulaire Hébreu</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Chargée en non-bloquant (media="print" puis bascule au onload) : en <link> classique,
-     WebKit ne peint RIEN — pas même le fond — tant que cette feuille n'est pas arrivée,
-     et c'est tout le « premier affichage lent » du tout premier chargement. -->
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Assistant:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playpen+Sans+Hebrew:wght@300;400;500&display=swap" rel="stylesheet" media="print" onload="this.onload=null;this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Assistant:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playpen+Sans+Hebrew:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
 <style>
-  /* La charte du carnet — bloc injecté au build depuis src/chartes/carnet/jetons.css,
-     sa source unique. Rien à recopier à la main : hebreu build le repose ici. */
+  /* La charte du carnet — bloc injecté au build : les @font-face de ses polices, puis
+     src/chartes/nuit/jetons.css, sa source unique. Rien à recopier à la main : hebreu build le repose ici. */
+@font-face{font-family:'Tel Aviv Modernist';font-weight:400;font-style:normal;font-display:swap;src:url("polices/telaviv-modernistregular.ttf") format("truetype");}
+@font-face{font-family:'Tel Aviv Modernist';font-weight:700;font-style:normal;font-display:swap;src:url("polices/telaviv-modernistbold.ttf") format("truetype");}
+@font-face{font-family:'Frank Ruhl Libre';font-weight:400;font-style:normal;font-display:swap;src:url("polices/frankruhllibre.ttf") format("truetype");}
+@font-face{font-family:'Frank Ruhl Libre';font-weight:500;font-style:normal;font-display:swap;src:url("polices/frankruhllibre.ttf") format("truetype");}
+@font-face{font-family:'Frank Ruhl Libre';font-weight:700;font-style:normal;font-display:swap;src:url("polices/frankruhllibre.ttf") format("truetype");}
+@font-face{font-family:'Assistant';font-weight:400;font-style:normal;font-display:swap;src:url("polices/assistant.ttf") format("truetype");}
+@font-face{font-family:'Assistant';font-weight:500;font-style:normal;font-display:swap;src:url("polices/assistant.ttf") format("truetype");}
+@font-face{font-family:'Assistant';font-weight:600;font-style:normal;font-display:swap;src:url("polices/assistant.ttf") format("truetype");}
+@font-face{font-family:'Assistant';font-weight:700;font-style:normal;font-display:swap;src:url("polices/assistant.ttf") format("truetype");}
+@font-face{font-family:'JetBrains Mono';font-weight:400;font-style:normal;font-display:swap;src:url("polices/jetbrainsmono.ttf") format("truetype");}
+@font-face{font-family:'JetBrains Mono';font-weight:500;font-style:normal;font-display:swap;src:url("polices/jetbrainsmono.ttf") format("truetype");}
+@font-face{font-family:'Playpen Sans Hebrew';font-weight:300;font-style:normal;font-display:swap;src:url("polices/playpensanshebrew.ttf") format("truetype");}
+@font-face{font-family:'Playpen Sans Hebrew';font-weight:400;font-style:normal;font-display:swap;src:url("polices/playpensanshebrew.ttf") format("truetype");}
 :root{
   --bg:#12181f; --bg2:#161e28; --card:#1a222b; --card-edge:#2c3844;
   --ink:#ece7dd; --ink-dim:#9aa3ac; --gold:#d4a24c; --gold-soft:#e6c68a;
