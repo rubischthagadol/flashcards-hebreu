@@ -1774,7 +1774,7 @@ function answerHtml(card){
   if(card.note) h += noteHtml(card.note);
   return h;
 }
-// Expose : prefsLoad, savePrefs, sessSave, sessClear, sessRestore, srsLoad, srsSave, srsMigrateIds, cardId, PREFS_KEY, SESS_KEY, bootResumed, SRS_KEY, SRS — Utilise : CARDS (05), render (10), state (99)
+// Expose : prefsLoad, savePrefs, sessSave, sessClear, sessRestore, srsLoad, srsSave, cardId, PREFS_KEY, SESS_KEY, bootResumed, SRS_KEY, SRS — Utilise : CARDS (05), render (10), state (99)
 
 // ================= Préférences de réglage (persistées) =================
 // Les choix du panneau de réglages survivent d'une session à l'autre. Restaurés
@@ -1795,7 +1795,7 @@ function savePrefs(){
 // Une session en cours survit à un rechargement ou à une éviction de l'onglet
 // par iOS. Restauré au boot par sessRestore(), appelé depuis buildChips() → les
 // deux chemins (en ligne et autonome). Les cartes sont référencées par leur id
-// (cat|he) ; si le vocabulaire a changé sous la session, on l'abandonne.
+// (`id` de cards.json) ; si le vocabulaire a changé sous la session, on l'abandonne.
 const SESS_KEY='sess_v1';
 let bootResumed=false;
 function sessSave(){
@@ -1837,38 +1837,23 @@ function sessRestore(){
 // Chaque réponse (dans TOUS les modes) fait monter ou redescendre la carte d'une
 // « boîte » ; l'intervalle avant réapparition croît avec la boîte. Persisté en
 // localStorage → la progression survit entre les sessions et les jours.
-const SRS_KEY='srs_v1';
-// ⚠️ La clé porte la forme VOCALISÉE : la forme plate créait trois collisions
-// d'homographes consonantiques (לְסַפֵּר raconter / לִסְפֹּר compter,
-// לְלַמֵּד enseigner / לִלְמֹד étudier, שלומך m. / f.) — deux cartes partageaient
-// alors la même boîte de Leitner et une session restaurée substituait l'une à
-// l'autre. `cat|he` est unique dans le corpus actuel (0 doublon).
-function cardId(c){ return c.cat+'|'+c.he; }
+// srs_v1 rangeait la progression sous `cat|he`, qu'une correction de nikoud
+// effaçait ; srs_v2 la range sous l'`id` stable de chaque entrée de data/,
+// unique et figé (garde du build). Aucune progression n'est migrée.
+const SRS_KEY='srs_v2';
+try{ localStorage.removeItem('srs_v1'); }catch(e){}
+function cardId(c){ return c.id; }
 function srsLoad(){ try{ return JSON.parse(localStorage.getItem(SRS_KEY))||{}; }catch(e){ return {}; } }
 function srsSave(){ try{ localStorage.setItem(SRS_KEY, JSON.stringify(SRS)); }catch(e){} }
 let SRS=srsLoad();
-// Migration des profils d'avant le changement de clé : l'entrée `cat|he_plain`
-// est recopiée sous `cat|he`, puis retirée. Les deux cartes d'une ancienne
-// collision héritent chacune de l'entrée partagée — meilleure information
-// disponible, et déterministe. Appelée depuis buildChips(), quand CARDS existe.
-function srsMigrateIds(){
-  let moved=0;
-  CARDS.forEach(c=>{
-    const oldId=c.cat+'|'+c.he_plain, newId=cardId(c);
-    if(oldId!==newId && SRS[oldId] && !SRS[newId]){
-      SRS[newId]=JSON.parse(JSON.stringify(SRS[oldId])); moved++;
-    }
-  });
-  if(moved){
-    const keep=new Set(CARDS.map(cardId));
-    Object.keys(SRS).forEach(k=>{ if(!keep.has(k)) delete SRS[k]; });
-    srsSave();
-  }
-}
 // Expose : CARDS, cartesAJour — Utilise : (rien — CARDS est rempli par init() dans 99-principal.js, ou inscrit par le build dans le fichier autonome)
 let CARDS = [];
-// Chaque carte porte-t-elle sa graphie pleine ? Une cards.json d'avant he_plein est refusée par init().
-function cartesAJour(cartes){ return cartes.every(c=>typeof c.he_plein==='string'); }
+// Chaque carte porte-t-elle sa graphie pleine et un id propre ? Une cards.json d'avant he_plein
+// ou d'avant les id (la progression est rangée sous l'id, 04) est refusée par init().
+function cartesAJour(cartes){
+  return cartes.every(c=>typeof c.he_plein==='string' && typeof c.id==='string' && c.id!=='')
+    && new Set(cartes.map(c=>c.id)).size===cartes.length;
+}
 // Expose : loadVoices, reflectVoiceUi, speak, speakCurrent, updateSpeaker, TTS_OK, heVoice — Utilise : state (99)
 
 // ----- Speech (Web Speech API) -----
@@ -1947,7 +1932,7 @@ function updateSpeaker(){
   }
   btn.classList.toggle('hide', !(TTS_OK && hebrewVisible));
 }
-// Expose : nivOfCard, nivOk, themeOk, indexRecherche, runSearch, buildChips, buildNivChips, buildThemeChips, toggle, segPick, refreshAdvSub, foldSub, refreshFoldSubs, applyFoldState, refreshSelAll, updateStart, limitPool, THEMES, SPK_SVG, catCounts, nivCounts, themeCounts, catsEl, nivEl, themeEl, catOrder — Utilise : state (99), CARDS (05), escapeHtml (01), he2tr/cleRecherche (02), speak/bindTap (06/11), savePrefs/sessRestore/srsMigrateIds (04), applyPrefs/perfReport (13), refreshSrsUi (08)
+// Expose : nivOfCard, nivOk, themeOk, indexRecherche, runSearch, buildChips, buildNivChips, buildThemeChips, toggle, segPick, refreshAdvSub, foldSub, refreshFoldSubs, applyFoldState, refreshSelAll, updateStart, limitPool, THEMES, SPK_SVG, catCounts, nivCounts, themeCounts, catsEl, nivEl, themeEl, catOrder — Utilise : state (99), CARDS (05), escapeHtml (01), he2tr/cleRecherche (02), speak/bindTap (06/11), savePrefs/sessRestore (04), applyPrefs/perfReport (13), refreshSrsUi (08)
 
 // ================= Niveaux de difficulté (CECRL) =================
 // Le carnet stocke le CECRL fin (data-niveau="A1"…"C1") ; l'app l'affiche en
@@ -2162,7 +2147,6 @@ function buildChips(){
   buildNivChips();
   buildThemeChips();
   applyPrefs();
-  srsMigrateIds();   // avant tout lecteur de SRS (révision du jour, maîtrise)
   refreshSrsUi();
   sessRestore();
 }
@@ -3034,7 +3018,7 @@ document.getElementById('start').onclick=start;
 (function(){ const b=document.getElementById('review-btn'); if(b) b.onclick=startReview; })();
 
 // ================= Remise à zéro du profil =================
-// Efface la progression et les réglages (srs_v1, prefs_v1, sess_v1) et remet l'appli
+// Efface la progression et les réglages (srs_v2, prefs_v1, sess_v1) et remet l'appli
 // dans l'état du premier lancement, en place ; la charte choisie reste. Deux temps obligatoires : le bouton ouvre une
 // confirmation qui nomme la perte (nombre de cartes suivies), « Annuler » est le
 // défaut sûr et reçoit le focus.
@@ -3242,8 +3226,8 @@ document.addEventListener('keydown', e=>{
 // ===== BUILD:ONLINE-ONLY : bloc remplace par le build dans le fichier autonome =====
 // ---------- Chargement runtime des cartes (cards.json, généré par le build) ----------
 
-// Le refus d'une cards.json sans graphie pleine (cartesAJour, 05) : une paire app/cartes
-// périmée du cache, montrée sans nikud, afficherait « undefined ».
+// Le refus d'une cards.json sans graphie pleine ou sans id propre (cartesAJour, 05) : une
+// paire app/cartes périmée du cache afficherait « undefined » et mêlerait les progressions.
 const CARTES_PERIMEES = 'cartes-perimees';
 function showLoaderError(reason){
   const loader=document.getElementById('loader');
