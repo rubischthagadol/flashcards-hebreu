@@ -2042,7 +2042,7 @@ function runSearch(){
         detail += '<div class="srd-title">'+lbl+'</div><div class="srd-forms">';
         c.forms.forEach(f=>{
           detail += '<div class="srd-f"><span class="srd-he" lang="he">'+f.he+'</span>'
-                 +  '<span class="srd-lbl">'+f.label+(f.tr?' · '+f.tr:'')+'</span></div>';
+                 +  '<span class="srd-lbl">'+(FORME_LBL[f.label]||f.label)+(f.tr?' · '+f.tr:'')+'</span></div>';
         });
         detail += '</div>';
       }
