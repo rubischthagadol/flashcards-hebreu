@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-31",
+  "version": "2026-11-02",
   "cartes": [
     {
       "id": "41bcbe23",
@@ -29767,17 +29767,17 @@
       "cat": "Noms",
       "he": "פָּנִים",
       "tr": "",
-      "fr": "visage (m)",
-      "genre": "m",
-      "note": "toujours au pluriel",
+      "fr": "visage (f)",
+      "genre": "f",
+      "note": "toujours au pluriel ; féminin, parfois masculin",
       "niveau": "A2",
       "theme": "corps-sante",
       "exemples": [
         {
-          "he": "הַפָּנִים שֶׁל הַיַּלְדָּה שְׂמֵחִים",
-          "tr": "hapanim shel hayaldah semechim",
+          "he": "הַפָּנִים שֶׁל הַיַּלְדָּה שְׂמֵחוֹת",
+          "tr": "hapanim shel hayaldah semechot",
           "fr": "le visage de la fille est joyeux",
-          "he_plain": "הפנים של הילדה שמחים"
+          "he_plain": "הפנים של הילדה שמחות"
         }
       ],
       "he_plain": "פנים",
