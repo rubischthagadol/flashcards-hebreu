@@ -13,7 +13,7 @@
 <!-- iPhone installé : viewport-fit=cover étend la page sous l'encoche, et la barre d'état
      black-translucent la rend transparente ; la bande sous l'heure et les quatre zones sûres sont
      décrites dans flashcards/docs/DESIGN.md § La barre d'état et les zones sûres (gardées par
-     build/gardes/charte.rs). -->
+     outils/src/flashcards/build/gardes/charte.rs). -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Flashcards Hébreu</title>
 <!-- PWA : installable sur iPhone via Safari → Partager → « Sur l'écran d'accueil ». Même couche : l'icône
@@ -516,6 +516,8 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
     display:flex; flex-direction:column;
     padding:calc(16px + env(safe-area-inset-top, 0px)) max(14px, env(safe-area-inset-right, 0px)) 26px max(14px, env(safe-area-inset-left, 0px));
   }
+  /* Le repère des trois écrans : il relaie au `body` en colonne le `flex:1` de `.study` et `.done`. */
+  main{ display:flex; flex-direction:column; flex:1; }
   /* ⚠️ `*` ne cible pas les pseudo-éléments : les trois sélecteurs, toujours.
      Aucune animation de l'app n'est portée par un ::before aujourd'hui (spin et
      cardIn sont sur de vrais éléments) — c'est justement pourquoi on l'écrit
@@ -650,15 +652,10 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   .cat-row{ display:flex; align-items:center; gap:8px; margin-bottom:9px; }
   /* Au doigt : chips à hauteur de cible réelle, sans épaissir le bureau.
      `min-height` et non du rembourrage : la hauteur d'une puce dépend de son
-     corps, et le calcul par padding plafonnait à ~42px — sous la barre des 44px
-     que le reste de l'app tient déjà (cf. le bloc `pointer:coarse` de
-     `30-cartes.css`). Mesuré après : 59 puces, minimum 44px, aucune en dessous ;
-     et au pointeur fin la signature des hauteurs est inchangée (36px partout).
-     ⚠️ Trois règles `.cat-row .chip` vivaient ici et **ne matchaient rien** :
-     `.cat-row` n'entoure que le bouton « tout sélectionner », les puces de
-     catégorie vivant dans `#cats.chips`. La dette qui a mené ici accusait ce
-     sélecteur ; le défaut était réel, sa cause déclarée était fausse. Retirées
-     plutôt que reconduites — un sélecteur mort est un piège qui attend. */
+     corps, et un calcul par padding plafonne à ~42px — sous la barre des 44px
+     que le reste de l'app tient (cf. le bloc `pointer:coarse` de `30-cartes.css`).
+     Les puces de catégorie vivent dans `#cats.chips`, pas dans `.cat-row` (qui
+     n'entoure que le bouton « tout sélectionner »). */
   @media (pointer:coarse){
     .chip{
       padding:11px 16px;
@@ -691,11 +688,11 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   }
   body.has-due .start:enabled:hover{ border-color:var(--gold); }
   /* Désactivé, « Commencer » quitte l'or : la lampe n'éclaire jamais un état inerte
-     (règle de la lampe). Peau pleine et opaque plutôt qu'une opacité, qui laissait
-     le contenu de la page transparaître à travers le bouton.
+     (règle de la lampe). Surface nue plutôt qu'une opacité, qui laisserait le
+     contenu de la page transparaître à travers le bouton.
      ⚠️ Ce qui le sépare du secondaire actif ci-dessus n'est PAS le filet — --line
-     (#2a3440) et --card-edge (#2c3844) sont indiscernables à l'écran — mais la
-     surface (aucune contre une peau pleine) et le texte (estompé contre plein). */
+     et --card-edge sont indiscernables à l'écran — mais la surface (aucune contre
+     une peau pleine) et le texte (estompé contre plein). */
   .start:disabled{
     background:none; border-color:var(--line); color:var(--ink-dim);
     cursor:not-allowed; box-shadow:none;
@@ -715,7 +712,7 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   .adv{ margin-top:18px; border:1px solid var(--line); border-radius:var(--rayon-panneau-12); background:var(--bg2); }
   .adv summary{
     display:flex; align-items:baseline; gap:10px; cursor:pointer; list-style:none;
-    padding:12px 14px; border-radius:var(--rayon-panneau-12); -webkit-tap-highlight-color:transparent;
+    padding:12px 14px; border-radius:var(--rayon-panneau-12);
     font-size:.95rem; font-weight:var(--graisse-etiquette); color:var(--ink); transition:color .13s ease;
   }
   .adv summary::-webkit-details-marker{ display:none; }
@@ -735,7 +732,7 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   }
   /* Le summary est la seule cible tactile du groupe replié. */
   @media (pointer:coarse){
-    .adv summary{ min-height:44px; box-sizing:border-box; align-items:center; }
+    .adv summary{ min-height:44px; align-items:center; }
   }
   /* Remise à zéro : discrète au repos, rouge assumé au moment de confirmer. */
   .reset-zone{ margin-top:20px; padding-top:4px; border-top:1px solid var(--line); }
@@ -753,9 +750,9 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   .study.active{ display:flex; }
   /* Colonne flex à TOUTES les largeurs, y compris sous le palier ordi où elle
      n'est qu'un conteneur transparent. C'est délibéré : en flex, les marges de
-     ses enfants ne fusionnent pas — exactement le régime qu'ils connaissaient
-     dans le `.study` flex avant que ce conteneur existe. C'est ce qui rend le
-     téléphone strictement immobile malgré une boîte de plus dans l'arbre. */
+     ses enfants ne fusionnent pas, comme dans le `.study` flex qui les contient.
+     C'est ce qui laisse le téléphone strictement immobile malgré une boîte de
+     plus dans l'arbre. */
   .answer-col{ display:flex; flex-direction:column; }
   .setup.hidden{ display:none; }
 
@@ -763,7 +760,7 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   .bar{ flex:1; height:5px; background:var(--line); border-radius:var(--rayon-pilule); overflow:hidden; }
   .bar > span{ display:block; height:100%; width:100%; background:var(--gold); border-radius:var(--rayon-pilule); transform:scaleX(0); transform-origin:left; transition:transform .35s ease; }
   .counter{ font-family:var(--fonte-mono); font-size:.88rem; color:var(--ink-dim); white-space:nowrap; }
-  .exit{ display:inline-flex; align-items:center; gap:3px; min-height:44px; background:var(--card); border:1px solid var(--card-edge); color:var(--ink-dim); font-family:inherit; font-size:.95rem; line-height:1; cursor:pointer; padding:9px 12px 9px 10px; border-radius:var(--rayon-case-10); -webkit-tap-highlight-color:transparent; }
+  .exit{ display:inline-flex; align-items:center; gap:3px; min-height:44px; background:var(--card); border:1px solid var(--card-edge); color:var(--ink-dim); font-family:inherit; font-size:.95rem; line-height:1; cursor:pointer; padding:9px 12px 9px 10px; border-radius:var(--rayon-case-10); }
   .exit > span{ font-size:.82rem; letter-spacing:var(--interlettre-sortie); }
   .exit:hover, .exit:active{ color:var(--ink); border-color:var(--ink-dim); }
 
@@ -780,25 +777,22 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
     transition:transform .12s ease;
   }
   /* En mode saisie, carte plus compacte pour que réponse + Suivant tiennent à
-     l'écran. Mais `height:min(32vh,290px)` était un plafond RIGIDE, indifférent
-     à ce que la carte porte : un adjectif à trois inflexions réclamait 179px
-     là où il en recevait 151, et la troisième étiquette était coupée net
-     (mesuré : 28px avalés sur iPhone 16 Pro, 7px sur un Chrome à 380px). La
-     hauteur suit désormais le contenu, sous un plafond plus généreux — la carte
-     ne prend que ce qu'il lui faut, et ne dépasse jamais la borne qui protège la
-     ligne de flottaison. `overflow-y:auto` reste le filet en dessous du palier
-     ordi : c'est le seul endroit où un plafond peut encore mordre. */
+     l'écran. La hauteur suit le contenu, sous un plafond : un plafond rigide,
+     indifférent à ce que la carte porte, couperait net la troisième étiquette d'un
+     adjectif à trois inflexions. La carte ne prend que ce qu'il lui faut, et ne
+     dépasse jamais la borne qui protège la ligne de flottaison. `overflow-y:auto`
+     reste le filet en dessous du palier ordi : c'est le seul endroit où un plafond
+     peut mordre. */
   body.input-mode .flip{ min-height:190px; height:auto; max-height:min(46vh,340px); }
   body.input-mode .stage{ flex:0 0 auto; margin-bottom:2px; }
   .flip:active{ transform:scale(.994); }
-  /* Trois rangées en flux — étiquette / contenu / indice —, et non plus un
-     contenu centré entre deux éléments épinglés en `position:absolute`.
-     Épinglés, l'étiquette et l'indice ne défilaient pas avec le contenu : dès
-     que la carte était trop courte pour lui (un adjectif à trois inflexions
-     dans la carte compacte du mode saisie), le texte passait *sous* « traduis
-     en français » au lieu de s'arrêter avant. Le padding réservait la place
-     des deux, ce qui ne vaut que tant que rien ne défile. En flux, la rangée
-     du milieu est la seule à défiler et ne peut plus recouvrir personne. */
+  /* Trois rangées en flux — étiquette / contenu / indice —, non un contenu centré
+     entre deux éléments épinglés en `position:absolute` : épinglés, l'étiquette et
+     l'indice ne défileraient pas avec le contenu, et dès que la carte est trop
+     courte pour lui (un adjectif à trois inflexions dans la carte compacte du mode
+     saisie) le texte passerait *sous* « traduis en français » au lieu de s'arrêter
+     avant. En flux, la rangée du milieu est la seule à défiler et ne recouvre
+     personne. */
   .face{
     flex:1; min-height:0; display:grid; grid-template-rows:auto 1fr auto;
     padding:16px 22px 14px; text-align:center;
@@ -833,7 +827,6 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   .speak-btn svg{ width:21px; height:21px; }
   .speak-btn:active{ transform:scale(.9); }
   .speak-btn.speaking{ color:var(--gold-soft); border-color:var(--gold); }
-  .speak-btn.hide{ display:none !important; }
   /* Pas de voix hébraïque sur l'appareil : on masque les boutons audio plutôt
      que de laisser la voix par défaut prononcer l'hébreu de travers. */
   body.no-he-voice .speak-btn, body.no-he-voice .sr-speak, body.no-he-voice .spk-hint, body.no-he-voice .ex-speak{ display:none !important; }
@@ -862,7 +855,7 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   /* Phrases : plus longues qu'un mot → taille réduite et retour à la ligne propre. */
   .big-he.phrase{ font-size:2.15rem; line-height:1.45; }
   .big-fr.phrase{ font-size:1.5rem; line-height:1.35; }
-  @media (max-width:480px){ .big-he.phrase{ font-size:1.9rem; } .big-fr.phrase{ font-size:1.35rem; } }
+  @media (max-width:480px){ .big-he{ font-size:3.2rem; } .big-he.cursive{ font-size:2.8rem; } .big-fr{ font-size:2rem; } .big-he.phrase{ font-size:1.9rem; } .big-fr.phrase{ font-size:1.35rem; } }
   .translit{ font-family:var(--fonte-mono); font-size:1.1rem; color:var(--ink-dim); margin-top:12px; direction:ltr; }
   .rappel{font-family:var(--fonte-hebreu);font-size:2.5rem;line-height:1.4;direction:rtl;margin-bottom:6px} .rappel.phrase{font-size:1.9rem;line-height:1.45} /* verso hé→fr : l'hébreu rappelé en tête, plus grand que la vedette française (DESIGN.md § 3) */
   .cursive-line{ font-family:var(--fonte-cursive); font-weight:var(--graisse-cursive); font-size:1.7rem; color:var(--gold-soft); direction:rtl; margin-top:8px; }
@@ -907,9 +900,9 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   }
   .ex-speak:hover{ border-color:var(--gold); color:var(--gold); }
   .ex-speak svg{ width:100%; height:100%; }
-  /* Au doigt, toute la famille passe la barre des 44px — pas seulement les deux
-     contrôles traités au premier passage. .ex-toggle et les boutons de correction
-     comptent double : ce sont ceux qu'on vise juste après s'être trompé. */
+  /* Au doigt, toute la famille passe la barre des 44px. .ex-toggle et les boutons
+     de correction comptent double : ce sont ceux qu'on vise juste après s'être
+     trompé. */
   @media (pointer:coarse){
     .ex-speak, #speak-btn{ width:44px; height:44px; }
     .ex-toggle, #fix-verdict, #quiz-fix, #btn-skip, #reset-btn{
@@ -939,32 +932,27 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   .forms .f-lbl{ font-size:.75rem; color:var(--ink-dim); direction:ltr; text-align:left; white-space:nowrap; text-transform:var(--casse-surtitre); letter-spacing:var(--interlettre-surtitre); }
 
   /* ---------- Le palier « ordi » ----------
-     L'app est née sur iPhone et s'y était arrêtée : avant ce bloc, ses seules
-     @media de largeur étaient des `max-width:480px` — c'est-à-dire des ordres
-     de *rétrécir*. Aucune ne disait jamais de grandir, si bien qu'un écran de
-     1900 px affichait une carte de 420 px et un hébreu de 57,6 px au milieu
-     d'un vide. La règle de la vedette (docs/DESIGN.md) dit que l'hébreu est
-     toujours plus grand que tout le reste : sur ordi il y avait la place, et
-     elle n'était pas prise.
+     Ici la carte grandit : les @media de largeur du téléphone sont des
+     `max-width:480px`, des ordres de *rétrécir*. La règle de la vedette
+     (docs/DESIGN.md) dit que l'hébreu est toujours plus grand que tout le reste :
+     sur ordi il y a la place, on la prend.
 
-     Deux corrections, liées par la même cause. On rend la largeur — et on
-     rend surtout la *hauteur au contenu* : `height:min(60vh,520px)` était
-     rigide, la carte réclamait 60 % de l'écran même à moitié vide, et la
-     réponse suivie de l'exemple déplié partait alors sous la ligne de
-     flottaison. Ici la carte prend ce qu'il lui faut, pas davantage.
+     Deux corrections, liées par la même cause. On rend la largeur — et surtout la
+     *hauteur au contenu* : avec la hauteur rigide du téléphone, la carte
+     réclamerait 60 % de l'écran même à moitié vide, et la réponse suivie de
+     l'exemple déplié partirait sous la ligne de flottaison. Ici la carte prend ce
+     qu'il lui faut, pas davantage.
      ⚠️ Palier à 900 px, pas au-dessous : c'est la largeur à partir de
      laquelle 640 px de carte laissent encore des marges franches. */
   @media (min-width:900px){
     /* Deux colonnes : la carte à gauche, tout ce qu'on FAIT de la carte à droite.
-       Mesuré à 1536×730 avant ce bloc : « Suivant » passait 42px sous la fenêtre
-       avec l'exemple replié, 150px déplié, 222px sur un verbe à 4 formes ; en mode
-       Cartes « Je savais » dépassait de 19px. Le coût n'est pas la carte (264px)
-       mais le bloc de correction (375px) — l'empiler SOUS une carte qui prend déjà
-       la moitié de la hauteur utile ne pouvait pas tenir. Côte à côte, le déficit
-       tombe à 0 sur les six situations mesurées, et la largeur perdue était là.
-       420px à droite : c'est la translittération d'exemple qui dicte la largeur,
-       et 420px couvre 96,8 % du corpus — au-delà le texte se replie, il n'est
-       jamais tronqué. Pistes en `minmax(0,…fr)` et non en largeurs fixes : à 900px
+       Le coût n'est pas la carte mais le bloc de correction : l'empiler SOUS une
+       carte qui prend déjà la moitié de la hauteur utile ne tient pas, « Suivant »
+       passerait sous la ligne de flottaison (a fortiori avec l'exemple déplié ou un
+       verbe à 4 formes). Côte à côte, tout tient.
+       C'est la translittération d'exemple qui dicte la largeur de la colonne de
+       droite : au-delà, le texte se replie, il n'est jamais tronqué. Pistes en
+       `minmax(0,…fr)` et non en largeurs fixes : à 900px
        il n'y a pas 1094px à distribuer, et les deux colonnes doivent se resserrer
        ensemble plutôt que déborder. `.study.active` et non `.study` : c'est lui
        qui porte le `display:flex`, à sélecteur moins spécifique on ne gagnerait
@@ -983,9 +971,8 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
       max-width:640px;
       height:auto; min-height:min(42vh,380px); max-height:none;
     }
-    /* Le mode saisie comprimait la carte à 32vh pour que la correction tienne
-       sous elle ; à cette largeur le besoin disparaît et c'était précisément
-       cet écrasement qui faisait défiler les inflexions. */
+    /* Le mode saisie ne comprime pas la carte à cette largeur : la correction a
+       sa colonne, et un plafond ferait défiler les inflexions. */
     /* ⚠️ `max-height:none` est indispensable ici : le `.flip{max-height:none}`
        ci-dessus ne suffit pas, `body.input-mode .flip` étant plus spécifique, le
        plafond `46vh` posé pour le téléphone gagnerait aussi au palier ordi. */
@@ -998,13 +985,12 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
     .face .hint{ font-size:.95rem; margin-top:12px; }
     /* Au-dessus de 900px, rien ne défile dans la carte — il n'y a rien à y faire
        défiler. `height:auto` y résout la hauteur sur le contenu, sur les DEUX
-       moteurs (mesuré : 80 combinaisons sous WebKit, marge exactement nulle ;
-       229,6px sous Blink pour un plancher à 218,9px). Ne restait qu'un arrondi
-       sous-pixel — `clientHeight` 152 contre `scrollHeight` 153 — invisible sous
-       WebKit dont les barres sont en surimpression, mais pas sous Windows où elles
-       sont classiques : 1px de dépassement y suffit à faire apparaître une barre à
-       flèches, qui vole en plus 15px de largeur au contenu. Le téléphone garde son
-       `overflow-y:auto` : là le plafond `32vh` rogne pour de vrai. */
+       moteurs. Reste un arrondi sous-pixel (`scrollHeight` d'un pixel au-dessus de
+       `clientHeight`), invisible sous WebKit dont les barres sont en surimpression,
+       mais pas sous Windows où elles sont classiques : 1px de dépassement y suffit
+       à faire apparaître une barre à flèches, qui vole en plus 15px de largeur au
+       contenu. Le téléphone garde son `overflow-y:auto` : là le plafond de hauteur
+       rogne pour de vrai. */
     #face-content{ overflow:visible; }
 
     .big-he{ font-size:4.8rem; }
@@ -1024,12 +1010,34 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
        c'est le dernier qui gagne — une @media n'ajoute pas de spécificité. Le
        palier ordi de ce bloc-là vit donc au même endroit que sa base. */
 
-    /* L'exemple était le plus maltraité : sa translittération tombait à
-       12,8 px, moitié moins que la ligne française qu'elle accompagne. */
+    /* L'exemple : sa translittération reste de la taille de la ligne française
+       qu'elle accompagne, non moitié moins. */
     .ex-he{ font-size:2rem; }
     .ex-tr{ font-size:1rem; }
     .ex-fr{ font-size:1.15rem; }
     .ex-toggle{ font-size:1rem; }
+  }
+
+  /* ---------- Le verso en deux colonnes, sur un écran large et bas ----------
+     Le bureau (1536×730) perd sa hauteur au verso et sa largeur sur les côtés : sur une seule colonne,
+     un verbe à 4 formes, exemple déplié, dépasse la ligne de flottaison (dette n° 2, docs/TODO.md). Au retournement,
+     la carte s'élargit, et le verso se range en deux colonnes de texte, que le navigateur équilibre :
+     le mot (le rappel ou le mot, la cursive, la translittération) ne se coupe pas et ouvre la
+     colonne de gauche ; la coupure tombe après lui ou plus bas (inflexions, note, exemple), là où les
+     deux colonnes sont le moins hautes. Des colonnes de texte et non une grille : une grille lierait
+     la hauteur des rangées des deux côtés. Seulement si quelque chose suit la translittération :
+     sinon le verso tient déjà. `max-height` reste sous 900 px : 1440×900, où tourne le contrôle 9 de
+     verso.js, garde le verso sur un seul axe (docs/DESIGN.md). */
+  @media (min-width:1200px) and (max-height:820px){
+    body:not(.input-mode) .study.active:has(#face-content > .translit + *):has(#face-content > :is(.rappel, .cursive-line)){
+      max-width:1480px; grid-template-columns:minmax(0,1fr) minmax(0,420px);
+    }
+    body:not(.input-mode) .flip:has(#face-content > .translit + *):has(#face-content > :is(.rappel, .cursive-line)){ max-width:none; }
+    body:not(.input-mode) #face-content:has(> .translit + *):has(> :is(.rappel, .cursive-line)){
+      display:block; columns:2; column-gap:44px; align-self:safe center;
+    }
+    body:not(.input-mode) #face-content:has(> .translit + *):has(> :is(.rappel, .cursive-line)) > *{ break-inside:avoid; }
+    body:not(.input-mode) #face-content:has(> .translit + *):has(> :is(.rappel, .cursive-line)) > :is(.rappel, .big-fr, .big-he, .cursive-line, .forms-titre){ break-after:avoid; }
   }
 
   /* Téléphone couché : la carte prend la hauteur de son contenu et c'est la page qui défile. Plafonnée,
@@ -1120,7 +1128,7 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   .kbd-hint{ text-align:center; color:var(--ink-dim); font-size:.84rem; margin-top:12px; text-wrap:balance; line-height:2; }
   /* Une touche ne se sépare pas de son libellé : la ligne se coupe entre les paires. */
   .kbd-hint .kh{ white-space:nowrap; }
-  @media (max-width:480px){ .kbd-hint{ display:none; } .big-he{ font-size:3.2rem; } .big-he.cursive{ font-size:2.8rem; } .big-fr{ font-size:2rem; } }
+  @media (max-width:480px){ .kbd-hint{ display:none; } }
 
   .loader{ max-width:520px; margin:40px auto; text-align:center; color:var(--ink-dim); }
   .loader .spin{ width:34px; height:34px; margin:0 auto 14px; border:3px solid var(--line); border-top-color:var(--gold); border-radius:var(--rayon-rond); animation:spin 1s linear infinite; }
@@ -1169,18 +1177,14 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   /* Inflexions sous la correction en mode saisie : la même liste, espacement
      resserré pour tenir dans la carte compacte. */
   .feedback .forms{ margin:12px auto 0; gap:10px 16px; }
-  .feedback .forms .f-he{ font-size:1.7rem; }
   .feedback .note-line{ margin-top:10px; }
   /* Inflexions sur la carte elle-même (mode saisie, sens hébreu→français) */
   body.input-mode #face-content .forms{ margin:12px auto 0; gap:10px 14px; }
-  body.input-mode #face-content .forms .f-he{ font-size:1.7rem; }
 
   /* ---------- Le palier « ordi » (suite de 30-cartes.css) ----------
-     La correction du mode saisie souffrait du même défaut que la carte : le
-     mot juste y était rendu à 1,9rem — plus petit que la carte qui venait de
-     le poser à 3,6rem, et la ligne de translittération à 1,1rem. C'est la
-     réponse, c'est-à-dire ce qu'on est venu lire : elle ne peut pas être le
-     plus petit hébreu de l'écran. Les boutons, eux, ne bougent pas — la règle
+     La correction du mode saisie grandit avec la carte : le mot juste est la
+     réponse, ce qu'on est venu lire, il ne peut pas être le plus petit hébreu de
+     l'écran. Les boutons, eux, ne bougent pas — la règle
      de la vedette veut qu'aucun contrôle ne rivalise avec l'hébreu, et les
      agrandir avec lui reviendrait à ne rien avoir hiérarchisé du tout. */
   @media (min-width:900px){
@@ -1191,14 +1195,10 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
     .feedback .your-answer{ font-size:1rem; }
     .feedback .forms .f-he{ font-size:2.2rem; }
     .feedback .forms{ gap:12px 22px; }
-    /* Les inflexions sur la carte elle-même. Ce bloc a vécu dans le palier ordi de
-       `30-cartes.css` et n'a JAMAIS rien appliqué : même sélecteur que la règle
-       inconditionnelle ci-dessus, mais dans un fichier concaténé AVANT elle, et
-       une @media n'ajoute pas de spécificité. Les inflexions rendaient donc à
-       1,7rem sur ordi — la taille pensée pour la carte comprimée du téléphone —
-       et la marge à 12px, soit douze pixels entre un mot de 76,8px et ses formes.
-       Corrigé en posant l'override là où vit sa base. 24px est la valeur que
-       `.forms` porte déjà au palier ordi : pas un nombre neuf. */
+    /* Les inflexions sur la carte elle-même. L'override vit ici, là où vit sa base :
+       posé dans `30-cartes.css`, concaténé AVANT la règle inconditionnelle ci-dessus,
+       il ne s'appliquerait jamais (même sélecteur, et une @media n'ajoute pas de
+       spécificité). */
     body.input-mode #face-content .forms{ margin-top:24px; gap:12px 22px; }
     body.input-mode #face-content .forms .f-he{ font-size:2.2rem; }
     #answer-input{ font-size:1.25rem; }
@@ -1247,9 +1247,9 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
     color:var(--ink); font-family:inherit; padding:13px 15px; transition:background .13s ease, color .13s ease, border-color .13s ease;
   }
   .review-card:hover{ background:rgba(var(--gold-rgb),.24); }
-  /* Peau pleine, pas d'opacité : `opacity:.55` enfreignait DESIGN.md §5 deux fois —
-     il disait l'état inerte par une transparence, et laissait l'icône en or PÂLI
-     plutôt que de la sortir de l'or. Un état inactif n'est jamais éclairé. */
+  /* Peau pleine, pas d'opacité : DESIGN.md §5 interdit de dire l'état inerte par
+     une transparence, et l'icône sort de l'or au lieu d'y rester pâlie. Un état
+     inactif n'est jamais éclairé. */
   .review-card:disabled{ cursor:default; border-color:var(--line); background:var(--bg2); color:var(--ink-dim); }
   .review-card:disabled .review-ico{ color:var(--ink-dim); }
   .review-ico{ flex:none; width:24px; height:24px; color:var(--gold); }
@@ -1257,7 +1257,6 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   .review-body{ flex:1; min-width:0; }
   .review-title{ font-weight:var(--graisse-titre); font-size:1rem; }
   .review-sub{ font-size:.84rem; color:var(--ink-dim); margin-top:1px; }
-  .review-card:disabled .review-sub{ color:var(--ink-dim); }
   .review-arrow{ flex:none; color:var(--gold); font-size:1.3rem; }
   .review-card:disabled .review-arrow{ display:none; }
   .mastery{ margin-top:12px; font-size:.9rem; color:var(--ink-dim); }
@@ -1275,6 +1274,7 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
 
 <!-- ============ SETUP ============ -->
 <div id="loader" class="loader"><div class="spin"></div><p id="loader-msg" role="status">Chargement du vocabulaire…</p></div>
+<main>
 <section class="setup panel hidden" id="setup">
   <!-- Après « Quitter » : le SRS a déjà enregistré chaque réponse donnée — le dire. -->
   <div class="exit-note hide" id="exit-note" role="status"></div>
@@ -1302,7 +1302,7 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   </div>
   <div class="search-results hide" id="search-results"></div>
 
-  <!-- Les deux plus gros points de décision de l'écran (23 chips à eux deux) passent
+  <!-- Les deux plus gros points de décision de l'écran passent
        sous un pli, sur le modèle des réglages avancés. Le summary porte la sélection
        en cours : replier ne cache donc aucune information, il la condense.
        ⚠️ L'état ouvert/replié se décide au chargement seulement (applyFoldState) :
@@ -1408,12 +1408,13 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
            l'ouvre et le ferme, et ôte `hidden` du montage. -->
       <div data-chartes hidden><h2 id="h-charte"><button type="button" class="chartes-bouton" aria-expanded="false" aria-controls="chartes-liste">Thème</button></h2><div class="chartes-choix" id="chartes-liste" role="group" aria-label="Thème" hidden></div></div>
 
-      <!-- Piège n°14 d'AGENTS.md : la seule mesure qui fasse
+      <!-- Piège n°14 de flashcards/docs/PIEGES.md : la seule mesure qui fasse
            foi est prise sur l'appareil réel, et il n'a pas d'inspecteur — les
-           millisecondes s'affichent donc ici, comme le nom de la voix ci-dessus. -->
-      <h2>Diagnostic de latence</h2>
-      <div class="seg-note" id="perf-boot"></div>
-      <div class="seg-note" id="perf-note">Touche une chip ou « Commencer » : les temps du dernier geste s'affichent ici.</div>
+           millisecondes s'affichent donc ici, comme le nom de la voix ci-dessus.
+           Caché sauf avec `?diag` dans l'adresse (13-reglages.js). -->
+      <h2 data-diag hidden>Diagnostic de latence</h2>
+      <div class="seg-note" id="perf-boot" data-diag hidden></div>
+      <div class="seg-note" id="perf-note" data-diag hidden>Touche une chip ou « Commencer » : les temps du dernier geste s'affichent ici.</div>
 
       <!-- Action rare et destructrice : derrière le pli, jamais en concurrence
            avec « Commencer » ni la révision du jour. Deux temps obligatoires. -->
@@ -1461,11 +1462,10 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   </div>
 
   <!-- Colonne de droite au palier ordi : tout ce qu'on FAIT de la carte.
-       Conteneur ajouté pour la grille — sans lui, la colonne 2 ne peut être
-       tenue en une seule pile qu'au prix d'un `grid-row: 2 / span N` fragile.
-       Il est `display:flex; flex-direction:column` À TOUTES LES LARGEURS : c'est
-       ce qui garantit le téléphone au pixel près, les marges y étant traitées
-       comme dans le `.study` flex d'avant, sans fusion. -->
+       Un seul conteneur pour la grille : la colonne 2 y tient en une pile, sans
+       `grid-row: 2 / span N`. Il est `display:flex; flex-direction:column` À TOUTES
+       LES LARGEURS : c'est ce qui garantit le téléphone au pixel près, les marges ne
+       fusionnant pas en flex. -->
   <div class="answer-col">
     <div class="controls" id="controls-cards">
       <button class="btn-flip" id="btn-flip">Voir la réponse</button>
@@ -1499,7 +1499,7 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
       <button class="btn-next hide" id="quiz-next">Suivant →</button>
     </div>
 
-    <div class="kbd-hint" id="kbd-hint"><span class="kh"><kbd>espace</kbd> retourner</span> · <span class="kh"><kbd>&larr;</kbd> à revoir</span> · <span class="kh"><kbd>&rarr;</kbd> je savais</span><span class="spk-hint"> · <span class="kh"><kbd>p</kbd> écouter</span></span></div>
+    <div class="kbd-hint" id="kbd-hint"></div>
   </div>
 
 </section>
@@ -1515,6 +1515,7 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
     <button id="back-setup">Changer de réglages</button>
   </div>
 </section>
+</main>
 
 <script>
 // Expose : escapeHtml, shuffle, todayNum, fmtMs — Utilise : (rien — utilitaires purs)
@@ -1568,10 +1569,9 @@ function he2tr(he){
     var isFinal=(j>=s.length || s[j]===' ');
     var cons='';
     switch(ch){
-      // Standard de translittération (cf. carnet) : א = ' entre deux voyelles
-      // seulement (tsme'a) ; ע = ' partout ('ivrit, be'er, rega').
-      // א = ' entre deux voyelles (tsme'ah), et devant un yod FINAL porteur du
-      // i, où l'alef s'entend également (achra'i, et non achray).
+      // Standard de translittération (flashcards/docs/TRANSLITTERATION.md) : ע = ' partout
+      // ('ivrit, be'er, rega') ; א = ' entre deux voyelles (tsme'ah), et devant un yod FINAL
+      // porteur du i, où l'alef s'entend également (achra'i, et non achray).
       case 'א': cons=(!wordStart && /[aeiou]$/.test(out) && (hasVowel || yodFinal))?"'":''; break;
       case 'ע': cons="'"; break;
       case 'ב': cons=has(0x05BC)?'b':'v'; break;
@@ -1611,13 +1611,10 @@ function he2tr(he){
     // (kol, bekhol, lekhol). C'est la seule occurrence assez fréquente et assez
     // sûre pour être codée — le kamats katan général dépend de la syllabe fermée
     // non accentuée, que ce translittérateur ne sait pas voir, et le coder « au
-    // jugé » régresserait ailleurs. Mesuré sur les 4229 paires du corpus :
-    // exact +31, replié +34, distance −34 — gain strict sur les trois.
+    // jugé » régresserait ailleurs.
     // ⚠️ Et seulement si ce ל CLÔT le mot. Sans cette condition la règle
     // sur-applique : dans כַּלְכָּלִי (kalkali) le second כ porte un kamats
-    // gadol suivi d'un ל non final, et le mot sortait « kalkoli ». Mesuré :
-    // c'était la seule vraie régression de la règle large, les cinq autres
-    // écarts qu'elle produisait étant des `tr` rédigés fautifs.
+    // gadol suivi d'un ל non final, et le mot sortirait « kalkoli ».
     if(has(0x05B8) && (ch==='כ'||ch==='ך') && s[j]==='ל'){
       var r=j+1;
       while(r<s.length && s.charCodeAt(r)>=0x0591 && s.charCodeAt(r)<=0x05C7) r++;
@@ -1647,7 +1644,7 @@ function trKey(s){
   s=s.replace(/ph/g,'f').replace(/kh/g,'ch').replace(/q/g,'k').replace(/w/g,'v').replace(/tz/g,'ts');
   s=s.replace(/ou/g,'u').replace(/ch/g,'h');
   // Shva initial : il s'entend ou non selon le mot (shkufah mais ledaber, cf.
-  // AGENTS.md § Transliteration standard). he2tr tranche pour l'affichage ;
+  // flashcards/docs/TRANSLITTERATION.md). he2tr tranche pour l'affichage ;
   // la SAISIE, elle, doit accepter les deux graphies — on replie donc le « e »
   // qui sépare les deux consonnes d'attaque. Sans ce pliage, corriger he2tr
   // rétrograderait « shekufah » de Correct à Presque.
@@ -1688,22 +1685,21 @@ function cleRecherche(s){
       m=m.replace(/ou/g,'u').replace(/ch/g,'h');
       m=m.replace(/^([^aeiou]{1,2})e(?=[^aeiou])/,'$1');
       // Gémination : PAIRES et CONSONNES seulement, là où trKey écrase les
-      // séries entières. Deux dérapages mesurés le 29/07 sur le contrôle
-      // négatif, que trKey ne connaît pas parce qu'il compare des mots entiers
-      // quand on cherche, ici, par sous-chaîne :
-      //   « zzzqqq » tombait sur « zk » — deux caractères qui se retrouvent
-      //   dans la moitié du corpus, donc une requête absurde rendait des mots ;
-      //   et « baal » tombait sur « bal », qui matche « balai » et « balcon ».
+      // séries entières. trKey compare des mots entiers, ici on cherche par
+      // sous-chaîne, et un pliage plus large ferait dérailler la recherche :
+      //   « zzzqqq » tomberait sur « zk » — deux caractères qui se retrouvent
+      //   dans la moitié du corpus, donc une requête absurde rendrait des mots ;
+      //   et « baal » tomberait sur « bal », qui matche « balai » et « balcon ».
       // Les voyelles gardent donc leur doublement (« baal » ≡ « ba'al » se
       // rejoignent déjà par la chute de l'apostrophe), et une série de trois
-      // reste longue — he2tr n'écrit jamais de consonne doublée (mesuré :
-      // shabat, saba, aba), le pliage n'existe que pour accepter la graphie
-      // géminée que l'on TAPE (« shabbat »).
+      // reste longue — he2tr n'écrit jamais de consonne doublée (shabat, saba,
+      // aba), le pliage n'existe que pour accepter la graphie géminée que l'on
+      // TAPE (« shabbat »).
       return m.replace(/([^aeiou])\1/g,'$1');
     })
     .join(' ');
 }
-// Expose : normFr, frVariants, checkAnswer, answerHtml — Utilise : he2tr/trKey/normHe/cleSaisieHe/editDist (02), formsHtml/noteHtml (10), state (99)
+// Expose : frVariants, checkAnswer, answerHtml — Utilise : he2tr/trKey/normHe/cleSaisieHe/editDist (02), formsHtml/noteHtml (10), state (99)
 
 // ---------- Input mode: answer checking ----------
 function normFr(s){
@@ -1728,7 +1724,6 @@ function checkAnswer(card, raw){
     const variants = frVariants(card.fr);
     let almost=false;
     for(const v of variants){
-      if(!v) continue;
       if(u===v) return 'exact';
       if(v.length>4 && editDist(u,v)<=1) almost=true;
     }
@@ -1739,7 +1734,7 @@ function checkAnswer(card, raw){
     // La graphie pleine (he_plein), celle qu'on tape au clavier : le dénudé reste accepté ci-dessus.
     const p = cleSaisieHe(user);
     if(p && p===cleSaisieHe(card.he_plein)) return 'exact';
-    // Translittération : celle du carnet si présente, sinon générée depuis le nikud
+    // Translittération : celle du carnet ET celle tirée du nikud, les deux sont acceptées
     const uTr = trKey(user);
     let almost=false;
     if(uTr){
@@ -1774,7 +1769,7 @@ function answerHtml(card){
   if(card.note) h += noteHtml(card.note);
   return h;
 }
-// Expose : prefsLoad, savePrefs, sessSave, sessClear, sessRestore, srsLoad, srsSave, cardId, PREFS_KEY, SESS_KEY, bootResumed, SRS_KEY, SRS — Utilise : CARDS (05), render (10), state (99)
+// Expose : prefsLoad, savePrefs, sessSave, sessClear, sessRestore, srsSave, cardId, PREFS_KEY, bootResumed, SRS_KEY, SRS — Utilise : CARDS (05), render (10), state (99)
 
 // ================= Préférences de réglage (persistées) =================
 // Les choix du panneau de réglages survivent d'une session à l'autre. Restaurés
@@ -1905,8 +1900,8 @@ function speak(text){
   try{
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = heVoice ? heVoice.lang : 'he-IL';
-    if(heVoice) u.voice = heVoice;
+    u.lang = heVoice.lang;
+    u.voice = heVoice;
     u.rate = 0.88;
     const btn = document.getElementById('speak-btn');
     u.onstart = ()=>{ if(btn) btn.classList.add('speaking'); };
@@ -1917,9 +1912,8 @@ function speak(text){
 }
 function speakCurrent(){
   const c = state.queue[state.idx];
-  // Prefer the vocalized form (with nikud) so the voice pronounces the exact vowels;
-  // fall back to the plain form if no vocalized text is present.
-  if(c) speak(c.he || c.he_plain);
+  // The vocalized form (with nikud): the voice pronounces the exact vowels.
+  if(c) speak(c.he);
 }
 function updateSpeaker(){
   const btn = document.getElementById('speak-btn');
@@ -1932,19 +1926,18 @@ function updateSpeaker(){
   }
   btn.classList.toggle('hide', !(TTS_OK && hebrewVisible));
 }
-// Expose : nivOfCard, nivOk, themeOk, indexRecherche, runSearch, buildChips, buildNivChips, buildThemeChips, toggle, segPick, refreshAdvSub, foldSub, refreshFoldSubs, applyFoldState, refreshSelAll, updateStart, limitPool, THEMES, SPK_SVG, catCounts, nivCounts, themeCounts, catsEl, nivEl, themeEl, catOrder — Utilise : state (99), CARDS (05), escapeHtml (01), he2tr/cleRecherche (02), speak/bindTap (06/11), savePrefs/sessRestore (04), applyPrefs/perfReport (13), refreshSrsUi (08)
+// Expose : nivOk, themeOk, runSearch, buildChips, segPick, refreshAdvSub, applyFoldState, updateStart, limitPool, SPK_SVG, catCounts, nivCounts, themeCounts, catsEl, nivEl, themeEl — Utilise : state (99), CARDS (05), escapeHtml (01), he2tr/cleRecherche (02), speak/bindTap (06/11), savePrefs/sessRestore (04), applyPrefs/perfReport (13), refreshSrsUi (08)
 
 // ================= Niveaux de difficulté (CECRL) =================
 // Le carnet stocke le CECRL fin (data-niveau="A1"…"C1") ; l'app l'affiche en
-// trois libellés. Un mot sans niveau ignore le filtre : il reste visible
-// partout, le carnet peut donc s'annoter progressivement sans perdre de carte.
+// trois libellés. Le build refuse une carte sans niveau valide : tout mot en a un.
 const NIVEAUX = [
   {key:'facile',    label:'Facile',        cecrl:['A1']},
   {key:'inter',     label:'Intermédiaire', cecrl:['A2','B1']},
   {key:'difficile', label:'Difficile',     cecrl:['B2','C1']}
 ];
 function nivOfCard(c){ const g=NIVEAUX.find(g=>g.cecrl.includes(c.niveau)); return g ? g.key : null; }
-function nivOk(c){ const k=nivOfCard(c); return !k || state.niveaux.has(k); }
+function nivOk(c){ return state.niveaux.has(nivOfCard(c)); }
 
 // ================= Thèmes (champ sémantique) =================
 // Le carnet annote les trois tables Noms/Adjectifs/Verbes (data-theme) ; les
@@ -2040,7 +2033,7 @@ function runSearch(){
     // fermé, coquille.html:11), et aucun des tokens interdits au fichier autonome n'entre
     // ici. ⚠️ Ce commentaire n'en cite AUCUN littéralement, et c'est délibéré : le
     // garde-fou du build cherche la sous-chaîne dans tout le fichier assemblé, donc une
-    // simple mention en commentaire le fait échouer comme un vrai appel (payé une fois).
+    // simple mention en commentaire le fait échouer comme un vrai appel.
     const enHe = /[א-ת]/.test(raw);
     const url = 'https://'+(enHe?'he':'fr')+'.wiktionary.org/w/index.php?search='+encodeURIComponent(raw);
     box.innerHTML = '<div class="search-empty">Aucun résultat pour « '+escapeHtml(raw)+' ».'
@@ -2093,7 +2086,7 @@ function runSearch(){
   box.innerHTML = html;
   hits.forEach((c,i)=>{
     const speakBtn=document.querySelector('#sr-'+i+' .sr-speak');
-    if(speakBtn) bindTap(speakBtn, ()=>speak(c.he||c.he_plain));
+    if(speakBtn) bindTap(speakBtn, ()=>speak(c.he));
     const row=document.getElementById('sr-'+i);
     const item=document.getElementById('sri-'+i);
     const detail=document.getElementById('srd-'+i);
@@ -2106,7 +2099,7 @@ function runSearch(){
           const hidden=detail.classList.toggle('hide');
           item.classList.toggle('open', !hidden);
           row.setAttribute('aria-expanded', String(!hidden));
-        } else speak(c.he||c.he_plain);
+        } else speak(c.he);
       };
       bindTap(row, activate);
       row.addEventListener('keydown', e=>{
@@ -2126,80 +2119,53 @@ const themeEl = document.getElementById('theme');
 const catOrder = ['Pronoms personnels','Démonstratifs','Verbes','Verbes modaux','Impératif','Tournures impersonnelles','Adjectifs','Comparatif et superlatif','Noms','Abréviations et sigles',
   'Prépositions','Prépositions fléchies','Conjonctions','Connecteurs du discours','Mots interrogatifs','Existence','Nombres',
   'Jours de la semaine','Heure et date','Saisons & mois','Adverbes','Mots de quantité','Expressions','Phrases','Hébreu parlé','Hébreu biblique'];
+// L'amorce, une fois les cartes là : en ligne par init(), dans l'autonome par DEMARRAGE (autonome.rs).
 function buildChips(){
-  catCounts = {};
-  CARDS.forEach(c=>{ catCounts[c.cat]=(catCounts[c.cat]||0)+1; });
-  catsEl.innerHTML='';
-  catOrder.filter(c=>catCounts[c]).forEach(cat=>{
-    const b=document.createElement('button');
-    b.className='chip'; b.setAttribute('aria-pressed','false'); b.dataset.cat=cat;
-    b.innerHTML=cat+' <span class="n">'+catCounts[cat]+'</span>';
-    b.onclick=()=>{
-      const t0=performance.now();
-      toggle(b); if(b.getAttribute('aria-pressed')==='true') state.cats.add(cat); else state.cats.delete(cat);
-      const t1=performance.now(); updateStart();
-      const t2=performance.now(); savePrefs();
-      const t3=performance.now();
-      perfReport('Chip « '+cat+' »', [['état',t1-t0],['bouton',t2-t1],['sauvegarde',t3-t2]], t0, t3);
-    };
-    catsEl.appendChild(b);
-  });
+  buildCatChips();
   buildNivChips();
   buildThemeChips();
   applyPrefs();
   refreshSrsUi();
   sessRestore();
 }
-// Chips « Niveau » : seuls les niveaux non vides s'affichent ; groupe entier
-// masqué si le carnet n'a aucun data-niveau.
+// Une puce de sélection multiple. onToggle(coché) lit l'ensemble d'état au clic, qu'applyPrefs vide et remplit sur place.
+function chip(label, n, dataset, onToggle){
+  const b=document.createElement('button');
+  b.className='chip'; b.setAttribute('aria-pressed','false'); Object.assign(b.dataset, dataset);
+  b.innerHTML=label+' <span class="n">'+n+'</span>';
+  b.onclick=()=>{
+    const t0=performance.now();
+    toggle(b); onToggle(b.getAttribute('aria-pressed')==='true');
+    const t1=performance.now(); updateStart();
+    const t2=performance.now(); savePrefs();
+    const t3=performance.now();
+    perfReport('Chip « '+label+' »', [['état',t1-t0],['bouton',t2-t1],['sauvegarde',t3-t2]], t0, t3);
+  };
+  return b;
+}
+// Chips « Catégories » : seules les catégories non vides s'affichent, dans l'ordre de catOrder.
+function buildCatChips(){
+  catCounts = {};
+  CARDS.forEach(c=>{ catCounts[c.cat]=(catCounts[c.cat]||0)+1; });
+  catsEl.innerHTML='';
+  catOrder.filter(c=>catCounts[c]).forEach(cat=>catsEl.appendChild(
+    chip(cat, catCounts[cat], {cat}, on=>{ if(on) state.cats.add(cat); else state.cats.delete(cat); })));
+}
+// Chips « Niveau » : seuls les niveaux non vides s'affichent.
 function buildNivChips(){
   nivCounts = {};
   CARDS.forEach(c=>{ const k=nivOfCard(c); if(k) nivCounts[k]=(nivCounts[k]||0)+1; });
   nivEl.innerHTML='';
-  NIVEAUX.filter(g=>nivCounts[g.key]).forEach(g=>{
-    const b=document.createElement('button');
-    b.className='chip'; b.setAttribute('aria-pressed','false'); b.dataset.niv=g.key;
-    b.innerHTML=g.label+' <span class="n">'+nivCounts[g.key]+'</span>';
-    b.onclick=()=>{
-      const t0=performance.now();
-      toggle(b); if(b.getAttribute('aria-pressed')==='true') state.niveaux.add(g.key); else state.niveaux.delete(g.key);
-      const t1=performance.now(); updateStart();
-      const t2=performance.now(); savePrefs();
-      const t3=performance.now();
-      perfReport('Chip « '+g.label+' »', [['état',t1-t0],['bouton',t2-t1],['sauvegarde',t3-t2]], t0, t3);
-    };
-    nivEl.appendChild(b);
-  });
-  // Carnet sans aucun data-niveau : c'est le pli entier qui disparaît, titre compris.
-  const any = Object.keys(nivCounts).length>0;
-  document.getElementById('fold-niv').classList.toggle('hide', !any);
+  NIVEAUX.filter(g=>nivCounts[g.key]).forEach(g=>nivEl.appendChild(
+    chip(g.label, nivCounts[g.key], {niv:g.key}, on=>{ if(on) state.niveaux.add(g.key); else state.niveaux.delete(g.key); })));
 }
-// Chips « Thèmes » : seuls les thèmes non vides s'affichent, dans l'ordre de
-// THEMES. Un slug du carnet absent de THEMES s'affiche quand même (libellé =
-// slug) : un thème ajouté côté carnet reste filtrable en attendant son libellé.
+// Chips « Thèmes » : seuls les thèmes non vides s'affichent, dans l'ordre de THEMES.
 function buildThemeChips(){
   themeCounts = {};
   CARDS.forEach(c=>{ if(c.theme) themeCounts[c.theme]=(themeCounts[c.theme]||0)+1; });
-  const known = THEMES.filter(t=>themeCounts[t.key]);
-  const unknown = Object.keys(themeCounts).filter(k=>!THEMES.some(t=>t.key===k))
-    .sort().map(k=>({key:k, label:k}));
   themeEl.innerHTML='';
-  known.concat(unknown).forEach(t=>{
-    const b=document.createElement('button');
-    b.className='chip'; b.setAttribute('aria-pressed','false'); b.dataset.theme=t.key;
-    b.innerHTML=t.label+' <span class="n">'+themeCounts[t.key]+'</span>';
-    b.onclick=()=>{
-      const t0=performance.now();
-      toggle(b); if(b.getAttribute('aria-pressed')==='true') state.themes.add(t.key); else state.themes.delete(t.key);
-      const t1=performance.now(); updateStart();
-      const t2=performance.now(); savePrefs();
-      const t3=performance.now();
-      perfReport('Chip « '+t.label+' »', [['état',t1-t0],['bouton',t2-t1],['sauvegarde',t3-t2]], t0, t3);
-    };
-    themeEl.appendChild(b);
-  });
-  // Carnet sans aucun data-theme : le pli entier disparaît, comme pour le niveau.
-  document.getElementById('fold-theme').classList.toggle('hide', Object.keys(themeCounts).length===0);
+  THEMES.filter(t=>themeCounts[t.key]).forEach(t=>themeEl.appendChild(
+    chip(t.label, themeCounts[t.key], {theme:t.key}, on=>{ if(on) state.themes.add(t.key); else state.themes.delete(t.key); })));
 }
 
 function toggle(b){ b.setAttribute('aria-pressed', b.getAttribute('aria-pressed')==='true'?'false':'true'); }
@@ -2263,8 +2229,7 @@ function updateStart(){
   refreshSelAll();
   refreshFoldSubs();   // toute voie qui change la sélection passe ici
   const noCat = state.cats.size===0;
-  // Le filtre niveau n'existe que si le carnet est annoté ; sinon il est inerte.
-  const noNiv = Object.keys(nivCounts).length>0 && state.niveaux.size===0;
+  const noNiv = state.niveaux.size===0;
   const poolSize = (noCat || noNiv) ? 0 : CARDS.filter(c=>state.cats.has(c.cat) && nivOk(c) && themeOk(c)).length;
   const noMatch = !noCat && !noNiv && poolSize===0;
   const empty = noCat || noNiv || noMatch;
@@ -2273,7 +2238,7 @@ function updateStart(){
   // Le volume réel de la session (croisement catégories × niveau, borné par la
   // Longueur) se lit sur le bouton — pas de surprise au premier compteur.
   const n = state.len==='all' ? poolSize : Math.min(+state.len, poolSize);
-  btn.textContent = (empty || !CARDS.length) ? 'Commencer' : 'Commencer — '+n+' carte'+(n>1?'s':'');
+  btn.textContent = empty ? 'Commencer' : 'Commencer — '+n+' carte'+(n>1?'s':'');
   const hint=document.getElementById('start-hint');
   if(hint){
     if(noCat) hint.textContent='Choisis au moins une catégorie pour commencer.';
@@ -2289,7 +2254,7 @@ function updateStart(){
 function limitPool(pool){
   return state.len==='all' ? pool : pool.slice(0, +state.len);
 }
-// Expose : recordResult, undoLastRecord, dueCards, masteryStats, refreshSrsUi, startReview, lastRecord — Utilise : CARDS (05), cardId/SRS/srsSave (04), state (99), limitPool (07), shuffle (01), beginSession (09), perfReport (13)
+// Expose : recordResult, undoLastRecord, masteryStats, refreshSrsUi, startReview, lastRecord — Utilise : CARDS (05), cardId/SRS/srsSave (04), state (99), limitPool (07), shuffle/todayNum (01), beginSession (09), perfReport (13)
 const SRS_INTERVALS=[0,1,2,4,8,16,32];      // jours avant réapparition, par boîte
 const SRS_MASTER=4;                          // boîte à partir de laquelle « maîtrisée »
 // Mémorise l'état SRS d'avant la dernière écriture → le verdict reste annulable
@@ -2346,7 +2311,7 @@ function refreshSrsUi(){
     mEl.classList.remove('hide');
     document.getElementById('mastery-txt').innerHTML='<b>'+m.mastered+'</b> maîtrisée'+(m.mastered>1?'s':'')
       +' · <b>'+m.seen+'</b> vue'+(m.seen>1?'s':'')+' sur '+m.total;
-    document.getElementById('mastery-bar').style.transform='scaleX('+(m.total?m.mastered/m.total:0)+')';
+    document.getElementById('mastery-bar').style.transform='scaleX('+m.mastered/m.total+')';
   } else { mEl.classList.add('hide'); }
 }
 function startReview(){
@@ -2363,7 +2328,7 @@ function startReview(){
   const t2=performance.now();
   perfReport('Révision du jour', [['préparation',t1-t0],['rendu',t2-t1]], t0, t2);
 }
-// Expose : beginSession, start, finish — Utilise : state (99), CARDS (05), nivOk/themeOk/limitPool (07), shuffle (01), render (10), sessSave/sessClear (04), refreshSrsUi (08), perfReport (13)
+// Expose : beginSession, start, finish — Utilise : state (99), CARDS (05), nivOk/themeOk/limitPool (07), shuffle (01), render (10), sessClear (04), refreshSrsUi/lastRecord (08), cardsUndo (11), perfReport (13)
 // Transition setup/done → étude, commune à tous les points d'entrée (catégories,
 // révision, rejeu). `origQueue` mémorise le jeu de la session pour « Recommencer ».
 function beginSession(pool){
@@ -2421,9 +2386,9 @@ function finish(){
     '<li><span class="m-he" lang="he">'+c.he+'</span><span class="m-fr">'+c.fr+'</span></li>').join('');
   document.getElementById('retry-missed').classList.toggle('hide', !state.missed.length);
 }
-// Expose : render, versoHeFr, heFront, bigFr, formsHtml, noteHtml, exHtml, exActivate, exBind, frShort, ancreMarques — Utilise : state (99), he2tr (02), speak/updateSpeaker/speakCurrent (06), setupCardsMode/setupInputCard (11), setupQuizCard (12), sessSave (04), escapeHtml (01)
+// Expose : render, versoHeFr, heFront, bigFr, formsHtml, noteHtml, exHtml, exActivate, exBind, frShort, ancreMarques — Utilise : state (99), he2tr (02), speak/updateSpeaker/speakCurrent (06), setupCardsMode/setupInputCard/animateFace (11), setupQuizCard/quizPrompt (12), sessSave (04), escapeHtml (01), SPK_SVG (07)
 
-// ================= Mode QCM (choix multiple) =================
+// ================= Rendu de la carte =================
 function frShort(card){ return card.fr.split(/[\/,]| ou /)[0].replace(/\([^)]*\)/g,'').trim() || card.fr; }
 
 function heFront(card){
@@ -2531,7 +2496,7 @@ function exActivate(t){
 function exBind(el){
   if(!el) return;
   let handled=false;
-  const hit=e=>(e.target.closest ? e.target.closest('.ex-toggle,.ex-speak') : null);
+  const hit=e=>e.target.closest('.ex-toggle,.ex-speak');
   el.addEventListener('pointerup', e=>{ const t=hit(e); if(!t) return; e.preventDefault(); e.stopPropagation(); handled=true; exActivate(t); setTimeout(()=>handled=false,50); });
   el.addEventListener('click', e=>{ const t=hit(e); if(!t) return; e.preventDefault(); e.stopPropagation(); if(!handled) exActivate(t); });
 }
@@ -2583,7 +2548,7 @@ function render(){
   if(state.audio==='auto' && state.dir==='he2fr') speakCurrent();
   sessSave();
 }
-// Expose : setupCardsMode, setupInputCard, animateFace, doFlip, bindTap, answer, undoCardAnswer, showInputFeedback, fixVerdict, submitAnswer, nextAfterInput, skipAnswer, cardsUndo — Utilise : state (99), recordResult/undoLastRecord (08), finish (09), checkAnswer/answerHtml (03), exHtml (10), updateSpeaker/speakCurrent (06), he2tr (02), sessSave (04)
+// Expose : setupCardsMode, setupInputCard, animateFace, doFlip, bindTap, answer, undoCardAnswer, submitAnswer, nextAfterInput, skipAnswer, cardsUndo — Utilise : state (99), recordResult/undoLastRecord (08), finish (09), checkAnswer/answerHtml (03), exHtml/render (10), updateSpeaker/speakCurrent (06), he2tr (02), escapeHtml (01), sessSave (04)
 // Mode Cartes : la carte suivante s'affiche sitôt répondu → on garde de quoi
 // revenir en arrière (carte + verdict) tant que la suivante n'est pas jouée.
 let cardsUndo=null;
@@ -2780,7 +2745,7 @@ function skipAnswer(){
   if(state.audio==='auto') speakCurrent();
   sessSave();
 }
-// Expose : quizPrompt, quizChoiceHtml, pickDistractors, setupQuizCard, quizPick, quizFixVerdict — Utilise : state (99), heFront/bigFr/frShort/exHtml (10), he2tr (02), shuffle (01), editDist (02), frVariants (03), bindTap/nextAfterInput (11), recordResult/undoLastRecord (08), sessSave (04), updateSpeaker/speakCurrent (06)
+// Expose : quizPrompt, quizChoiceHtml, pickDistractors, setupQuizCard — Utilise : state (99), heFront/bigFr/frShort/exHtml (10), he2tr (02), shuffle (01), editDist (02), frVariants (03), bindTap (11), recordResult/undoLastRecord (08), sessSave (04), CARDS (05), updateSpeaker/speakCurrent (06)
 function quizPrompt(card){
   return state.dir==='he2fr' ? heFront(card) : bigFr(card);
 }
@@ -2895,7 +2860,7 @@ function quizFixVerdict(card, wasCorrect, btn){
   document.getElementById('quiz-live').textContent = nowGood ? 'Compté comme réussi.' : 'Compté à revoir.';
   sessSave();
 }
-// Expose : applyPrefs, reflectSeg, perfReport, SEG_KEYS, lastPointerUp — Utilise : state (99), catCounts/nivCounts/themeCounts/catsEl/nivEl/themeEl/refreshAdvSub/refreshFoldSubs/applyFoldState (07)
+// Expose : applyPrefs, perfReport, SEG_KEYS, lastPointerUp — Utilise : state (99), fmtMs (01), prefsLoad (04), catCounts/nivCounts/themeCounts/catsEl/nivEl/themeEl/refreshAdvSub/applyFoldState (07)
 const SEG_KEYS=['mode','dir','script','order','audio','len'];
 // Aligne un groupe de chips segmentés sur la valeur courante de state[key].
 function reflectSeg(key){
@@ -2915,10 +2880,7 @@ function applyPrefs(){
   if(p){
     SEG_KEYS.forEach(k=>{ if(typeof p[k]==='string') state[k]=p[k]; });
     (Array.isArray(p.cats)?p.cats:[]).forEach(cat=>{ if(catCounts[cat]) state.cats.add(cat); });
-    // Niveaux : rétro-compatible — préférences d'avant le filtre (pas de champ
-    // `niveaux`) → tout sélectionné, rien ne disparaît pour un profil existant.
     if(Array.isArray(p.niveaux)) p.niveaux.forEach(k=>{ if(nivCounts[k]) state.niveaux.add(k); });
-    else Object.keys(nivCounts).forEach(k=>state.niveaux.add(k));
     // Thèmes : filtre optionnel — champ absent (préférences d'avant) = rien de
     // coché, c'est-à-dire « tous les thèmes ». Rien ne change pour l'existant.
     if(Array.isArray(p.themes)) p.themes.forEach(k=>{ if(themeCounts[k]) state.themes.add(k); });
@@ -2931,11 +2893,12 @@ function applyPrefs(){
   themeEl.querySelectorAll('.chip').forEach(b=>
     b.setAttribute('aria-pressed', state.themes.has(b.dataset.theme) ? 'true':'false'));
   refreshAdvSub();
-  refreshFoldSubs();
   applyFoldState();
 }
 
-// ================= Diagnostic de latence (piège n°14 d'AGENTS.md) =================
+// ================= Diagnostic de latence (piège n°14 de flashcards/docs/PIEGES.md) =================
+// Le bloc ne se montre qu'avec `?diag` dans l'adresse : il sert à la mesure sur l'appareil, pas à l'élève.
+if(new URLSearchParams(location.search).has('diag')) document.querySelectorAll('[data-diag]').forEach(e=>{ e.hidden=false; });
 // Trois temps par geste, affichés dans « Réglages avancés » : « attente » (dernier
 // doigt levé → le gestionnaire démarre — c'est là que vivrait un délai de synthèse
 // du clic ou un fil principal occupé), « travail » (le gestionnaire, décomposé),
@@ -2954,7 +2917,7 @@ function perfReport(label, segs, t0, tEnd){
       + ' · affichage '+fmtMs(tPaint-tEnd)+' · total '+fmtMs(tPaint-base);
   }));
 }
-// Expose : init, showLoaderError, state — Utilise : tout ce qui précède (01 à 13)
+// Expose : state — Utilise : tout ce qui précède (01 à 13)
 
 const state = {
   dir:'he2fr', script:'nikud', order:'shuffle', audio:'click', mode:'cards', len:'20',
@@ -2987,7 +2950,6 @@ document.getElementById('selall').onclick=()=>{
   const t3=performance.now();
   perfReport('« Tout (dé)sélectionner »', [['état',t1-t0],['bouton',t2-t1],['sauvegarde',t3-t2]], t0, t3);
 };
-updateStart();
 
 (function(){
   const note = document.getElementById('audio-note');
@@ -3077,7 +3039,7 @@ bindTap(document.getElementById('btn-check'), submitAnswer);
 bindTap(document.getElementById('btn-next'), nextAfterInput);
 bindTap(document.getElementById('btn-skip'), skipAnswer);
 
-// ---------- Clavier hébreu virtuel (ordre alphabétique) ----------
+// ---------- Clavier hébreu virtuel ----------
 (function(){
   const kb=document.getElementById('hebkb'); if(!kb) return;
   // Disposition standard israélienne (3 rangées) ; lettres finales en doré.
@@ -3183,7 +3145,7 @@ document.addEventListener('keydown', e=>{
   else if(state.flipped && e.code==='ArrowLeft'){ answer(false); }
 });
 // Clavier du QCM : 1–4 choisissent une option, Entrée/Espace passent à la
-// suivante — le mode saisie avait déjà son équivalent, pas le QCM.
+// suivante (l'équivalent du clavier du mode saisie).
 document.addEventListener('keydown', e=>{
   if(!document.getElementById('study').classList.contains('active')) return;
   if(state.mode!=='quiz') return;
@@ -3223,6 +3185,11 @@ document.addEventListener('keydown', e=>{
   if(btn && !btn.classList.contains('hide') && !btn.disabled){ e.preventDefault(); btn.click(); }
 });
 
+// Tout hébreu affiché, à l'arrivée et à chaque rendu, reçoit son ancre (ancreMarques, 10),
+// dans l'app en ligne comme dans le fichier autonome.
+ancreMarques(document.body);
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(ancreMarques))).observe(document.body,{childList:true,subtree:true});
+
 // ===== BUILD:ONLINE-ONLY : bloc remplace par le build dans le fichier autonome =====
 // ---------- Chargement runtime des cartes (cards.json, généré par le build) ----------
 
@@ -3231,8 +3198,6 @@ document.addEventListener('keydown', e=>{
 const CARTES_PERIMEES = 'cartes-perimees';
 function showLoaderError(reason){
   const loader=document.getElementById('loader');
-  const spin=loader.querySelector('.spin');
-  if(spin) spin.style.display='none';
   const isFile = location.protocol==='file:';
   const isOffline = ('onLine' in navigator) && navigator.onLine===false;
   const isPerimees = !!reason && reason.message===CARTES_PERIMEES;
@@ -3264,7 +3229,6 @@ function showLoaderError(reason){
 }
 async function init(){
   const loader=document.getElementById('loader');
-  const msg=document.getElementById('loader-msg');
   try{
     const tB0=performance.now();
     const res = await fetch('./cards.json', {cache:'no-store'});
@@ -3277,11 +3241,8 @@ async function init(){
     buildChips();
     updateStart();
     const tB3=performance.now();
-    // Décomposition du démarrage pour le diagnostic de latence : c'est ici que
-    // vivrait un boot lent (H3 du dossier — le carnet, pas l'app).
-    // ⚠️ tB1→tB2 s'appelait « extraction » du temps où l'app lisait le HTML du
-    // carnet ; elle ne mesure plus qu'un JSON.parse depuis la bascule sur
-    // cards.json. L'étiquette dit désormais ce qu'elle chronomètre.
+    // Décomposition du démarrage pour le diagnostic de latence ; tB1→tB2 ne
+    // mesure que le JSON.parse de cards.json (l'étiquette « lecture JSON »).
     const pb=document.getElementById('perf-boot');
     if(pb) pb.textContent='Chargement : cartes (réseau) '+fmtMs(tB1-tB0)
       +' · lecture JSON '+fmtMs(tB2-tB1)+' · construction '+fmtMs(tB3-tB2)
@@ -3290,25 +3251,10 @@ async function init(){
     if(!bootResumed) document.getElementById('setup').classList.remove('hidden');
     const note=document.getElementById('count-note');
     note.textContent = CARDS.length + ' mots chargés';
-    // Garde-fou : une catégorie disparue de data/ ou un décalage entre les catégories du build
-    // (outils/src/donnees/constantes.rs) et catOrder (src/app/js/07-filtres.js) fait disparaître ses cartes de cards.json sans erreur —
-    // signaler toute catégorie vide.
-    const counts={};
-    CARDS.forEach(c=>{ counts[c.cat]=(counts[c.cat]||0)+1; });
-    console.log('Cartes par catégorie :', counts);
-    const missing = catOrder.filter(c=>!counts[c]);
-    if(missing.length){
-      console.warn('Catégories attendues sans carte :', missing);
-      note.innerHTML += '<br><span style="color:var(--red)">Aucune carte dans : '
-        + missing.join(', ') + ' — vocabulaire manquant dans data/ ?</span>';
-    }
   }catch(err){
     showLoaderError(err);
   }
 }
-// Tout hébreu affiché, à l'arrivée et à chaque rendu, reçoit son ancre (ancreMarques, 10).
-ancreMarques(document.body);
-new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(ancreMarques))).observe(document.body,{childList:true,subtree:true});
 init();
 
 // ---------- PWA : service worker (hors-ligne) ----------

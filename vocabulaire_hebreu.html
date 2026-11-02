@@ -49,9 +49,9 @@
   --rayon-pilule:999px; --rayon-rond:50%;
 }
   /* --- Rampe typographique — LOCALE AU CARNET --------------------------------
-     Volontairement hors du bloc ci-dessus : celui-là est le jeu de jetons
-     partagé, qui doit rester identique au caractère près entre les trois
-     fichiers (DESIGN.md §6). Cette rampe-ci ne décrit que ce document.
+     Volontairement hors du bloc ci-dessus : celui-là est le jeu de jetons de la
+     charte `nuit`, que le build pose depuis `src/chartes/nuit/jetons.css`
+     (PIEGES.md, piège 5). Cette rampe-ci ne décrit que ce document.
 
      ⚠️ 1rem vaut 16px, PAS 22px. Le `font-size:22px` de `body` ne déplace pas
      la racine des rem — il faudrait le poser sur `html` — si bien que toute
@@ -64,8 +64,8 @@
 
      Huit pas, resserrés en haut (l'hébreu demande une gradation fine) et plus
      ouverts en bas. Aucune taille littérale ne doit subsister hors de cette
-     rampe — les deux `em` de la prose sont la seule exception, et elles sont
-     relatives par nature (voir « un cran au-dessus de ce qui m'entoure »). */
+     rampe — les `em` de la prose sont la seule exception, et ils sont
+     relatifs par nature (voir « un cran au-dessus de ce qui m'entoure »). */
   :root{
     --pas-titre:2.3rem;      /* 36.8px — titre de page                           */
     --pas-vedette:1.6rem;    /* 25.6px — hébreu vedette, titres de section       */
@@ -81,12 +81,12 @@
      Jamais de border-radius ici : il ne décorerait pas l'anneau, il redessinerait
      l'élément focalisé (DESIGN.md §5). */
   :focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
-  ::selection{ background:rgba(212,162,76,.30); color:var(--ink); }
+  ::selection{ background:rgba(var(--gold-rgb),.30); color:var(--ink); }
   body{
     margin:0;
     background:radial-gradient(120% 80% at 50% 0%, var(--bg2), var(--bg) 70%) fixed;
     color:var(--ink);
-    font-family:'Assistant','Arial Hebrew','Helvetica Neue',Arial,sans-serif;
+    font-family:var(--fonte-ui);
     /* Base du texte qui ne déclare rien (prose nue, .steps li, .tip p).
        ⚠️ Ne déplace PAS la racine des rem : posé sur body, il ne vaut que par
        héritage — voir la rampe ci-dessus. */
@@ -103,14 +103,13 @@
     padding-bottom:18px;
   }
   h1{
-    font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif;
+    font-family:var(--fonte-hebreu);
     font-size:var(--pas-titre);
     font-weight:700;
     margin:0 0 4px;
     color:var(--ink);
   }
-  /* Le français qui accompagne l'hébreu du titre — troisième composant qui
-     s'ignorait, jusqu'ici un `style=` inline dans le <h1>. */
+  /* Le français qui accompagne l'hébreu du titre. */
   .h1-sub{ color:var(--ink-dim); font-size:var(--pas-corps); }
   .subtitle{
     color:var(--ink-dim);
@@ -118,7 +117,7 @@
     letter-spacing:0.02em;
   }
   h2{
-    font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif;
+    font-family:var(--fonte-hebreu);
     font-size:var(--pas-vedette);
     font-weight:500;
     color:var(--gold);
@@ -131,7 +130,7 @@
     /* Assistant, pas mono : c'est le nom français de la section (la voix de
        l'outil), pas une translittération ni un compteur — le mono bas-de-casse
        serait un 3e emploi hors des deux voix inventoriées. */
-    font-family:'Assistant','Arial Hebrew','Helvetica Neue',Arial,sans-serif;
+    font-family:var(--fonte-ui);
     font-size:var(--pas-petite);
     color:var(--ink);
     font-weight:400;
@@ -170,9 +169,7 @@
     white-space:nowrap;
   }
   /* --- Les deux voix de micro-titre (DESIGN.md §3) ---------------------------
-     Elles remplacent quatre formulations ad hoc qui disaient la même chose de
-     quatre façons différentes (.92rem/.08em, .82rem/.12em, .66rem/.10em,
-     .70rem/.16em). Deux rôles, donc deux voix, et pas une de plus :
+     Deux rôles, donc deux voix, et pas une de plus :
        · voix Title       — Assistant 700 capitales espacées : étiquette de repère
                             (en-têtes de colonnes, sous-thèmes) ;
        · voix Repère-mono — JetBrains Mono capitales espacées : repère structurel
@@ -180,22 +177,22 @@
      La couleur n'appartient pas à la voix : elle suit la règle de la lampe et se
      déclare au cas par cas ci-dessous. */
   thead th, .subtheme{
-    font-family:'Assistant','Arial Hebrew','Helvetica Neue',Arial,sans-serif;
+    font-family:var(--fonte-ui);
     font-size:var(--pas-petite); font-weight:700;
     text-transform:uppercase; letter-spacing:0.12em;
     color:var(--gold);
   }
   .toc-group-label, .part .part-num{
-    font-family:'JetBrains Mono','Courier New',monospace;
+    font-family:var(--fonte-mono);
     font-size:var(--pas-micro); font-weight:400;
     text-transform:uppercase; letter-spacing:0.14em;
   }
   thead th{ background:var(--card); }
   thead th:first-child{ color:var(--ink); }
   tbody tr:last-child td{ border-bottom:none; }
-  tbody tr:hover{ background:rgba(212,162,76,0.06); }
+  tbody tr:hover{ background:rgba(var(--gold-rgb),0.06); }
   .he{
-    font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif;
+    font-family:var(--fonte-hebreu);
     font-size:var(--pas-vedette);
   }
   /* --- L'hébreu inséré dans la prose française -------------------------------
@@ -211,7 +208,7 @@
      Le sélecteur cible les spans nus : il ne peut pas atteindre .he, .cursive,
      .toc-he, .part-he ni .ex-he, qui ont chacun leur voix déclarée. */
   span[lang="he"]:not([class]){
-    font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif;
+    font-family:var(--fonte-hebreu);
   }
   /* Deux voix gardent délibérément la main sur leur hébreu : la voix Title des
      en-têtes de colonnes, et la mono des translittérations. */
@@ -225,7 +222,7 @@
   }
   .cursive{
     display:block;
-    font-family:'Playpen Sans Hebrew','Segoe Script','Comic Sans MS',cursive;
+    font-family:var(--fonte-cursive);
     font-weight:300;
     font-size:var(--pas-compagnon);
     color:var(--gold);
@@ -233,7 +230,7 @@
   }
   .tr{
     display:block;
-    font-family:'JetBrains Mono','Courier New',monospace;
+    font-family:var(--fonte-mono);
     font-size:var(--pas-corps);
     color:var(--ink-dim);
     margin-top:3px;
@@ -244,11 +241,10 @@
     color:var(--ink-dim);
     font-size:var(--pas-glose);
   }
-  td:first-child .he{ color:var(--ink); font-size:var(--pas-vedette); }
-  td:first-child .cursive{ font-size:var(--pas-compagnon); }
+  td:first-child .he{ color:var(--ink); }
   td:first-child .fr{
     display:block;
-    font-family:'Assistant','Arial Hebrew','Helvetica Neue',Arial,sans-serif;
+    font-family:var(--fonte-ui);
     color:var(--ink-dim);
     font-size:var(--pas-glose);
     margin-top:3px;
@@ -260,7 +256,7 @@
      mot-vedette d'abord, puis les formes courtes étiquetées comme le thead
      qu'elles remplacent. Le pire geste du tactile (défiler horizontalement dans
      un défilement vertical) disparaît, et avec lui les ~274px de vide par rang.
-     Les 12 tables de GRAMMAIRE (sans exemples) gardent leur grille : leur
+     Les tables de GRAMMAIRE (sans exemples) gardent leur grille : leur
      structure EST la leçon — pour elles, le direction:rtl du wrap suffit à
      ouvrir sur la bonne colonne. */
   @media (max-width:640px){
@@ -287,17 +283,15 @@
     /* ⚠️ `display:contents` supprime la BOÎTE, pas l'HÉRITAGE : le
        `white-space:nowrap` de la règle générique `th,td` continue de descendre
        à travers la cellule dissoute vers .he, .cursive, .fr et tout le contenu
-       de ul.exemples. En grille défilante c'était sans conséquence (le wrap
-       coupait), mais la carte mobile passe en `overflow-x:visible` : plus rien
+       de ul.exemples. Or la carte mobile est en `overflow-x:visible` : plus rien
        ne coupe, et le texte insécable PEINT hors de l'écran. Deux symptômes,
-       une cause — la glose française d'une entrée sortait à gauche de sa carte
-       (left −31px, texte coupé), et les .fr/.tr des phrases d'exemple, eux en
-       direction:ltr, sortaient à DROITE et poussaient le document à 444px pour
-       402 de viewport. ⚠️ Le débordement ne se voit pas sur le rect des
-       éléments (les boîtes flex se rétrécissent, seul le texte dépasse) : il se
-       mesure au Range sur les nœuds texte. La cellule voisine posait déjà
-       `white-space:normal` de son côté ; c'est la même remise à zéro, pour la
-       cellule que le display:contents avait rendue invisible à la règle. */
+       une cause — la glose française d'une entrée sortirait à gauche de sa carte,
+       et les .fr/.tr des phrases d'exemple, eux en direction:ltr, sortiraient à
+       DROITE en poussant le document au-delà du viewport. ⚠️ Le débordement ne
+       se voit pas sur le rect des éléments (les boîtes flex se rétrécissent, seul
+       le texte dépasse) : il se mesure au Range sur les nœuds texte. La cellule
+       voisine pose déjà `white-space:normal` de son côté ; c'est la même remise
+       à zéro, pour la cellule que le display:contents rend invisible à la règle. */
     .table-wrap:has(ul.exemples) td:first-child,
     .table-wrap:has(ul.exemples) td:first-child *{ white-space:normal; }
     .table-wrap:has(ul.exemples) td:first-child > .he{ order:1; flex:0 0 100%; }
@@ -313,11 +307,10 @@
       white-space:normal; text-align:right;
     }
     .table-wrap:has(ul.exemples) td:not(:first-child) + td:not(:first-child){ margin-inline-start:18px; }
-    .table-wrap:has(ul.exemples) td:empty{ display:none; }
     .table-wrap:has(ul.exemples) td:not(:first-child) .he{ font-size:var(--pas-hebreu-2); }
     .table-wrap:has(ul.exemples) td:not(:first-child)::before{
       display:block; direction:ltr; text-align:right;
-      font-family:'JetBrains Mono','Courier New',monospace;
+      font-family:var(--fonte-mono);
       font-size:var(--pas-micro); letter-spacing:0.14em; text-transform:uppercase;
       color:var(--ink-dim);
     }
@@ -350,19 +343,19 @@
     display:flex;
     justify-content:space-between;
     align-items:center;
+    flex-wrap:wrap; /* la sous-liste .exemples (width:100%) passe à la ligne */
     padding:13px 16px;
     border-bottom:1px solid var(--line);
     direction:rtl;
   }
   .word-list li:last-child{ border-bottom:none; }
-  .word-list li:hover{ background:rgba(212,162,76,.05); }
+  .word-list li:hover{ background:rgba(var(--gold-rgb),.05); }
   .word-list .word-main{
     display:flex;
     flex-direction:column;
     align-items:flex-end;
   }
-  .word-list .he{ font-size:var(--pas-vedette); }
-  .word-list .cursive{ font-size:var(--pas-compagnon); margin-top:1px; }
+  .word-list .cursive{ margin-top:1px; }
   .word-list .meta{
     direction:ltr;
     text-align:right;
@@ -371,7 +364,7 @@
     align-items:flex-end;
   }
   .word-list .fr{
-    font-family:'Assistant','Arial Hebrew','Helvetica Neue',Arial,sans-serif;
+    font-family:var(--fonte-ui);
     font-size:var(--pas-glose);
     color:var(--ink-dim);
   }
@@ -388,7 +381,7 @@
     margin-top:6px;
     direction:ltr;
     text-align:right;
-    font-family:'Assistant','Arial Hebrew','Helvetica Neue',Arial,sans-serif;
+    font-family:var(--fonte-ui);
     font-size:var(--pas-corps);
     color:var(--ink-dim);
     font-style:italic;
@@ -405,22 +398,21 @@
 
   /* --- Exemples en situation (extraits vers les flashcards, cf. ARCHITECTURE.md) ---
      Sous-liste <ul class="exemples"> dans le <li> du mot ou la 1re cellule d'une table. */
-  .word-list li{ flex-wrap:wrap; }
   .exemples{ list-style:none; width:100%; margin:8px 0 0; padding:0; direction:rtl; }
-  /* Couche tonale, pas voile noir : `rgba(0,0,0,.14)` était un cinquième gris
+  /* Couche tonale, pas voile noir : un `rgba(0,0,0,…)` serait un cinquième gris
      inventé (règle des couches). L'exemple est une surface posée sur la rangée,
      donc la couche `carte` — la même que l'encadré `.example` de la grammaire,
-     si bien que les deux familles d'exemples se lisent enfin pareil. */
+     si bien que les deux familles d'exemples se lisent pareil. Le `background`
+     de `.word-list .exemples li` neutralise aussi le survol doré de la rangée
+     parente (`.word-list li:hover`, même spécificité, venu avant). */
   .exemples li, .word-list .exemples li{
     display:block; padding:7px 12px; margin-top:4px;
     border-bottom:none; background:var(--card); border-radius:9px;
   }
-  /* Neutralise le survol doré de la rangée parente sur les exemples. */
-  .word-list .exemples li:hover, .exemples li:hover{ background:var(--card); }
   td:first-child .exemples .he, .word-list .exemples .he{ font-size:var(--pas-hebreu-2); color:var(--ink); }
   .exemples .tr{ font-size:var(--pas-petite); margin-top:1px; text-align:right; }
   td:first-child .exemples .fr, .word-list .exemples .fr{
-    display:block; font-family:'Assistant','Arial Hebrew','Helvetica Neue',Arial,sans-serif; font-size:var(--pas-corps);
+    display:block; font-family:var(--fonte-ui); font-size:var(--pas-corps);
     color:var(--ink-dim); direction:ltr; text-align:right; margin-top:1px;
   }
   /* Le pointillé ne dit plus qu'une chose : « rien ici ». */
@@ -443,15 +435,15 @@
      Un composant aussi, pas un style inline à recopier. */
   .gram-title{
     color:var(--gold); font-size:var(--pas-glose); margin:26px 0 6px;
-    font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif;
+    font-family:var(--fonte-hebreu);
   }
 
   /* ---------- Search ---------- */
   .search-wrap{
     position:sticky; top:0; z-index:20;
     margin:0 -18px 8px; padding:14px 18px;
-    /* Opaque, délibérément : le voile translucide + blur était du glassmorphism
-       (anti-référence SaaS de PRODUCT.md) et laissait le texte transparaître
+    /* Opaque, délibérément : un voile translucide + blur serait du glassmorphism
+       (anti-référence SaaS de PRODUCT.md) et laisserait le texte transparaître
        sous la barre au défilement. */
     background:var(--bg);
     border-bottom:1px solid var(--line);
@@ -459,11 +451,11 @@
   .search-inner{ position:relative; max-width:560px; }
   .search-ico{ position:absolute; left:14px; top:50%; transform:translateY(-50%); width:18px; height:18px; color:var(--ink-dim); pointer-events:none; }
   #voc-search{
-    width:100%; box-sizing:border-box; border-radius:12px; border:1px solid var(--line);
+    width:100%; border-radius:12px; border:1px solid var(--line);
     background:var(--card); color:var(--ink); font-family:inherit; font-size:var(--pas-corps);
     padding:12px 42px 12px 42px; transition:border-color .15s ease;
   }
-  /* Bordure or au focus, pas de glow (DESIGN.md §5) — et plus d'`outline:none` :
+  /* Bordure or au focus, pas de glow (DESIGN.md §5) — et pas d'`outline:none` :
      l'anneau doré global s'en charge, comme dans app.html. */
   #voc-search:focus{ border-color:var(--gold); }
   .search-clear{
@@ -474,7 +466,7 @@
   .search-count{ display:block; margin-top:8px; font-size:var(--pas-petite); color:var(--ink-dim); min-height:1em; }
   /* Filtering: hide non-matching entries and emptied sections */
   .search-hidden{ display:none !important; }
-  mark.hl{ background:rgba(212,162,76,.28); color:var(--ink); border-radius:4px; padding:0 1px; }
+  mark.hl{ background:rgba(var(--gold-rgb),.28); color:var(--ink); border-radius:4px; padding:0 1px; }
 
   /* ---------- Pedagogical example blocks ---------- */
   .note .he, .steps li .he{ font-size:1.15em; }
@@ -486,20 +478,19 @@
   .steps li::before{
     content:counter(step); position:absolute; left:0; top:0;
     width:26px; height:26px; border-radius:50%;
-    /* Chiffre or sur couche, plus de disque or plein : un numéro d'étape n'est
+    /* Chiffre or sur couche, non un disque or plein : un numéro d'étape n'est
        ni action, ni sélection, ni identité (règle de la lampe : pas de surface
-       dorée au repos). Même idiome que
-       .part-num : l'or ne subsiste que sur le chiffre. */
+       dorée au repos). Même idiome que .part-num : l'or ne vit que sur le chiffre. */
     background:var(--bg2); border:1px solid var(--line); color:var(--gold);
-    font-family:'JetBrains Mono','Courier New',monospace;
+    font-family:var(--fonte-mono);
     font-size:var(--pas-petite); font-weight:700; display:flex; align-items:center; justify-content:center;
   }
   .example{
     background:var(--card); border:1px solid var(--line);
     border-radius:10px; padding:12px 16px; margin:10px 0;
   }
-  .example .ex-he{ font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:var(--pas-hebreu-2); direction:rtl; }
-  .example .ex-tr{ font-family:'JetBrains Mono','Courier New',monospace; font-size:var(--pas-petite); color:var(--ink-dim); margin-top:2px; }
+  .example .ex-he{ font-family:var(--fonte-hebreu); font-size:var(--pas-hebreu-2); direction:rtl; }
+  .example .ex-tr{ font-family:var(--fonte-mono); font-size:var(--pas-petite); color:var(--ink-dim); margin-top:2px; }
   .example .ex-fr{ font-size:var(--pas-corps); color:var(--ink); margin-top:4px; }
   .example .ex-gloss{ font-size:var(--pas-petite); color:var(--ink-dim); margin-top:6px; font-style:italic; }
   .ex-title{ color:var(--gold); font-size:var(--pas-petite); font-weight:600; margin:16px 0 4px; }
@@ -529,13 +520,13 @@
        WebKit fige alors l'anneau de focus sur les valeurs UA (DESIGN.md §6). */
     transition:background .15s ease, color .15s ease;
   }
-  .app-link:hover{ background:var(--gold); color:#1a1206; }
+  .app-link:hover{ background:var(--gold); color:var(--sur-or); }
   .toc{
     background:var(--card); border:1px solid var(--line); border-radius:12px;
     padding:18px 20px; margin:0 0 28px;
   }
   .toc-title{
-    font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; color:var(--gold);
+    font-family:var(--fonte-hebreu); color:var(--gold);
     font-size:var(--pas-glose); font-weight:600; margin:0 0 12px;
     display:flex; align-items:center; gap:8px;
   }
@@ -551,13 +542,13 @@
     transition:border-color .13s ease, color .13s ease;
   }
   .toc-links a:hover{ border-color:var(--gold); color:var(--gold); }
-  .toc-links a .toc-he{ font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:var(--pas-glose); color:var(--gold); }
+  .toc-links a .toc-he{ font-family:var(--fonte-hebreu); font-size:var(--pas-glose); color:var(--gold); }
   html{ scroll-behavior:smooth; }
   :target{ scroll-margin-top:80px; }
 
   /* Alternative mouvement réduit — la garde globale de app.html/index.html ne
      suffirait pas ici : scroll-behavior exige son propre `auto`, et c'est lui qui
-     anime les 27 liens du sommaire. */
+     anime les liens du sommaire. */
   @media (prefers-reduced-motion: reduce){
     html{ scroll-behavior:auto; }
     /* ⚠️ `*` ne cible pas les pseudo-éléments : les trois sélecteurs, toujours
@@ -582,9 +573,9 @@
   }
   .part .part-num{ display:block; color:var(--gold); margin-bottom:4px; }
   .part .part-name{
-    display:block; font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; font-size:var(--pas-compagnon); color:var(--ink);
+    display:block; font-family:var(--fonte-hebreu); font-size:var(--pas-compagnon); color:var(--ink);
   }
-  .part .part-name .part-he{ font-family:'Frank Ruhl Libre','David Libre','Times New Roman',serif; color:var(--gold); font-size:var(--pas-vedette); }
+  .part .part-name .part-he{ font-family:var(--fonte-hebreu); color:var(--gold); font-size:var(--pas-vedette); }
   .part .part-sub{ display:block; color:var(--ink-dim); font-size:var(--pas-petite); margin-top:3px; }
   /* Filet plein, non pointillé : le pointillé ne dit plus qu'une chose dans ce
      carnet — « rien ici » (.empty). Voir la note de .attention. */
@@ -599,8 +590,8 @@
 
   /* ---------- Colonne de lecture ------------------------------------------
      Troisième bloc de jetons, et il reste séparé pour la même raison que la
-     rampe : le premier :root est le jeton de charte partagé, identique au
-     caractère près entre les trois fichiers (DESIGN.md §6) ; le second décrit
+     rampe : le premier :root porte les jetons de la charte `nuit`, que le build
+     pose depuis `src/chartes/nuit/jetons.css` (PIEGES.md, piège 5) ; le second décrit
      la typographie de ce document ; celui-ci décrit sa mise en page. Ne pas
      les fusionner.
 
@@ -619,16 +610,14 @@
      gagnent un défilement horizontal qu'elles n'avaient pas. Ne pas déduire ce
      plancher du `min-width:640px` des tables — c'est un plancher lui aussi, qui
      ne joue que sur mobile, et le prendre pour la largeur naturelle fait tomber
-     le cadre à 704px et met 7 tables sur 29 en défilement (essayé, mesuré,
-     annulé le 2026-07-20).
+     le cadre sous la largeur naturelle de plusieurs tables, qui passent alors
+     en défilement.
 
      ⚠️ Les deux valeurs sont MESURÉES, pas déduites. Une colonne se calibre sur
      l'avance moyenne réelle de la prose (6,63px par caractère, Assistant 16px,
      relevé en WebKit), jamais sur la largeur d'un chiffre : le « 0 » fait 7,87px,
      soit 19 % de trop, et une colonne réglée sur lui sort à 82 caractères par
-     ligne en croyant en viser 69. Première rédaction de ce bloc prise à ce
-     piège — même famille d'erreur que le commentaire « 1rem = 22px » qui a
-     produit la dérive typographique.
+     ligne en croyant en viser 69.
 
      La mise en œuvre passe par le `padding-inline` de `main` et non par une
      `max-width` + marges auto : le padding centre le cadre sans toucher aux
@@ -648,25 +637,24 @@
      l'œil le lit comme la borne du groupe qu'il ouvre, et un trait en désaccord
      avec le contenu qu'il annonce affiche ce désaccord dans les deux sens. Un
      sous-thème dont le filet s'arrête à 448px au-dessus d'une table qui court
-     à 896px se lit comme un défaut d'alignement (17 cas) ; le même filet mené
+     à 896px se lit comme un défaut d'alignement ; le même filet mené
      à 896px au-dessus d'une simple liste, restée à 448px, est exactement le
-     même défaut retourné (4 cas : Temps, Lieu & direction, Saisons, Mois).
+     même défaut retourné (Temps, Lieu & direction, Saisons, Mois).
      D'où le `:has(+ .table-wrap)`, qui distingue les deux — et non un
-     `main > .subtheme` global, essayé et mesuré fautif le 2026-07-20.
+     `main > .subtheme` global, qui élargirait aussi les filets des listes.
 
      Les autres titres restent sur la colonne, chacun pour sa raison :
        · h2       — il porte bien un filet (::after), mais il ouvre sur de la
-                    prose dans 27 cas sur 27 ; élargi, il part seul à gauche et
+                    prose ; élargi, il part seul à gauche et
                     se lit comme un titre qui a glissé, pas comme une potence ;
        · .gram-title, .ex-title — pas de filet, donc rien qui prétende borner :
                     l'œil les lit comme des légendes posées dans la colonne, et
-                    9 sur 12 n'ouvrent sur aucune table.
+                    la plupart n'ouvrent sur aucune table.
 
      ⚠️ La spécificité n'est pas décorative ici. `main > *:not(.table-wrap)`
      pèse 0,1,1 et fait donc **plancher** : tout sélecteur d'élément nu qui
      voudrait le contredire (`main > h2`, `main > ol`…) est ignoré en silence.
-     Une règle morte a déjà été livrée ainsi, avec un commentaire affirmant
-     qu'elle agissait. Ce `:has()` pèse 0,2,1 et passe par sa
+     Ce `:has()` pèse 0,2,1 et passe par sa
      spécificité propre, sans dépendre de l'ordre d'écriture.
 
      Sans support de `:has()`, les sous-thèmes restent à la colonne : aucune casse. WebKit le porte depuis 15.4. */
@@ -18923,10 +18911,9 @@ function he2tr(he){
     var isFinal=(j>=s.length || s[j]===' ');
     var cons='';
     switch(ch){
-      // Standard de translittération (cf. carnet) : א = ' entre deux voyelles
-      // seulement (tsme'a) ; ע = ' partout ('ivrit, be'er, rega').
-      // א = ' entre deux voyelles (tsme'ah), et devant un yod FINAL porteur du
-      // i, où l'alef s'entend également (achra'i, et non achray).
+      // Standard de translittération (flashcards/docs/TRANSLITTERATION.md) : ע = ' partout
+      // ('ivrit, be'er, rega') ; א = ' entre deux voyelles (tsme'ah), et devant un yod FINAL
+      // porteur du i, où l'alef s'entend également (achra'i, et non achray).
       case 'א': cons=(!wordStart && /[aeiou]$/.test(out) && (hasVowel || yodFinal))?"'":''; break;
       case 'ע': cons="'"; break;
       case 'ב': cons=has(0x05BC)?'b':'v'; break;
@@ -18966,13 +18953,10 @@ function he2tr(he){
     // (kol, bekhol, lekhol). C'est la seule occurrence assez fréquente et assez
     // sûre pour être codée — le kamats katan général dépend de la syllabe fermée
     // non accentuée, que ce translittérateur ne sait pas voir, et le coder « au
-    // jugé » régresserait ailleurs. Mesuré sur les 4229 paires du corpus :
-    // exact +31, replié +34, distance −34 — gain strict sur les trois.
+    // jugé » régresserait ailleurs.
     // ⚠️ Et seulement si ce ל CLÔT le mot. Sans cette condition la règle
     // sur-applique : dans כַּלְכָּלִי (kalkali) le second כ porte un kamats
-    // gadol suivi d'un ל non final, et le mot sortait « kalkoli ». Mesuré :
-    // c'était la seule vraie régression de la règle large, les cinq autres
-    // écarts qu'elle produisait étant des `tr` rédigés fautifs.
+    // gadol suivi d'un ל non final, et le mot sortirait « kalkoli ».
     if(has(0x05B8) && (ch==='כ'||ch==='ך') && s[j]==='ל'){
       var r=j+1;
       while(r<s.length && s.charCodeAt(r)>=0x0591 && s.charCodeAt(r)<=0x05C7) r++;
@@ -19002,7 +18986,7 @@ function trKey(s){
   s=s.replace(/ph/g,'f').replace(/kh/g,'ch').replace(/q/g,'k').replace(/w/g,'v').replace(/tz/g,'ts');
   s=s.replace(/ou/g,'u').replace(/ch/g,'h');
   // Shva initial : il s'entend ou non selon le mot (shkufah mais ledaber, cf.
-  // AGENTS.md § Transliteration standard). he2tr tranche pour l'affichage ;
+  // flashcards/docs/TRANSLITTERATION.md). he2tr tranche pour l'affichage ;
   // la SAISIE, elle, doit accepter les deux graphies — on replie donc le « e »
   // qui sépare les deux consonnes d'attaque. Sans ce pliage, corriger he2tr
   // rétrograderait « shekufah » de Correct à Presque.
@@ -19043,17 +19027,16 @@ function cleRecherche(s){
       m=m.replace(/ou/g,'u').replace(/ch/g,'h');
       m=m.replace(/^([^aeiou]{1,2})e(?=[^aeiou])/,'$1');
       // Gémination : PAIRES et CONSONNES seulement, là où trKey écrase les
-      // séries entières. Deux dérapages mesurés le 29/07 sur le contrôle
-      // négatif, que trKey ne connaît pas parce qu'il compare des mots entiers
-      // quand on cherche, ici, par sous-chaîne :
-      //   « zzzqqq » tombait sur « zk » — deux caractères qui se retrouvent
-      //   dans la moitié du corpus, donc une requête absurde rendait des mots ;
-      //   et « baal » tombait sur « bal », qui matche « balai » et « balcon ».
+      // séries entières. trKey compare des mots entiers, ici on cherche par
+      // sous-chaîne, et un pliage plus large ferait dérailler la recherche :
+      //   « zzzqqq » tomberait sur « zk » — deux caractères qui se retrouvent
+      //   dans la moitié du corpus, donc une requête absurde rendrait des mots ;
+      //   et « baal » tomberait sur « bal », qui matche « balai » et « balcon ».
       // Les voyelles gardent donc leur doublement (« baal » ≡ « ba'al » se
       // rejoignent déjà par la chute de l'apostrophe), et une série de trois
-      // reste longue — he2tr n'écrit jamais de consonne doublée (mesuré :
-      // shabat, saba, aba), le pliage n'existe que pour accepter la graphie
-      // géminée que l'on TAPE (« shabbat »).
+      // reste longue — he2tr n'écrit jamais de consonne doublée (shabat, saba,
+      // aba), le pliage n'existe que pour accepter la graphie géminée que l'on
+      // TAPE (« shabbat »).
       return m.replace(/([^aeiou])\1/g,'$1');
     })
     .join(' ');
@@ -19130,7 +19113,6 @@ function cleRecherche(s){
       el.querySelectorAll('mark.hl').forEach(function(m){
         var t = document.createTextNode(m.textContent);
         m.parentNode.replaceChild(t, m);
-        // merge adjacent text nodes
       });
     }
     // On reçoit la saisie BRUTE, pas la clé : on ne peut surligner que ce qui
@@ -19186,7 +19168,7 @@ function cleRecherche(s){
         if(!any){
           w.classList.add('search-hidden');
           var prev = w.previousElementSibling;
-          if(prev && prev.classList && prev.classList.contains('subtheme')) prev.classList.add('search-hidden');
+          if(prev && prev.classList.contains('subtheme')) prev.classList.add('search-hidden');
         }
       });
       // Hide the part separators while filtering.
@@ -19198,27 +19180,26 @@ function cleRecherche(s){
         var visible = false;
         // Un TITRE qui correspond est une correspondance, pas une leçon : c'est
         // exactement ce que montrerait la pilule du sommaire — lequel est
-        // justement masqué pendant une recherche (plus haut), si bien qu'une
-        // section cherchée par son nom devenait introuvable des deux côtés à la
-        // fois. Le cas se voyait sur « Le nikoud », section de référence dont le
-        // nom ne vit que dans le titre et la prose : « qamats » ou « dagesh » la
-        // trouvaient (ce sont des lignes de tableau, donc indexées), « nikoud »
-        // ne la trouvait pas et la masquait. La règle « des correspondances, pas
-        // des leçons » n'est PAS entamée : la branche ci-dessous continue de
-        // masquer notes, encadrés et recettes des sections retenues — un titre
-        // seul apparaît, jamais le cours qui le suit.
+        // masqué pendant une recherche (plus haut), si bien qu'une section
+        // cherchée par son nom serait introuvable des deux côtés à la fois. C'est
+        // le cas de « Le nikoud », section de référence dont le nom ne vit que
+        // dans le titre et la prose : « qamats » ou « dagesh » la trouvent (ce
+        // sont des lignes de tableau, donc indexées), « nikoud » ne la trouverait
+        // pas. La règle « des correspondances, pas des leçons » reste entière : la
+        // branche ci-dessous masque notes, encadrés et recettes des sections
+        // retenues — un titre seul apparaît, jamais le cours qui le suit.
         if(s.hay.indexOf(q) !== -1){ visible = true; shown++; }
         s.block.forEach(function(b){
           if(visible) return;
-          if(b.matches && b.matches('.example') && !b.classList.contains('search-hidden')){ visible = true; return; }
-          if(b.matches && b.matches('ul.word-list')){
+          if(b.matches('.example') && !b.classList.contains('search-hidden')){ visible = true; return; }
+          if(b.matches('ul.word-list')){
             // :scope — seuls les <li> de PREMIER niveau comptent : les <li>
             // d'exemples d'une entrée masquée garderaient toutes les sections
             // visibles sous « 0 résultat ».
             if(b.querySelector(':scope > li:not(.search-hidden)')){ visible = true; }
             return;
           }
-          if(b.matches && b.matches('table, .table-wrap')){
+          if(b.matches('table, .table-wrap')){
             var rows = b.querySelectorAll('tbody tr');
             for(var k=0;k<rows.length;k++){
               if(!rows[k].classList.contains('search-hidden')){ visible = true; break; }
@@ -19233,8 +19214,8 @@ function cleRecherche(s){
           // titre, les sous-thèmes des tables visibles et les blocs porteurs.
           s.block.forEach(function(b){
             if(b === s.h2) return;
-            if(b.matches && b.matches('.subtheme, ul.word-list, table, .table-wrap')) return;
-            if(b.matches && b.matches('.example')) return; // déjà masqué s'il ne matche pas
+            if(b.matches('.subtheme, ul.word-list, table, .table-wrap')) return;
+            if(b.matches('.example')) return; // déjà masqué s'il ne matche pas
             b.classList.add('search-hidden');
           });
         }

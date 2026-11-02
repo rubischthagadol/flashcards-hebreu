@@ -27,11 +27,11 @@
  *    flashcards/servis.txt (les entrées `precache`) : l'éditer à la main ne sert à rien,
  *    le build le réécrit et --check le refuse.
  *  - pour forcer une VRAIE purge de cache (changement de stratégie qui rendrait les
- *    entrées gardées nuisibles), changer le préfixe de `CACHE` ci-dessous à la main —
- *    c'est le seul geste manuel qui reste sur ce fichier.
+ *    entrées gardées nuisibles), changer à la main le préfixe de `CACHE` ci-dessous en un nom
+ *    qui commence encore par `flashcards-hebreu-` (le filtre d'`activate`) — seul geste manuel.
  */
 /* ligne estampillée par le build — ne pas éditer la valeur (cf. en-tête) */
-const VERSION = 'v-98c2db32';
+const VERSION = 'v-d2d7dfc8';
 const CACHE = 'flashcards-hebreu-' + VERSION;
 
 const ASSETS = [
@@ -67,9 +67,11 @@ self.addEventListener('install', (e) => {
 });
 
 self.addEventListener('activate', (e) => {
+  // Seuls les caches de ce projet : l'origine github.io est partagée avec d'autres projets. Un
+  // nouveau préfixe de CACHE garde donc `flashcards-hebreu-` en tête (cf. l'en-tête).
   e.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => k.startsWith('flashcards-hebreu-') && k !== CACHE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -98,7 +100,7 @@ self.addEventListener('fetch', (e) => {
     // cache:'no-cache' pour la même raison qu'à l'installation. Une requête par URL
     // part en mode cors : le statut d'une police se lit, et une erreur n'est jamais
     // mise en cache.
-    const refresh = fetch(cacheKey === './' ? './' : req.url, { cache: 'no-cache' })
+    const refresh = fetch(cacheKey, { cache: 'no-cache' })
       .then((res) => {
         if (res && res.ok) cache.put(cacheKey, res.clone());
         return res;
