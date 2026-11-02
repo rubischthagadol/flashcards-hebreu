@@ -21317,24 +21317,24 @@
     {
       "id": "93ccd5dd",
       "cat": "Adjectifs",
-      "he": "אֳמָּנוּתִי",
+      "he": "אָמָּנוּתִי",
       "tr": "",
       "fr": "artistique",
       "forms": [
         {
-          "he": "אֳמָּנוּתִית",
+          "he": "אָמָּנוּתִית",
           "tr": "omanutit",
           "label": "f. sing.",
           "he_plain": "אמנותית"
         },
         {
-          "he": "אֳמָּנוּתִיִּים",
+          "he": "אָמָּנוּתִיִּים",
           "tr": "omanutiyim",
           "label": "m. plur.",
           "he_plain": "אמנותיים"
         },
         {
-          "he": "אֳמָּנוּתִיּוֹת",
+          "he": "אָמָּנוּתִיּוֹת",
           "tr": "omanutiyot",
           "label": "f. plur.",
           "he_plain": "אמנותיות"
@@ -21344,7 +21344,7 @@
       "theme": "loisirs-culture",
       "exemples": [
         {
-          "he": "הַצִּיּוּר הַזֶּה אֳמָּנוּתִי מְאֹד",
+          "he": "הַצִּיּוּר הַזֶּה אָמָּנוּתִי מְאֹד",
           "tr": "hatsiyur hazeh omanuti me'od",
           "fr": "ce dessin est très artistique",
           "he_plain": "הציור הזה אמנותי מאד"
