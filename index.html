@@ -3,22 +3,9 @@
 <html lang="fr" data-charte="plaque-emaillee">
 <head>
 <meta charset="UTF-8">
-<!-- CSP : GitHub Pages ne sert aucun en-tête de réponse, le <meta> est la seule voie.
-     'unsafe-inline' est imposé par le parti pris du projet — tout le CSS et le JS sont
-     inline ; passer aux hashes couplerait la règle au build pour un gain nul.
-     La vraie garde est ailleurs : connect-src 'self'
-     ferme l'exfiltration, object-src/base-uri la réécriture de page. Bloc identique dans
-     les trois pages. frame-ancestors est ignoré en <meta> : inutile de l'écrire. -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<!-- iPhone installé : viewport-fit=cover étend la page sous l'encoche, et la barre d'état
-     black-translucent la rend transparente ; la bande sous l'heure et les quatre zones sûres sont
-     décrites dans flashcards/docs/DESIGN.md § La barre d'état et les zones sûres (gardées par
-     outils/src/flashcards/build/gardes/charte.rs). -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Hébreu — carnet &amp; flashcards</title>
-<!-- Portail : la porte d'entrée commune, en deux temps — un accueil plein écran
-     (la page de Massora : les deux motifs, les versets, l'א et l'invite à entrer), puis
-     le choix des deux côtés (flashcards, carnet). L'icône installée ouvre ce portail (start_url: "./"). -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
@@ -33,7 +20,6 @@
 <link rel="preload" href="polices/telaviv-modernistregular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="polices/telaviv-modernistbold.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="polices/assistant.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="preload" href="polices/playpensanshebrew.ttf" as="font" type="font/ttf" crossorigin>
 <script>
 // La charte, posée avant le premier rendu : chartesLue() rend le slug stocké, traduit s'il est un
 // ancien nom (CHARTES.renommees), s'il est une charte du registre, sinon le défaut ; la clé n'est
@@ -160,8 +146,6 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
 </script>
 <script>document.documentElement.classList.add('js');</script>
 <style>
-  /* Chartes — CSS injecté au build depuis le registre src/chartes/ (repli, jetons, règles),
-     sa source unique. Rien à recopier à la main : hebreu build le repose ici. */
 @font-face{font-family:'Tel Aviv Modernist';font-weight:400;font-style:normal;font-display:swap;src:url("polices/telaviv-modernistregular.ttf") format("truetype");}
 @font-face{font-family:'Tel Aviv Modernist';font-weight:700;font-style:normal;font-display:swap;src:url("polices/telaviv-modernistbold.ttf") format("truetype");}
 @font-face{font-family:'Assistant';font-weight:400;font-style:normal;font-display:swap;src:url("polices/assistant.ttf") format("truetype");}
@@ -352,21 +336,14 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   --rayon-pilule:999px; --rayon-rond:50%;
 }
 :root[data-charte~="nuit"]{color-scheme:dark;}
-/* Plaque émaillée (docs/DESIGN.md) : le port des règles de l'aperçu
-   (bauhaus/apercu-ordi-2026-10-21/chartes/plaque-emaillee.css), chaque sélecteur sous le préfixe.
-   Les jetons portent polices, graisses, rayons et la suppression des ombres. Le préfixe ajoute
-   (0,2,0) : les règles d'état communes des éléments touchés sont reposées en fin de fichier. */
 :root[data-charte~="plaque-emaillee"] ::selection{ background:var(--gold); color:var(--sur-or); }
 :root[data-charte~="plaque-emaillee"] .note-line,
 :root[data-charte~="plaque-emaillee"] .srd-note{ font-style:normal; }
-/* la bande sous l'heure d'iOS : l'encre (l'heure est blanche), le fond sous le mode sombre */
 :root[data-charte~="plaque-emaillee"] body::before{ background:var(--ink); }
 @media (prefers-color-scheme: dark){ :root[data-charte~="plaque-emaillee"] body::before{ background:var(--bg); } }
-/* aucune profondeur : ni dégradé, ni enfoncement */
 :root[data-charte~="plaque-emaillee"] .flip:active,
 :root[data-charte~="plaque-emaillee"] .door:active,
 :root[data-charte~="plaque-emaillee"] .speak-btn:active{ transform:none; }
-/* la plaque : cadre bleu doublé d'un filet intérieur */
 :root[data-charte~="plaque-emaillee"] .flip,
 :root[data-charte~="plaque-emaillee"] .review-card,
 :root[data-charte~="plaque-emaillee"] .adv,
@@ -377,13 +354,11 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
 :root[data-charte~="plaque-emaillee"] .review-card:disabled .review-ico{ color:var(--ink); }
 :root[data-charte~="plaque-emaillee"] .panel{ background:none; border:0; }
 :root[data-charte~="plaque-emaillee"] .panel h2{ color:var(--ink); }
-:root[data-charte~="plaque-emaillee"] .face .eyebrow{ color:var(--ink); border-bottom:1px solid var(--line); padding-bottom:8px; margin-inline:0 46px; padding-inline:46px 0; } /* le filet s'arrête avant le bouton d'écoute ; l'étiquette reste sur l'axe de la carte */
+:root[data-charte~="plaque-emaillee"] .face .eyebrow{ color:var(--ink); border-bottom:1px solid var(--line); padding-bottom:8px; margin-inline:0 46px; padding-inline:46px 0; } 
 :root[data-charte~="plaque-emaillee"] header h1,
 :root[data-charte~="plaque-emaillee"] .brand{ padding-bottom:10px; border-bottom:3px solid var(--line); }
-/* l'en-tête de l'app à la largeur de son texte : le filet du titre court sur le titre et le sous-titre, comme au portail */
 :root[data-charte~="plaque-emaillee"] body > header{ width:fit-content; margin-inline:auto; }
 :root[data-charte~="plaque-emaillee"] .tagline{ margin-top:8px; }
-/* commandes à cadre : neutres sur l'enduit */
 :root[data-charte~="plaque-emaillee"] .exit,
 :root[data-charte~="plaque-emaillee"] .speak-btn,
 :root[data-charte~="plaque-emaillee"] .ex-speak,
@@ -403,8 +378,6 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
 :root[data-charte~="plaque-emaillee"] .ex-speak,
 :root[data-charte~="plaque-emaillee"] .sr-speak{ border-radius:var(--rayon-case-10); }
 :root[data-charte~="plaque-emaillee"] .ex-toggle{ border:0; text-decoration:underline; background:none; }
-/* le nombre d'une puce à l'encre de sa puce : Plaque n'a pas d'encre atténuée (--ink-dim = --ink),
-   et l'opacité commune (.6, .7) le mettrait sous 4,5:1 */
 :root[data-charte~="plaque-emaillee"] .chip .n{ opacity:1; }
 :root[data-charte~="plaque-emaillee"] .chip:hover,
 :root[data-charte~="plaque-emaillee"] .qc:hover,
@@ -412,7 +385,6 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
 :root[data-charte~="plaque-emaillee"] .fix-btn:hover,
 :root[data-charte~="plaque-emaillee"] .ex-speak:hover,
 :root[data-charte~="plaque-emaillee"] .exit:hover{ border-color:var(--line); color:var(--ink); }
-/* l'action : bleu plein */
 :root[data-charte~="plaque-emaillee"] .start,
 :root[data-charte~="plaque-emaillee"] .controls .btn-flip,
 :root[data-charte~="plaque-emaillee"] #btn-check,
@@ -427,13 +399,11 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
 :root[data-charte~="plaque-emaillee"] .controls .btn-again,
 :root[data-charte~="plaque-emaillee"] .controls .btn-again:hover{ background:var(--card); color:var(--ink); border-color:var(--line); }
 :root[data-charte~="plaque-emaillee"] .controls .btn-good:hover{ background:var(--gold); color:var(--sur-or); }
-/* jauges : piste d'enduit cerclée de bleu, remplissage d'encre */
 :root[data-charte~="plaque-emaillee"] .bar,
 :root[data-charte~="plaque-emaillee"] .mastery .mbar{ display:block; height:12px; background:var(--card); border:3px solid var(--line); }
 :root[data-charte~="plaque-emaillee"] .bar > span,
 :root[data-charte~="plaque-emaillee"] .mastery .mbar > span{ background:var(--ink); border-radius:0; }
 :root[data-charte~="plaque-emaillee"] .counter{ color:var(--ink); font-weight:var(--graisse-accent); }
-/* rangées : coins de tôle, filet fin */
 :root[data-charte~="plaque-emaillee"] .missed-list li,
 :root[data-charte~="plaque-emaillee"] .sr-row,
 :root[data-charte~="plaque-emaillee"] .sr-item,
@@ -441,7 +411,6 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
 :root[data-charte~="plaque-emaillee"] .sr-cat{ background:var(--card); border:1px solid var(--line); }
 :root[data-charte~="plaque-emaillee"] .sr-item .sr-row{ border:0; }
 :root[data-charte~="plaque-emaillee"] kbd{ background:none; border:1px solid var(--line); color:var(--ink); }
-/* juste / faux : la forme dit le verdict, pas la couleur (exception au piège n°7, docs/DESIGN.md) */
 :root[data-charte~="plaque-emaillee"] .qc.ok,
 :root[data-charte~="plaque-emaillee"] .qc.ok .qc-tr{ background:var(--gold); color:var(--sur-or); border-color:var(--gold); }
 :root[data-charte~="plaque-emaillee"] .qc.no{ background:var(--card); color:var(--ink); border-color:var(--line); text-decoration:line-through; text-decoration-thickness:2px; outline:3px dashed var(--ink); outline-offset:-8px; }
@@ -451,15 +420,12 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
 :root[data-charte~="plaque-emaillee"] #answer-input.no{ border-color:var(--line); }
 :root[data-charte~="plaque-emaillee"] #answer-input.no{ border-style:dashed; }
 :root[data-charte~="plaque-emaillee"] .reset-confirm{ background:none; }
-/* portail */
 :root[data-charte~="plaque-emaillee"] .door-he,
 :root[data-charte~="plaque-emaillee"] .welcome{ color:var(--ink); }
 :root[data-charte~="plaque-emaillee"] h1 .he,
 :root[data-charte~="plaque-emaillee"] .brand .he{ color:var(--gold); }
-/* le filet intérieur passe par outline : le focus clavier le remplace */
 :root[data-charte~="plaque-emaillee"] .review-card:focus-visible,
 :root[data-charte~="plaque-emaillee"] .door:focus-visible{ outline:3px solid var(--ink); outline-offset:3px; }
-/* les états communs que le préfixe ferait perdre, reposés tels quels */
 :root[data-charte~="plaque-emaillee"] #search-input:focus,
 :root[data-charte~="plaque-emaillee"] #answer-input:focus{ border-color:var(--gold); }
 :root[data-charte~="plaque-emaillee"] .sr-row:hover,
@@ -472,17 +438,10 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
 :root[data-charte~="plaque-emaillee"] .ex-toggle[aria-expanded="true"]{ color:var(--gold); }
 :root[data-charte~="plaque-emaillee"] .hebkb button:active{ background:var(--gold); color:var(--sur-or); }
 :root[data-charte~="plaque-emaillee"] .door:hover{ border-color:var(--gold); }
-/* Balcons partout (docs/DESIGN.md § 8) : Plaque émaillée, sa base, et le bout arrondi des balcons ;
-   les rayons sont des jetons (jetons.css), ici la place que le bout arrondi demande. Aucune règle
-   d'état commune ne pose ces propriétés : rien n'est à reposer. */
 :root[data-charte~="balcons-partout"] .door{ padding-inline-end:40px; }
 :root[data-charte~="balcons-partout"] .review-card{ padding-inline-end:32px; }
 :root[data-charte~="balcons-partout"] .speak-btn{ right:32px; top:24px; }
-/* l'étiquette descend avec le bouton d'écoute, rentré hors de la courbe du coin : les deux restent sur une ligne */
 :root[data-charte~="balcons-partout"] .face .eyebrow{ margin-top:8px; }
-/* Décor propre à nuit (docs/DESIGN.md § 4) : les dégradés que le CSS commun pose en aplat
-   du même jeton. Le préfixe ajoute (0,2,0) : chaque règle d'état commune qui pose un
-   background sur ces éléments, et qu'il ferait perdre, est reposée ici, dans le même ordre. */
 :root[data-charte~="nuit"] body{ background:radial-gradient(120% 80% at 50% 0%, var(--bg2), var(--bg) 70%); }
 :root[data-charte~="nuit"] .panel{ background:linear-gradient(180deg, var(--card), var(--bg2)); }
 :root[data-charte~="nuit"] .start{ background:linear-gradient(180deg, var(--gold-soft), var(--gold)); }
@@ -497,17 +456,12 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
 :root[data-charte~="nuit"] .review-card:disabled{ background:var(--bg2); }
 :root[data-charte~="nuit"] .mastery .mbar > span{ background:linear-gradient(90deg,var(--gold),var(--gold-soft)); }
 :root[data-charte~="nuit"] .door{ background:linear-gradient(160deg, var(--card), var(--bg2)); }
-/* le nombre d'une puce pressée : .8 de --sur-or sur l'or, 5,6:1 ; l'opacité commune (.7) le mettrait sous 4,5:1 */
 :root[data-charte~="nuit"] .chip[aria-pressed="true"] .n{ opacity:.8; }
 
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   ::selection{ background:rgba(var(--gold-rgb),.30); color:var(--ink); }
   html,body{margin:0;} html{height:100%;}
-  /* La bande sous l'heure d'iOS (app installée, `black-translucent` : la page passe sous la
-     barre d'état) : fixe, au fond de la charte ; sans zone d'iOS, `env()` vaut 0 et la bande n'a pas de hauteur. */
   body::before{ content:""; position:fixed; top:0; left:0; right:0; height:env(safe-area-inset-top, 0px); background:var(--bg); z-index:3; pointer-events:none; }
-  /* Le bas : un enfant du flux, après le pied, qui ajoute la zone du bas d'iOS aux 34px du
-     rembourrage ; étiré, car vide et centré il serait large de 0 et ne compterait pas. */
   body::after{ content:""; flex:none; align-self:stretch; height:env(safe-area-inset-bottom, 0px); }
   body{
     background:var(--bg);
@@ -516,25 +470,11 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
     font-size:22px;
     min-height:100dvh;
     display:flex; flex-direction:column; align-items:center;
-    /* En haut, la place du menu « Thème » (.chartes) : sa marge, sa hauteur et un écart ; sur les
-       côtés, les zones sûres d'iOS en paysage. */
     padding:calc(64px + env(safe-area-inset-top, 0px)) max(18px, env(safe-area-inset-right, 0px)) 34px max(18px, env(safe-area-inset-left, 0px));
   }
-  /* ⚠️ `*` NE CIBLE PAS LES PSEUDO-ÉLÉMENTS — il faut les nommer. Sans ::before,
-     un halo animé en pseudo-élément continuerait de respirer en boucle sous
-     « réduire les animations », c'est-à-dire exactement le mouvement infini que le
-     réglage sert à éteindre. Défaut récurrent dans ce dépôt : on écrit les trois
-     sélecteurs partout, même là où aucun pseudo-élément n'est animé. */
   @media (prefers-reduced-motion: reduce){ *,*::before,*::after{transition:none !important; animation:none !important;} }
   :focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
 
-  /* ————— Premier temps : l'accueil plein écran, la page de Massora —————
-     Un seul grand bouton par-dessus la page ; sans JS il n'existe pas (les portes restent
-     directement accessibles). z-index 1 : au-dessus des portes et du menu « Thème » (.chartes,
-     z-index 0) ; la bande sous la barre d'état (body::before, z-index 3) passe au-dessus de lui.
-     Ordi : les motifs et le centre dans le flux, en ligne, les quatre vides égaux (space-evenly) ;
-     les versets aux quatre bords du cadre. Téléphone : une colonne, sans cadre ni bords latéraux.
-     Le placement des versets et l'ouverture : src/portail/accueil/ouverture.js. */
   #accueil{
     position:fixed; inset:0; z-index:1;
     display:none;
@@ -547,14 +487,11 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   }
   html.js #accueil{ display:flex; }
   body.entree #accueil{ opacity:0; visibility:hidden; pointer-events:none; }
-  /* L'anneau de focus en dedans : à 3 px au-dehors, il sortirait de l'écran (inset:0) ; à -8 px, il passe
-     entre le bord de la fenêtre et le cadre (inset 14 px). */
   #accueil:focus-visible{ outline-offset:-8px; }
   .acc-cadre{
     position:absolute; inset:max(14px, env(safe-area-inset-top, 0px)) max(14px, env(safe-area-inset-right, 0px)) max(14px, env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left, 0px));
     border:2px solid var(--gold); pointer-events:none;
   }
-  /* Bords et mesure à l'identique : la mesure (à 100 px) doit valoir le rendu. */
   .acc-bord,.acc-mesure{
     white-space:nowrap; overflow:hidden; line-height:1.3;
     letter-spacing:var(--interlettre-verset); font-weight:var(--graisse-texte);
@@ -571,7 +508,6 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
     width:clamp(60px, 17.58vw, 270px); color:var(--gold); pointer-events:none;
     transform:translateY(-5%);
   }
-  /* La règle d'auteur bat l'attribut font-family du <svg> : la pile du jeton, repli compris. */
   .acc-motif svg{
     display:block; width:100%; height:auto; overflow:visible; font-family:var(--fonte-accueil);
   }
@@ -592,12 +528,8 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
     .acc-entrer .souris{ display:none; }
     .acc-entrer .tactile{ display:inline; }
   }
-  /* Largeur 0 : la mesure des versets, jamais vue. */
   .acc-mesure{ position:absolute; left:0; top:0; width:0; visibility:hidden; font-size:100px; }
-  /* Avant le départ (police en chemin), motifs et versets invisibles : pas d'éclair de repli. */
   #accueil:not(.acc-pret) .acc-motif, #accueil:not(.acc-pret) .acc-bord{ visibility:hidden; }
-  /* L'ouverture : ouverture.js pose ces animations en ligne, lettre par lettre ; la coupure de
-     « réduire les animations » (!important) l'emporte sur le style en ligne. */
   @keyframes acc-pose{ from{ opacity:0; transform:translateY(-6px); } }
   @keyframes acc-trace{ from{ opacity:0; } }
   @media (max-width:600px){
@@ -612,12 +544,10 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
     .acc-motif{ width:auto; transform:none; }
     .acc-motif svg{ height:min(19vh, 165px); width:auto; }
     .acc-alef{ font-size:min(8rem, 15vh); }
-    /* 6 px et non 4 (planche) : la boîte de texte de l'aleph à 8rem déborde de sa ligne (.95). */
     .acc-nom{ font-size:1.7rem; margin-top:6px; }
     .acc-entrer{ margin-top:18px; }
   }
 
-  /* ————— Second temps : le choix des deux côtés ————— */
   header{ text-align:center; margin-top:auto; margin-bottom:34px; }
   h1{
     margin:0; font-size:2.1rem; font-weight:var(--graisse-titre); letter-spacing:var(--interlettre-titre);
@@ -625,18 +555,14 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   }
   h1 .he{ color:var(--gold); }
   .tagline{ margin:8px 0 0; color:var(--ink-dim); font-size:.95rem; }
-  /* Le salut, en français ou en hébreu, tiré au hasard à chaque ouverture (le script en
-     bas de page). L'or tendre des accents chaleureux. */
   .welcome{ margin:16px 0 0; font-size:1.15rem; font-weight:var(--graisse-etiquette); color:var(--gold-soft); }
   .welcome[lang="he"]{ font-family:var(--fonte-hebreu); font-size:1.4rem; font-weight:var(--graisse-hebreu); }
 
-  /* Deux portes strictement égales — aucune n'est « sélectionnée » d'avance ;
-     l'or n'arrive qu'au survol et sur le petit lien d'action. */
   .doors{ display:flex; flex-direction:column; gap:16px; width:100%; max-width:440px; }
   .door{
     display:block; text-decoration:none; color:var(--ink);
     background:var(--card);
-    border:1px solid var(--card-edge); border-radius:var(--rayon-carte);  /* jeton rounded.carte */
+    border:1px solid var(--card-edge); border-radius:var(--rayon-carte);  
     padding:22px 22px 20px; transition:transform .12s ease, border-color .13s ease;
   }
   .door:hover{ border-color:var(--gold); }
@@ -657,9 +583,6 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
   footer{ margin-top:30px; margin-bottom:auto; color:var(--ink-dim); font-size:.8rem; text-align:center; }
   @media (pointer:coarse){ .door{ padding:24px 22px 22px; } }
 
-  /* Le menu « Thème », en haut à droite (src/chartes/selecteur.js remplit le groupe, l'ouvre et le
-     ferme, et ôte `hidden` du montage) : aucun `display` sur .chartes ni sur .chartes-choix
-     fermé, qui battrait [hidden]. Sous l'accueil (#accueil, z-index 1), au-dessus des portes. */
   .chartes{
     position:absolute; z-index:0;
     top:calc(env(safe-area-inset-top, 0px) + 12px); right:calc(env(safe-area-inset-right, 0px) + 12px);
@@ -670,8 +593,6 @@ document.addEventListener('DOMContentLoaded', chartesSelecteurs);
     color:var(--ink); background:var(--bg); cursor:pointer;
     border:1px solid var(--line); border-radius:var(--rayon-case-10); padding:8px 12px;
   }
-  /* La flèche hors du nom accessible (« / "" ») ; la première déclaration sert de repli au navigateur
-     qui ne lit pas ce texte de remplacement. */
   .chartes-bouton::after{ content:" ▾"; content:" ▾" / ""; }
   .chartes-bouton[aria-expanded="true"]::after{ content:" ▴"; content:" ▴" / ""; }
   .chartes-choix:not([hidden]){

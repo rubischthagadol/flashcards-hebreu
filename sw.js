@@ -31,7 +31,7 @@
  *    qui commence encore par `flashcards-hebreu-` (le filtre d'`activate`) — seul geste manuel.
  */
 /* ligne estampillée par le build — ne pas éditer la valeur (cf. en-tête) */
-const VERSION = 'v-433d064e';
+const VERSION = 'v-9ea96c68';
 const CACHE = 'flashcards-hebreu-' + VERSION;
 
 const ASSETS = [
