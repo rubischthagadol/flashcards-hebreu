@@ -31,7 +31,7 @@
  *    qui commence encore par `flashcards-hebreu-` (le filtre d'`activate`) — seul geste manuel.
  */
 /* ligne estampillée par le build — ne pas éditer la valeur (cf. en-tête) */
-const VERSION = 'v-9ea96c68';
+const VERSION = 'v-a610e0af';
 const CACHE = 'flashcards-hebreu-' + VERSION;
 
 const ASSETS = [
@@ -50,8 +50,8 @@ const ASSETS = [
   'icons/favicon-48.png',
   'polices/telaviv-modernistregular.ttf',
   'polices/telaviv-modernistbold.ttf',
-  'polices/assistant.ttf',
-  'polices/playpensanshebrew.ttf',
+  'polices/assistant.woff2',
+  'polices/playpensanshebrew.woff2',
   // BUILD:ASSETS fin
 ];
 
